@@ -1,0 +1,36 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Jupyter / Colab
+.ipynb_checkpoints/
+
+# Experiment trackers
+wandb/
+mlruns/
+lightning_logs/
+
+# Model artifacts
+*.ckpt
+*.onnx
+*.pt
+*.pth
+*.safetensors
+
+# Local datasets and generated outputs. Keep directory documentation only.
+data/**
+!data/**/
+!data/**/README.md
+outputs/**
+!outputs/**/
+!outputs/**/README.md
