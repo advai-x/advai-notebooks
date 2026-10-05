@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "advai-notebooks"
+version = "0.1.0"
+description = "Configurable model fine-tuning and evaluation for local and Colab runs"
+requires-python = ">=3.10"
+dependencies = ["PyYAML>=6,<7"]
+
+[project.optional-dependencies]
+decision = ["transformers==5.18.0", "torch>=2.4,<3", "safetensors>=0.4,<1", "numpy>=1.26,<3"]
+embedding = ["sentence-transformers==5.7.0", "torch>=2.4,<3"]
+ranker = ["sentence-transformers==5.7.0", "torch>=2.4,<3"]
+notebooks = ["nbformat>=5.10,<6", "nbclient>=0.10,<1", "ipykernel>=6,<8", "ipywidgets>=8,<9", "matplotlib>=3.9,<4"]
+dev = ["pytest>=8,<10", "ruff>=0.9,<1"]
+
+[project.scripts]
+advai-decision = "advai_notebooks.decision.cli:main"
+advai-embedding = "advai_notebooks.embedding.cli:main"
+advai-ranker = "advai_notebooks.ranker.cli:main"
+advai-data = "advai_notebooks.data_preparation.cli:main"
+advai-retrieval = "advai_notebooks.workflows.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

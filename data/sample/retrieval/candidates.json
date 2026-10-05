@@ -1,0 +1,318 @@
+{
+  "schema_version": 1,
+  "data_fingerprint": "f96589e88e79ce684f3c8733ae1a3c98a8f028459f6e82e3477efeb2867b2a19",
+  "source": {
+    "mining": {
+      "strategy": "judged",
+      "negatives_per_query": 2,
+      "candidate_strategy": "all_corpus"
+    },
+    "encoder": null
+  },
+  "splits": {
+    "validation": {
+      "cancel-0": [
+        {
+          "doc_id": "cancel-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "cancel-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "crash-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "crash-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "invoice-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "invoice-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "password-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "password-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "payment-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "payment-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "profile-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "profile-help",
+          "score": 0.0
+        }
+      ],
+      "cancel-1": [
+        {
+          "doc_id": "cancel-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "cancel-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "crash-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "crash-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "invoice-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "invoice-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "password-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "password-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "payment-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "payment-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "profile-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "profile-help",
+          "score": 0.0
+        }
+      ],
+      "cancel-2": [
+        {
+          "doc_id": "cancel-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "cancel-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "crash-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "crash-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "invoice-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "invoice-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "password-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "password-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "payment-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "payment-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "profile-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "profile-help",
+          "score": 0.0
+        }
+      ]
+    },
+    "test": {
+      "profile-0": [
+        {
+          "doc_id": "cancel-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "cancel-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "crash-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "crash-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "invoice-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "invoice-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "password-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "password-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "payment-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "payment-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "profile-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "profile-help",
+          "score": 0.0
+        }
+      ],
+      "profile-1": [
+        {
+          "doc_id": "cancel-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "cancel-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "crash-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "crash-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "invoice-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "invoice-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "password-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "password-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "payment-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "payment-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "profile-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "profile-help",
+          "score": 0.0
+        }
+      ],
+      "profile-2": [
+        {
+          "doc_id": "cancel-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "cancel-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "crash-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "crash-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "invoice-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "invoice-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "password-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "password-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "payment-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "payment-help",
+          "score": 0.0
+        },
+        {
+          "doc_id": "profile-guide",
+          "score": 0.0
+        },
+        {
+          "doc_id": "profile-help",
+          "score": 0.0
+        }
+      ]
+    }
+  }
+}

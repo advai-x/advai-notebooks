@@ -1,7 +1,9 @@
 .DS_Store
+Thumbs.db
 .env
 .env.*
 !.env.example
+.secrets/
 
 # Python
 __pycache__/
@@ -11,6 +13,26 @@ __pycache__/
 .ruff_cache/
 .venv/
 venv/
+env/
+*.egg-info/
+build/
+dist/
+.tox/
+.nox/
+.hypothesis/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Local caches, logs and machine-specific configuration
+/.cache/
+/hf_cache/
+/.hf_cache/
+*.log
+configs/local/
+*.local.yaml
+*.local.yml
 
 # Jupyter / Colab
 .ipynb_checkpoints/
@@ -26,11 +48,31 @@ lightning_logs/
 *.pt
 *.pth
 *.safetensors
+*.bin
+*.h5
+*.hdf5
+*.tflite
+*.gguf
+*.ggml
+*.npy
+*.npz
+/models/
+/checkpoints/
+/exports/
+/artifacts/
 
 # Local datasets and generated outputs. Keep directory documentation only.
 data/**
 !data/**/
 !data/**/README.md
+# Deliberately small synthetic fixtures only.
+!data/sample/decision/triage.jsonl
+!data/sample/retrieval/corpus.jsonl
+!data/sample/retrieval/queries.jsonl
+!data/sample/retrieval/qrels.jsonl
+!data/sample/retrieval/embedding_samples.json
+!data/sample/retrieval/ranker_samples.json
+!data/sample/retrieval/candidates.json
 outputs/**
 !outputs/**/
 !outputs/**/README.md

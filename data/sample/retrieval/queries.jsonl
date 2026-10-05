@@ -1,0 +1,18 @@
+{"query_id": "payment-0", "text": "how payment card charged twice duplicate refund", "group_id": "payment-queries", "split": "train"}
+{"query_id": "payment-1", "text": "please payment card charged twice duplicate refund", "group_id": "payment-queries", "split": "train"}
+{"query_id": "payment-2", "text": "explain payment card charged twice duplicate refund", "group_id": "payment-queries", "split": "train"}
+{"query_id": "password-0", "text": "how reset login password account", "group_id": "password-queries", "split": "train"}
+{"query_id": "password-1", "text": "please reset login password account", "group_id": "password-queries", "split": "train"}
+{"query_id": "password-2", "text": "explain reset login password account", "group_id": "password-queries", "split": "train"}
+{"query_id": "invoice-0", "text": "how subscription billing invoice payment", "group_id": "invoice-queries", "split": "train"}
+{"query_id": "invoice-1", "text": "please subscription billing invoice payment", "group_id": "invoice-queries", "split": "train"}
+{"query_id": "invoice-2", "text": "explain subscription billing invoice payment", "group_id": "invoice-queries", "split": "train"}
+{"query_id": "crash-0", "text": "how app crash technical bug fix", "group_id": "crash-queries", "split": "train"}
+{"query_id": "crash-1", "text": "please app crash technical bug fix", "group_id": "crash-queries", "split": "train"}
+{"query_id": "crash-2", "text": "explain app crash technical bug fix", "group_id": "crash-queries", "split": "train"}
+{"query_id": "cancel-0", "text": "how cancel subscription plan cancellation", "group_id": "cancel-queries", "split": "validation"}
+{"query_id": "cancel-1", "text": "please cancel subscription plan cancellation", "group_id": "cancel-queries", "split": "validation"}
+{"query_id": "cancel-2", "text": "explain cancel subscription plan cancellation", "group_id": "cancel-queries", "split": "validation"}
+{"query_id": "profile-0", "text": "how update account email profile settings", "group_id": "profile-queries", "split": "test"}
+{"query_id": "profile-1", "text": "please update account email profile settings", "group_id": "profile-queries", "split": "test"}
+{"query_id": "profile-2", "text": "explain update account email profile settings", "group_id": "profile-queries", "split": "test"}

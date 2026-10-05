@@ -1,0 +1,34 @@
+data:
+  corpus: data/local/retrieval/corpus.jsonl
+  queries: data/local/retrieval/queries.jsonl
+  qrels: data/local/retrieval/qrels.jsonl
+  enforce_document_groups: false
+  allow_unjudged_negatives: false
+evaluation:
+  cutoffs:
+  - 1
+  - 5
+  - 10
+  - 50
+  - 100
+  selection_metric: ndcg@10
+mining:
+  strategy: embedding
+  negatives_per_query: 4
+  candidate_strategy: embedding
+model:
+  id: BAAI/bge-small-zh-v1.5
+  max_len: 256
+  pooling: model
+  query_prefix: 为这个句子生成表示以用于检索相关文章：
+  revision: null
+output_dir: data/local/retrieval/prepared
+retrieval:
+  top_k: 100
+  corpus_chunk_size: 1024
+  query_chunk_size: 64
+runtime:
+  device: auto
+training:
+  batch_size: 4
+  seed: 42

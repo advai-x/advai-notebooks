@@ -1,0 +1,2 @@
+# Native decision encoder, option scorer and calibration.
+-e .[decision]

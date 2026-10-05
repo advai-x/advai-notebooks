@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "kind": "ranker",
+  "data_fingerprint": "f96589e88e79ce684f3c8733ae1a3c98a8f028459f6e82e3477efeb2867b2a19",
+  "source": {
+    "mining": {
+      "strategy": "judged",
+      "negatives_per_query": 2,
+      "candidate_strategy": "all_corpus"
+    },
+    "encoder": null
+  },
+  "rows": [
+    {
+      "query_id": "crash-0",
+      "doc_id": "crash-guide",
+      "label": 1.0
+    },
+    {
+      "query_id": "crash-0",
+      "doc_id": "crash-help",
+      "label": 1.0
+    },
+    {
+      "query_id": "crash-0",
+      "doc_id": "invoice-guide",
+      "label": 0.0
+    },
+    {
+      "query_id": "crash-0",
+      "doc_id": "invoice-help",
+      "label": 0.0
+    },
+    {
+      "query_id": "crash-1",
+      "doc_id": "crash-guide",
+      "label": 1.0
+    },
+    {
+      "query_id": "crash-1",
+      "doc_id": "crash-help",
+      "label": 1.0
+    },
+    {
+      "query_id": "crash-1",
+      "doc_id": "invoice-guide",
+      "label": 0.0
+    },
+    {
+      "query_id": "crash-1",
+      "doc_id": "invoice-help",
+      "label": 0.0
+    },
+    {
+      "query_id": "crash-2",
+      "doc_id": "crash-guide",
+      "label": 1.0
+    },
+    {
+      "query_id": "crash-2",
+      "doc_id": "crash-help",
+      "label": 1.0
+    },
+    {
+      "query_id": "crash-2",
+      "doc_id": "invoice-guide",
+      "label": 0.0
+    },
+    {
+      "query_id": "crash-2",
+      "doc_id": "invoice-help",
+      "label": 0.0
+    },
+    {
+      "query_id": "invoice-0",
+      "doc_id": "crash-guide",
+      "label": 0.0
+    },
+    {
+      "query_id": "invoice-0",
+      "doc_id": "crash-help",
+      "label": 0.0
+    },
+    {
+      "query_id": "invoice-0",
+      "doc_id": "invoice-guide",
+      "label": 1.0
+    },
+    {
+      "query_id": "invoice-0",
+      "doc_id": "invoice-help",
+      "label": 1.0
+    },
+    {
+      "query_id": "invoice-1",
+      "doc_id": "crash-guide",
+      "label": 0.0
+    },
+    {
+      "query_id": "invoice-1",
+      "doc_id": "crash-help",
+      "label": 0.0
+    },
+    {
+      "query_id": "invoice-1",
+      "doc_id": "invoice-guide",
+      "label": 1.0
+    },
+    {
+      "query_id": "invoice-1",
+      "doc_id": "invoice-help",
+      "label": 1.0
+    },
+    {
+      "query_id": "invoice-2",
+      "doc_id": "crash-guide",
+      "label": 0.0
+    },
+    {
+      "query_id": "invoice-2",
+      "doc_id": "crash-help",
+      "label": 0.0
+    },
+    {
+      "query_id": "invoice-2",
+      "doc_id": "invoice-guide",
+      "label": 1.0
+    },
+    {
+      "query_id": "invoice-2",
+      "doc_id": "invoice-help",
+      "label": 1.0
+    },
+    {
+      "query_id": "password-0",
+      "doc_id": "crash-guide",
+      "label": 0.0
+    },
+    {
+      "query_id": "password-0",
+      "doc_id": "crash-help",
+      "label": 0.0
+    },
+    {
+      "query_id": "password-0",
+      "doc_id": "password-guide",
+      "label": 1.0
+    },
+    {
+      "query_id": "password-0",
+      "doc_id": "password-help",
+      "label": 1.0
+    },
+    {
+      "query_id": "password-1",
+      "doc_id": "crash-guide",
+      "label": 0.0
+    },
+    {
+      "query_id": "password-1",
+      "doc_id": "crash-help",
+      "label": 0.0
+    },
+    {
+      "query_id": "password-1",
+      "doc_id": "password-guide",
+      "label": 1.0
+    },
+    {
+      "query_id": "password-1",
+      "doc_id": "password-help",
+      "label": 1.0
+    },
+    {
+      "query_id": "password-2",
+      "doc_id": "crash-guide",
+      "label": 0.0
+    },
+    {
+      "query_id": "password-2",
+      "doc_id": "crash-help",
+      "label": 0.0
+    },
+    {
+      "query_id": "password-2",
+      "doc_id": "password-guide",
+      "label": 1.0
+    },
+    {
+      "query_id": "password-2",
+      "doc_id": "password-help",
+      "label": 1.0
+    },
+    {
+      "query_id": "payment-0",
+      "doc_id": "crash-guide",
+      "label": 0.0
+    },
+    {
+      "query_id": "payment-0",
+      "doc_id": "crash-help",
+      "label": 0.0
+    },
+    {
+      "query_id": "payment-0",
+      "doc_id": "payment-guide",
+      "label": 1.0
+    },
+    {
+      "query_id": "payment-0",
+      "doc_id": "payment-help",
+      "label": 1.0
+    },
+    {
+      "query_id": "payment-1",
+      "doc_id": "crash-guide",
+      "label": 0.0
+    },
+    {
+      "query_id": "payment-1",
+      "doc_id": "crash-help",
+      "label": 0.0
+    },
+    {
+      "query_id": "payment-1",
+      "doc_id": "payment-guide",
+      "label": 1.0
+    },
+    {
+      "query_id": "payment-1",
+      "doc_id": "payment-help",
+      "label": 1.0
+    },
+    {
+      "query_id": "payment-2",
+      "doc_id": "crash-guide",
+      "label": 0.0
+    },
+    {
+      "query_id": "payment-2",
+      "doc_id": "crash-help",
+      "label": 0.0
+    },
+    {
+      "query_id": "payment-2",
+      "doc_id": "payment-guide",
+      "label": 1.0
+    },
+    {
+      "query_id": "payment-2",
+      "doc_id": "payment-help",
+      "label": 1.0
+    }
+  ]
+}

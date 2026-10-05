@@ -1,0 +1,12 @@
+{"doc_id": "payment-guide", "text": "payment card charged twice duplicate refund", "group_id": "payment"}
+{"doc_id": "payment-help", "text": "help payment card charged twice duplicate refund contact service", "group_id": "payment"}
+{"doc_id": "password-guide", "text": "reset login password account", "group_id": "password"}
+{"doc_id": "password-help", "text": "help reset login password account contact service", "group_id": "password"}
+{"doc_id": "invoice-guide", "text": "subscription billing invoice payment", "group_id": "invoice"}
+{"doc_id": "invoice-help", "text": "help subscription billing invoice payment contact service", "group_id": "invoice"}
+{"doc_id": "crash-guide", "text": "app crash technical bug fix", "group_id": "crash"}
+{"doc_id": "crash-help", "text": "help app crash technical bug fix contact service", "group_id": "crash"}
+{"doc_id": "cancel-guide", "text": "cancel subscription plan cancellation", "group_id": "cancel"}
+{"doc_id": "cancel-help", "text": "help cancel subscription plan cancellation contact service", "group_id": "cancel"}
+{"doc_id": "profile-guide", "text": "update account email profile settings", "group_id": "profile"}
+{"doc_id": "profile-help", "text": "help update account email profile settings contact service", "group_id": "profile"}

@@ -1,0 +1,36 @@
+# Random tiny model and synthetic examples: pipeline correctness only.
+model:
+  provider: hf
+  id: tiny
+  max_len: 128
+  head_max_len: 96
+  encoding: pair
+  head: independent
+  decoder: typed
+  pooling: mean
+  dropout: 0.1
+data:
+  path: data/sample/decision/triage.jsonl
+  tasks: configs/decision/tasks/triage.json
+  reject_truncation: true
+training:
+  optimizer: adamw
+  epochs: 2
+  batch_size: 3
+  gradient_accumulation: 4
+  encoder_lr: 0.0001
+  head_lr: 0.0003
+  loss: ce
+  ordinal_weight: 1.0
+  gradient_checkpointing: false
+  seed: 42
+runtime:
+  device: cpu
+  precision: fp32
+  num_threads: 2
+evaluation:
+  selection_metric: nll
+  include_baseline: true
+calibration:
+  enabled: true
+output_dir: outputs/decision/ce_smoke

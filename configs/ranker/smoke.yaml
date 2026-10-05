@@ -1,0 +1,24 @@
+model:
+  id: tiny
+  max_len: 64
+data:
+  enforce_document_groups: true
+  training_samples: data/sample/retrieval/ranker_samples.json
+  candidates: data/sample/retrieval/candidates.json
+training:
+  optimizer: adamw
+  epochs: 2
+  batch_size: 4
+  gradient_accumulation: 2
+  learning_rate: 0.001
+  loss: bce
+runtime:
+  device: cpu
+evaluation:
+  cutoffs:
+  - 1
+  - 3
+  - 5
+  - 10
+  selection_metric: mrr@3
+output_dir: outputs/ranker/smoke

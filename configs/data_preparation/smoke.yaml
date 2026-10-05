@@ -1,0 +1,27 @@
+model:
+  id: tiny
+  max_len: 64
+  pooling: mean
+data:
+  enforce_document_groups: true
+training:
+  batch_size: 4
+  seed: 42
+runtime:
+  device: cpu
+mining:
+  strategy: judged
+  negatives_per_query: 2
+  candidate_strategy: all_corpus
+retrieval:
+  top_k: 12
+  corpus_chunk_size: 4
+  query_chunk_size: 2
+evaluation:
+  cutoffs:
+  - 1
+  - 3
+  - 5
+  - 10
+  selection_metric: mrr@3
+output_dir: outputs/data_preparation/smoke

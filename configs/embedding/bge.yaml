@@ -1,0 +1,37 @@
+model:
+  id: BAAI/bge-small-zh-v1.5
+  revision: null
+  max_len: 256
+  pooling: model
+  query_prefix: 为这个句子生成表示以用于检索相关文章：
+data:
+  corpus: data/local/retrieval/corpus.jsonl
+  queries: data/local/retrieval/queries.jsonl
+  qrels: data/local/retrieval/qrels.jsonl
+  allow_unjudged_negatives: false
+  enforce_document_groups: false
+  reject_truncation: true
+  training_samples: data/local/retrieval/prepared/embedding_samples.json
+training:
+  optimizer: adamw
+  epochs: 3
+  batch_size: 16
+  gradient_accumulation: 2
+  learning_rate: 2.0e-05
+  loss: cached_mnrl
+  cached_mini_batch_size: 4
+  gradient_checkpointing: true
+runtime:
+  device: auto
+  precision: fp32
+retrieval:
+  top_k: 100
+evaluation:
+  cutoffs:
+  - 1
+  - 5
+  - 10
+  - 50
+  - 100
+  selection_metric: ndcg@10
+output_dir: outputs/embedding/bge

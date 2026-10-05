@@ -1,0 +1,21 @@
+data:
+  corpus: data/local/retrieval/corpus.jsonl
+  queries: data/local/retrieval/queries.jsonl
+  qrels: data/local/retrieval/qrels.jsonl
+  enforce_document_groups: false
+  allow_unjudged_negatives: false
+evaluation:
+  cutoffs:
+  - 1
+  - 5
+  - 10
+  - 50
+  - 100
+  selection_metric: ndcg@10
+retrieval:
+  top_k: 100
+  corpus_chunk_size: 1024
+  query_chunk_size: 64
+runtime:
+  device: auto
+batch_size: 16
