@@ -1,8 +1,11 @@
 from advai_notebooks.common.artifacts import write_json
 from advai_notebooks.common.cli import (
     experiment_parser,
+    hub_options,
     inference_arguments,
     print_result,
+    publish_parser,
+    publish_result,
     read_inputs,
 )
 from advai_notebooks.common.prepared_data import load_candidates
@@ -15,12 +18,18 @@ from .data import load_evaluation_candidates, load_training_samples
 
 def main(argv=None):
     parser, sub = experiment_parser("advai-ranker")
+    publish_parser(sub)
     sub.choices["evaluate"].add_argument(
         "--candidates", help="Override the configured candidate artifact"
     )
     inference = sub.add_parser("rerank")
     inference_arguments(inference)
     args = parser.parse_args(argv)
+    if args.command == "publish":
+        from .publish import publish
+
+        publish_result(args, publish)
+        return
     if args.command == "rerank":
         from .model import RankerModel
 
@@ -32,7 +41,7 @@ def main(argv=None):
             for pair in inputs
         ):
             raise ValueError("rerank expects [query, document] pairs")
-        model = RankerModel.load(args.checkpoint, resolve_device(args.device))
+        model = RankerModel.load(args.checkpoint, resolve_device(args.device), **hub_options(args))
         model.check_lengths(inputs)
         write_json(
             args.output, {"pairs": inputs, "scores": model.score(inputs), "score_type": "raw_logit"}
@@ -64,7 +73,11 @@ def main(argv=None):
                 cfg.path(args.candidates or cfg.data.candidates), data, (args.split,)
             )[args.split]
             report, rankings = evaluate(
-                RankerModel.load(args.checkpoint, setup(cfg)), data, cfg, args.split, candidates
+                RankerModel.load(args.checkpoint, setup(cfg), **hub_options(args)),
+                data,
+                cfg,
+                args.split,
+                candidates,
             )
             result = {"report": report, "rankings": rankings}
             write_json(args.output, result)

@@ -16,6 +16,7 @@ def experiment_parser(prog):
             item.add_argument("--resume", help="This experiment's output_dir/latest")
         if name == "evaluate":
             item.add_argument("--checkpoint", required=True)
+            hub_arguments(item)
             item.add_argument("--split", choices=("validation", "test"), default="test")
             item.add_argument("--output", required=True)
     return parser, sub
@@ -26,6 +27,52 @@ def inference_arguments(parser):
     parser.add_argument("--input", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--device", choices=("cpu", "cuda", "mps", "auto"), default="cpu")
+    hub_arguments(parser)
+
+
+def hub_arguments(parser):
+    parser.add_argument("--revision", help="Hub branch, tag or commit SHA for model loading")
+    parser.add_argument("--cache-dir", help="Hub snapshot cache directory")
+    parser.add_argument("--local-files-only", action="store_true", help="Use cached Hub files only")
+
+
+def hub_options(args):
+    return {
+        "revision": args.revision,
+        "cache_dir": args.cache_dir,
+        "local_files_only": args.local_files_only,
+    }
+
+
+def publish_parser(subparsers):
+    parser = subparsers.add_parser("publish", help="Publish an inference export to Hugging Face")
+    parser.add_argument("--export-dir", required=True)
+    parser.add_argument("--repo-id", required=True, help="namespace/model-name")
+    parser.add_argument("--public", action="store_true", help="Use a public repository")
+    parser.add_argument("--revision", default="main", help="Existing Hub branch")
+    parser.add_argument("--license", help="Model-card license identifier; omitted by default")
+    parser.add_argument("--model-card", help="Use a custom Markdown model card")
+    parser.add_argument("--commit-message")
+    parser.add_argument("--dry-run", action="store_true", help="Offline package validation only")
+    parser.add_argument("--output", help="Save the publication result or offline upload plan")
+
+
+def publish_result(args, publish):
+    result = publish(
+        args.export_dir,
+        args.repo_id,
+        private=not args.public,
+        revision=args.revision,
+        license=args.license,
+        model_card=args.model_card,
+        commit_message=args.commit_message,
+        dry_run=args.dry_run,
+    )
+    if args.output:
+        from .artifacts import write_json
+
+        write_json(args.output, result)
+    print_result(result)
 
 
 def read_inputs(path):

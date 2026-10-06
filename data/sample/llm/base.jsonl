@@ -1,0 +1,12 @@
+{"id": "train-0", "document_id": "train-0", "text": "the sky is blue . the grass is green .", "split": "train"}
+{"id": "train-1", "document_id": "train-1", "text": "reset your password in account settings .", "split": "train"}
+{"id": "train-2", "document_id": "train-2", "text": "a cat is an animal . a dog is an animal .", "split": "train"}
+{"id": "train-3", "document_id": "train-3", "text": "water is cold . the sun is hot .", "split": "train"}
+{"id": "train-4", "document_id": "train-4", "text": "change your email in profile settings .", "split": "train"}
+{"id": "train-5", "document_id": "train-5", "text": "cancel your subscription in billing settings .", "split": "train"}
+{"id": "train-6", "document_id": "train-6", "text": "France capital is Paris . Italy capital is Rome .", "split": "train"}
+{"id": "train-7", "document_id": "train-7", "text": "one and one are two . two and two are four .", "split": "train"}
+{"id": "validation-0", "document_id": "validation-0", "text": "the sky is blue and the grass is green .", "split": "validation"}
+{"id": "validation-1", "document_id": "validation-1", "text": "you can reset your password with email .", "split": "validation"}
+{"id": "test-0", "document_id": "test-0", "text": "a bird flies and a fish swims .", "split": "test"}
+{"id": "test-1", "document_id": "test-1", "text": "update your payment card in billing settings .", "split": "test"}

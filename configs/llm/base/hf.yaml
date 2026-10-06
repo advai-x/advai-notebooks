@@ -1,0 +1,25 @@
+# Replace the model/revision and data path for your own experiment.
+# Instruct requires a model-provided chat template or explicit Jinja text.
+model:
+  id: Qwen/Qwen3-0.6B-Base
+  revision: main
+  max_len: 1024
+data:
+  samples: data/sample/llm/base.jsonl
+  reject_truncation: false
+training:
+  method: lora
+  epochs: 2
+  batch_size: 1
+  gradient_accumulation: 8
+  learning_rate: 0.0002
+  lora_rank: 16
+  lora_alpha: 32
+  lora_target_modules: [q_proj, v_proj]
+  gradient_checkpointing: true
+runtime:
+  device: auto
+  precision: fp32
+generation:
+  max_new_tokens: 64
+output_dir: outputs/llm/base/hf-run

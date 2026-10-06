@@ -1,8 +1,8 @@
-# 项目架构：独立微调模块与自研 Decision Model
+# 项目架构：独立微调任务与自研 Decision Model
 
-本项目提供三条独立的模型训练与推理路径：Embedding、Ranker 和 Decision。
+本项目提供五条独立的模型训练与推理路径：Embedding、Ranker、Decision、LLM Base 和 LLM Instruct。
 每条路径拥有自己的配置、数据校验、采样、损失、优化器、评估、训练组装、导出和 CLI。
-三类模型可以分别训练、部署和调整，应用层按需要组合它们。
+五类任务可以分别训练、部署和调整，应用层按需要组合它们。
 
 Decision 的定位是本项目自行实现的决策模型。Laya 仅作为思想参考：将问题与候选选项显式建模，
 输出可解释的类型化概率，并关注概率校准。输入编码、模型组合、决策 head、损失、奖励、
@@ -10,14 +10,14 @@ Decision 的定位是本项目自行实现的决策模型。Laya 仅作为思想
 基础文本表示复用可配置的 Hugging Face 预训练 encoder，决策 head 从随机参数开始训练。
 这是在预训练语言表示上训练自己的决策模型，业务决策能力需要通过领域数据验证。
 
-## 1. 三类模型并行，应用组合单独表达
+## 1. 模型任务并行，应用组合单独表达
 
-Embedding、Ranker、Decision 是同一级的任务模块，各自从数据到训练、评估、导出、推理形成闭环。
+Embedding、Ranker、Decision、LLM Base、LLM Instruct 是同一级的任务模块，各自从数据到训练、评估、导出、推理形成闭环。
 图中的并行表示独立且同级，不表示必须同时训练。它们可以分别选择基座、参数、设备和部署方式。
 
 ```mermaid
 flowchart TB
-    subgraph TASKS[三条并行的模型路径]
+    subgraph TASKS[五条独立模型路径]
         direction LR
         subgraph EMB[Embedding]
             direction TB
@@ -25,6 +25,8 @@ flowchart TB
             ET --> EV[检索评估与选模]
             EV --> EX[模型导出]
             EX --> EI[推理：文本 → 向量]
+            EX --> EH[可选 Hub 发布]
+            EH --> EI
         end
         subgraph RNK[Ranker]
             direction TB
@@ -32,6 +34,8 @@ flowchart TB
             RT --> RV[排序评估与选模]
             RV --> RX[模型导出]
             RX --> RI[推理：文本对 → 分数]
+            RX --> RH[可选 Hub 发布]
+            RH --> RI
         end
         subgraph DEC[Decision]
             direction TB
@@ -39,14 +43,36 @@ flowchart TB
             DT --> DV[决策评估、选模与可选校准]
             DV --> DX[模型导出]
             DX --> DI[推理：决策请求 → 概率与答案]
+            DX --> DH[可选 Hub 发布]
+            DH --> DI
+        end
+        subgraph BASE[LLM Base]
+            direction TB
+            BD[文档文本] --> BT[继续预训练]
+            BT --> BV[validation NLL 选模]
+            BV --> BX[full / adapter 导出]
+            BX --> BI[推理：generate]
+            BX --> BH[可选 Hub 发布]
+            BH --> BI
+        end
+        subgraph INST[LLM Instruct]
+            direction TB
+            ID[指令与对话] --> IT[助手回复 SFT]
+            IT --> IV[validation NLL 选模]
+            IV --> IX[full / adapter 导出]
+            IX --> II[推理：chat]
+            IX --> IH[可选 Hub 发布]
+            IH --> II
         end
     end
 ```
 
-三条路径各自使用中立的配置/运行/checkpoint/产物/来源追踪工具。
-依赖方向为任务模块 → `common`；Embedding、Ranker、Decision 不互相导入。
+五条路径各自使用中立的配置/运行/checkpoint/产物/来源追踪工具。
+依赖方向为任务模块 → `common`；五个任务不互相导入。
+Base/Instruct 另复用 `llm/` 下的 SDK、运行参数、配置校验与文件读取工具，损失、指标、选模和训练组装归各任务。
 当前 Decision 使用自己的训练循环，Embedding/Ranker 使用共享检索训练循环；
-这是现有实现差异，不意味着三类模型存在上下游关系。
+Base/Instruct 各自组装 Transformers Trainer。训练器差异不意味着模型任务存在上下游关系。
+Base full/merged 导出可作为 Instruct 的初始模型，这是可选的产物衔接，不是模块依赖。
 
 离线准备及应用组合属于另一个层次，因此不放进主模型图：
 
@@ -58,7 +84,7 @@ flowchart TB
 
 ### 1.1 统一职责、契约与生命周期
 
-统一目标是：三类任务提供相同的工程入口、职责划分与实验阶段，每类任务保留自己的请求、
+统一目标是：五条任务提供相同的工程入口、职责划分与实验阶段，每类任务保留自己的请求、
 batch、loss、指标和输出语义。现有代码尚未全部达到这个目标。
 
 ```text
@@ -69,10 +95,12 @@ batch、loss、指标和输出语义。现有代码尚未全部达到这个目�
 可选 postprocess 拟合 → test 评估 → export
         ↓
 Model.load → predict(任务请求) → 任务结果
+或：export → 显式 publish → Hub snapshot → Model.load → 任务结果
 ```
 
 Postprocess 是可选阶段：Decision 可以拟合温度；当前 Embedding/Ranker 没有拟合步骤。
-实际指标和 batch 形状由任务实现，不能仅为接口一致将三者改成相同张量或同一个损失。
+实际指标和 batch 形状由任务实现，不要求不同任务采用相同张量或同一个损失。
+下表对比 Embedding/Ranker/Decision 的现有入口；LLM Base/Instruct 的对应实现见第 8 节。
 
 | 统一维度 | 当前代码差异 | 统一目标 | 保留的任务语义 |
 |---|---|---|---|
@@ -112,18 +140,21 @@ configs/
   data_preparation/ workflows/     # 可选准备与组合评估配置
 src/advai_notebooks/
   common/                         # 运行设备、原子产物、checkpoint、来源指纹、训练执行等
+    hub.py                        # 中立发布打包/Hub 上传/snapshot 下载
   embedding/
     backbones.py                  # 文本编码组件，引用原生 Transformer
     heads.py                      # Pooling、可学习输出层、Normalize，保留原模块顺序
     model.py                      # 网络组合、加载/保存、输入处理、encode
     config.py data.py sampling.py losses.py optimizer.py train.py
     metrics.py evaluate.py pipeline.py cli.py
+    publish.py                    # Embedding 文件契约、模型卡与发布入口
   ranker/
     backbones.py                  # 文本对 encoder 视图、原生分类前向路径
     heads.py                      # 分类侧模块视图、单个原始相关性 logit
     model.py                      # 网络组合、加载/保存、输入处理、score
     config.py data.py sampling.py losses.py optimizer.py train.py
     metrics.py evaluate.py pipeline.py cli.py
+    publish.py                    # Ranker 文件契约、模型卡与发布入口
   decision/
     contracts.py                  # 请求、编码结果和组件接口
     schema.py                     # 任务定义、硬/软标签校验
@@ -141,6 +172,17 @@ src/advai_notebooks/
     calibrate.py                  # 独立温度校准
     inference.py                  # 原有推理函数的兼容转发入口
     config.py pipeline.py cli.py  # 配置、完整生命周期、命令行
+    publish.py                    # 原生 Decision 文件契约、模型卡与发布入口
+  llm/
+    configuration.py native.py runtime.py records.py  # 中立 SDK / 运行 / 文件工具
+    base/
+      config.py backbones.py heads.py model.py         # 模型门面：generate
+      data.py sampling.py losses.py optimizer.py       # 文档 CLM
+      train.py evaluate.py metrics.py pipeline.py cli.py publish.py
+    instruct/
+      config.py backbones.py heads.py model.py         # 模型门面：chat
+      data.py sampling.py losses.py optimizer.py       # 助手回复 SFT
+      train.py evaluate.py metrics.py pipeline.py cli.py publish.py
   data_preparation/ workflows/     # 可选组合层
 notebooks/                        # 调用同一套 Python 实现的可运行示例
 tests/                           # 组件、生命周期及任务独立性验证
@@ -151,24 +193,34 @@ tests/                           # 组件、生命周期及任务独立性验证
 同一职责可能已被拆成多个内部文件，因此不以文件数量衡量架构是否统一。
 模型配置、模型定义、加载/保存、评估、指标、推理应分别列出：
 
-| 职责 | Embedding 当前入口 | Ranker 当前入口 | Decision 当前入口 |
-|---|---|---|---|
-| 配置 | `config.py` | `config.py` | `config.py` |
-| 模型门面/组合 | `model.py` | `model.py` | `model.py` |
-| 网络组件 | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` |
-| 加载与原生导出入口 | `model.py` | `model.py` | `model.py` |
-| 数据与输入入口 | `data.py`，`model.py` 的 prefix/features | `data.py`，`model.py` 的 pair/features | `data.py`，`model.py` 的 prepare/features |
-| 采样 | `sampling.py` | `sampling.py` | `sampling.py` |
-| 损失 | `losses.py` | `losses.py` | `losses.py` |
-| 优化器 | `optimizer.py` | `optimizer.py` | `optimizer.py` |
-| 训练组装 | `train.py` | `train.py` | `train.py` |
-| 评估编排 | `evaluate.py` | `evaluate.py` | `evaluate.py` |
-| 指标入口 | `metrics.py` | `metrics.py` | `metrics.py` |
-| 推理入口 | `model.py` 的 `encode` | `model.py` 的 `score` | `model.py` 的 `system_one` |
-| 可选后处理 | 当前无拟合步骤 | 当前无拟合步骤 | `calibrate.py` |
-| 生命周期与 CLI | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` |
+| 职责 | Embedding 当前入口 | Ranker 当前入口 | Decision 当前入口 | LLM Base 当前入口 | LLM Instruct 当前入口 |
+|---|---|---|---|---|---|
+| 配置 | `config.py` | `config.py` | `config.py` | `config.py` | `config.py` |
+| 模型门面/组合 | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` |
+| 网络组件 | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` |
+| 加载与原生导出入口 | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` |
+| 数据与输入入口 | `data.py`，`model.py` 的 prefix/features | `data.py`，`model.py` 的 pair/features | `data.py`，`model.py` 的 prepare/features | `data.py`，`model.py` 的 `prepare` | `data.py`，`model.py` 的 `prepare` |
+| 采样 | `sampling.py` | `sampling.py` | `sampling.py` | `sampling.py` | `sampling.py` |
+| 损失 | `losses.py` | `losses.py` | `losses.py` | `losses.py` | `losses.py` |
+| 优化器 | `optimizer.py` | `optimizer.py` | `optimizer.py` | `optimizer.py` | `optimizer.py` |
+| 训练组装 | `train.py` | `train.py` | `train.py` | `train.py` | `train.py` |
+| 评估编排 | `evaluate.py` | `evaluate.py` | `evaluate.py` | `evaluate.py` | `evaluate.py` |
+| 指标入口 | `metrics.py` | `metrics.py` | `metrics.py` | `metrics.py` | `metrics.py` |
+| 推理入口 | `model.py` 的 `encode` | `model.py` 的 `score` | `model.py` 的 `system_one` | `model.py` 的 `generate` | `model.py` 的 `chat` |
+| 可选后处理 | 当前无拟合步骤 | 当前无拟合步骤 | `calibrate.py` | 当前无拟合步骤 | 当前无拟合步骤 |
+| 生命周期与 CLI | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` |
+| 可选 Hub 发布 | `publish.py`, `cli.py` | `publish.py`, `cli.py` | `publish.py`, `cli.py` | `publish.py`, `cli.py` | `publish.py`, `cli.py` |
 
-除 `common/` 外，表中路径相对各自任务目录。这张表列职责入口，网络组件单列；内部实现细节在目录树和下文说明。
+表中路径相对各自任务目录；LLM 两列分别对应 `llm/base/`、`llm/instruct/`。
+这张表列职责入口，网络组件单列；内部实现细节在目录树和下文说明。
+五个任务各自维护 `metrics.py`，不共享指标实现。
+
+Base 的 `data.py` 负责文档分组、EOS 与保留边界目标的切片；Instruct 的 `data.py` 负责对话校验、
+chat template 与助手回复掩码。两者的 `train.py` 分别组装 Trainer、采样、loss、optimizer 和验证选模回调。
+`model.py` 提供公开加载/保存/推理入口，底层 SDK 操作复用 `llm/native.py`；中立配置、运行与文件工具
+分别位于 `llm/configuration.py`、`llm/runtime.py`、`llm/records.py`。两任务不互相导入。
+Full、adapter 和 merged 是导出方式；`model.save(..., merged=True)` 不属于校准或后处理拟合阶段。
+
 Decision 的红色差异已按当前 Embedding/Ranker 边界对齐：
 
 - `DecisionModel.load/save/from_config` 在 `model.py` 中完整实现初始化、加载和导出，无独立 provider 或 Bundle 包装层。
@@ -179,18 +231,18 @@ Decision 的红色差异已按当前 Embedding/Ranker 边界对齐：
 `DecisionModel` 同时是原生 PyTorch 模块，`.model` 暴露其训练模块，保持 SDK 适配器风格。
 直接构造 backbone/head 仍支持网络实验；完整输入/导出/推理需要通过 `from_config` 或 `load` 绑定 tokenizer 与元数据。
 旧 provider 模块及 Bundle 包装已移除，调用方直接使用 `DecisionModel`；`inference.py` 保留函数式推理兼容入口。原生权重命名/schema 和概率语义保持兼容。
-三类任务已有共同的指标记录规范；完整评估类型、实验报告/配置仍未完全统一，以下目标结构继续作为后续约定。
+五个任务已有共同的指标记录规范；完整评估类型、实验报告/配置仍未完全统一，以下目标结构继续作为后续约定。
 
 ### 2.1.1 网络组件的统一边界
 
-三个任务均通过各自 `backbones.py` 和 `heads.py` 提供组件与工厂，`model.py` 负责加载基础模型、
+五个任务均通过各自 `backbones.py` 和 `heads.py` 提供组件或原生组件视图，`model.py` 负责加载基础模型、
 组合组件、保存/重载以及公开推理。调用第三方库不会改变这个职责划分，组件不跨任务共享。
 
-| 组件 | Embedding | Ranker | Decision |
-| --- | --- | --- | --- |
-| Backbone | 原生 Transformer 组件及 HF encoder | 原生文本对 encoder 和 HF 分类模型的前向适配 | HF encoder 与选项级 pooling |
-| Head | 一个 Pooling、原有 Dense 等输出模块、末尾 Normalize | 分类侧模块视图及单个相关性 logit 的输出规则 | 类型 embedding 与独立选项评分 MLP |
-| 输出 | 单个归一化向量 | 单个原始相关性 logit | 选项 logits，供类型化概率解码 |
+| 组件 | Embedding | Ranker | Decision | LLM Base | LLM Instruct |
+| --- | --- | --- | --- | --- | --- |
+| Backbone | 原生 Transformer 组件及 HF encoder | 原生文本对 encoder 和 HF 分类模型的前向适配 | HF encoder 与选项级 pooling | 原生 causal decoder 视图 | 原生 causal decoder 视图 |
+| Head | 一个 Pooling、原有 Dense 等输出模块、末尾 Normalize | 分类侧模块视图及单个相关性 logit 的输出规则 | 类型 embedding 与独立选项评分 MLP | 原生 LM head 词表投影视图 | 原生 LM head 词表投影视图 |
+| 输出 | 单个归一化向量 | 单个原始相关性 logit | 选项 logits，供类型化概率解码 | token logits；推理返回续写列表 | token logits；推理返回助手回复字符串 |
 
 Embedding 的组件视图直接引用 SentenceTransformer 中的原有模块；推理按 backbone → head
 执行，head 保留完整输出模块顺序。MNRL/cached MNRL 仍使用同一个 SentenceTransformer 网络，
@@ -204,6 +256,10 @@ Ranker 的组件视图引用 CrossEncoder 的原有 HF 模型。`model.backbone`
 这两个任务的组件封装不重复注册参数；参数仍由原生库模型持有，保存沿用原模块名称与格式。
 Decision 的组件由自己的 PyTorch 网络持有。职责与文件布局统一，组件的继承类型、调用签名、
 张量形状和参数注册方式仍按任务保留。后续新增可学习组件需同时实现配置与导出重载支持。
+
+Base/Instruct 的组件视图直接引用各自原生 CausalLM 中的 decoder 和 LM head，forward 仍由原生模型执行，
+保留因果注意力、架构行为与权重绑定，不重复注册参数，也不另外构建分类 head。
+两者的训练差异由数据与损失实现表达：Base 监督有效文本的下一 token，Instruct 仅监督助手回复区域。
 
 ### 2.2 目标目录：三类任务采用相同骨架
 
@@ -453,6 +509,13 @@ expected-level MAE。后续真实评估需补充领域子群、类不平衡、�
 Embedding 使用 `EmbeddingModel.load/encode`，Ranker 使用 `RankerModel.load/score`，
 API 与 SDK 原生导出结构保持不变。旧 Ranker 导出中的无关 pooling 字段仍可读取。
 
+三个 `Model.load` 也支持 Hugging Face 仓库 ID、`revision`、`token`、`cache_dir` 和
+`local_files_only`。远程 snapshot 下载后仍使用各任务自己的加载器。
+发布使用三个相同的 `publish --export-dir ... --repo-id ...` CLI 入口，并保留原生权重结构。
+`--dry-run` 离线验证筛选后的推理包；真实上传返回 commit SHA。
+任务自己的 `publish.py` 管文件契约和模型卡，`common/hub.py` 管传输，不承担网络组件或指标职责。
+训练不自动上传，发布不上传训练数据或优化器状态。详细流程见 [发布指南](publishing.md)。
+
 Decision 原生导出为：
 
 ```text
@@ -536,3 +599,35 @@ Embedding/Ranker 使用稳定 baseline 元信息重建模型；Decision 使用�
 独立进程在训练/推理时阻止其他任务及 Laya/Sentence Transformers 导入，验证 Decision 独立性。
 Embedding/Ranker 同样测试阻止另一任务导入，并验证 MNRL/Cached MNRL/BCE、准备数据泄漏、
 候选身份及组合评估。当前验证为 CPU/fp32；CUDA/MPS 恢复与混合精度需要目标硬件验证。
+
+
+## 8. LLM Base 与 Instruct
+
+两任务遵循同样的职责结构，`model.py` 提供加载、保存、组合与推理门面。
+`backbones.py`、`heads.py` 是原生 decoder/LM head 的引用视图，不另建网络或破坏权重绑定。
+详细数据契约、配置、命令、导出与恢复说明见 [LLM guide](llm.md)。
+
+| 职责 | Base | Instruct |
+|---|---|---|
+| 配置、网络视图、门面 | `config.py`, `backbones.py`, `heads.py`, `model.py` | 同名任务文件 |
+| 数据与监督 | `data.py`：文档分组/EOS/保留边界目标的切片 | `data.py`：对话/模板/助手掩码/截断校验 |
+| 采样、损失、优化器 | `sampling.py`, `losses.py`, `optimizer.py` | 同名任务文件 |
+| 训练与选模 | `train.py`：Trainer、独立 validation 回调 | 同名任务文件，使用本任务数据和指标 |
+| 评估与指标 | `evaluate.py`, `metrics.py`：token 加权 NLL/PPL | 同名任务文件，另有 exact match/JSON validity |
+| 推理 | `model.py` 的 `generate` | `model.py` 的 `chat` |
+| 生命周期与命令 | `pipeline.py`, `cli.py`, `__main__.py` | 同名任务文件 |
+| 发布 | `publish.py`：full/adapter/merged 原生资产 | 同名任务文件，含 chat template |
+
+Neutral `llm/native.py` 仅提供 HF/PEFT 初始化、序列化、生成和按位置 padding 的机械操作；
+`llm/configuration.py` 校验共通运行设置，`llm/runtime.py` 提供 Trainer 参数、环境签名和恢复完整性校验，
+`llm/records.py` 负责 JSONL 读取与分组完整性。没有共享 metrics 或任务之间的导入。
+每任务的 `train.py` 自行维护采样、loss、optimizer、validation 选模与 checkpoint 回调。
+
+LLM checkpoint 是原生 Trainer 目录，保留 optimizer、scheduler 和 RNG，并附加
+`advai_resume.json` 与门面文件；与第 7 节三类模型的 `training_state.pt` 格式不同。
+`latest.json` 指向最近完整 checkpoint，支持 `output_dir/latest` 逻辑别名。
+Inference export 不参与恢复。格式统一到职责和生命周期，原生持久化格式保留各 SDK 的正确语义。
+
+LoRA 是两任务均可选择的训练方式。Hub 基座固定 revision，tiny/本地基座 adapter 附带冻结快照。
+合并导出加载副本，不修改训练模型。第一版单设备 full/LoRA 已实现；QLoRA、packing、分布式和
+偏好训练尚未实现。CPU/fp32 功能检查不能代替 CUDA/MPS、AMP 或真实领域模型验证。

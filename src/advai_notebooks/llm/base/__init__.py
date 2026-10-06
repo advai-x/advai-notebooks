@@ -1,1 +1,1 @@
-"""Base-model continued pre-training utilities."""
+"""Independent base causal language-model fine-tuning."""

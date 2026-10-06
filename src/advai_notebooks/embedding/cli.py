@@ -3,8 +3,11 @@ from pathlib import Path
 from advai_notebooks.common.artifacts import write_json
 from advai_notebooks.common.cli import (
     experiment_parser,
+    hub_options,
     inference_arguments,
     print_result,
+    publish_parser,
+    publish_result,
     read_inputs,
 )
 from advai_notebooks.common.retrieval_data import load_data
@@ -16,10 +19,16 @@ from .data import load_training_samples
 
 def main(argv=None):
     parser, sub = experiment_parser("advai-embedding")
+    publish_parser(sub)
     inference = sub.add_parser("encode")
     inference_arguments(inference)
     inference.add_argument("--role", choices=("query", "document"), required=True)
     args = parser.parse_args(argv)
+    if args.command == "publish":
+        from .publish import publish
+
+        publish_result(args, publish)
+        return
     if args.command == "encode":
         import numpy as np
 
@@ -28,7 +37,9 @@ def main(argv=None):
         inputs = read_inputs(args.input)
         if any(not isinstance(text, str) for text in inputs):
             raise ValueError("encode expects strings")
-        model = EmbeddingModel.load(args.checkpoint, resolve_device(args.device))
+        model = EmbeddingModel.load(
+            args.checkpoint, resolve_device(args.device), **hub_options(args)
+        )
         model.check_lengths(inputs, args.role)
         Path(args.output).parent.mkdir(parents=True, exist_ok=True)
         np.save(args.output, model.encode(inputs, args.role).numpy())
@@ -55,7 +66,10 @@ def main(argv=None):
             from .model import EmbeddingModel
 
             report, rankings = evaluate(
-                EmbeddingModel.load(args.checkpoint, setup(cfg)), data, cfg, args.split
+                EmbeddingModel.load(args.checkpoint, setup(cfg), **hub_options(args)),
+                data,
+                cfg,
+                args.split,
             )
             result = {"report": report, "rankings": rankings}
             write_json(args.output, result)

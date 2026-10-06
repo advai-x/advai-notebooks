@@ -54,6 +54,7 @@ assert {value["type"] for value in result["answers"].values()} == {"choice", "sc
 main(["validate", "--config", str(config), "--root", str(root)])
 main(["evaluate", "--config", str(config), "--root", str(root), "--model", report["export_dir"]])
 main(["predict", "--model", report["export_dir"], "--task", "triage", "--device", "cpu", "--state", "charged twice"])
+main(["publish", "--export-dir", report["export_dir"], "--repo-id", "test/decision", "--dry-run"])
 assert not any(any(name == prefix or name.startswith(prefix + ".") for prefix in blocked) for name in sys.modules)
 print("NATIVE_INDEPENDENCE_OK")
 """

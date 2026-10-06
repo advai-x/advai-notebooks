@@ -24,14 +24,14 @@ outputs/                    # Generated checkpoints and reports; not committed
 requirements/               # Environment-specific dependencies
 ```
 
-Notebook files orchestrate experiments and present results. Data processing, trainers, metrics and provider clients belong in `src/advai_notebooks` so they can be tested and reused across Colab sessions.
+Notebook files orchestrate experiments and present results. Data processing, trainers, metrics and SDK integrations belong in `src/advai_notebooks` so they can be tested and reused across Colab sessions.
 
 ## Embedding and ranker fine-tuning v1
 
 The [embedding notebook](notebooks/embedding/01_finetune.ipynb) and
 [ranker notebook](notebooks/ranker/01_finetune.ipynb) now contain executable
-end-to-end workflows. They share neutral corpus/query/qrels contracts, optimizer execution and
-Recall/MRR/nDCG metrics. Sampling, losses, data validation and training callbacks
+end-to-end workflows. They share neutral corpus/query/qrels contracts and optimizer execution. Each owns
+its Recall/MRR/nDCG metrics. Sampling, losses, data validation and training callbacks
 live in each task separately.
 Embedding uses MNRL or Cached MNRL; ranker uses a single-logit CrossEncoder with
 binary cross-entropy. Each reads its own prepared training samples. Ranker reads
@@ -59,7 +59,7 @@ have not been trained or benchmarked here.
 See [the architecture and adjustment map](docs/architecture.md) for module
 boundaries, file contracts and migration details.
 
-All three tasks own `backbones.py` and `heads.py` for their network components;
+All five tasks own `backbones.py` and `heads.py` for their network components;
 `model.py` composes them and implements loading, saving and public inference.
 Embedding and ranker also each have `config.py`, `data.py`, `sampling.py`, `losses.py`,
 `train.py`, `metrics.py`, `evaluate.py`, `optimizer.py`, `pipeline.py` and `cli.py`. Change the corresponding
@@ -113,10 +113,18 @@ python -m advai_notebooks.decision run --config configs/decision/smoke.yaml
 ```
 
 The smoke configuration uses a random tiny encoder and synthetic data. It checks
-pipeline correctness; its scores do not measure domain quality. The LLM
-base/instruct directories remain scaffolds.
+pipeline correctness; its scores do not measure domain quality. LLM Base and
+Instruct fine-tuning workflows are described below.
 
 ## Training lifecycle and independent adjustment
+
+After exporting, all three tasks support an explicit `publish` command with
+`--export-dir`, `--repo-id`, `--dry-run` and optional `--public` / `--model-card`.
+Inference files, task-specific metadata and a model card are uploaded to a Hugging Face
+model repository; training data and resumable state stay local. All three `Model.load`
+methods accept Hub repository IDs and a versioned `revision` as well as local paths.
+See [the publication guide](docs/publishing.md) for authentication, upload previews,
+private/public repositories and loading a pinned commit for inference.
 
 All three tasks support `run --resume <output_dir>/latest` at completed epoch
 boundaries. Checkpoints atomically store current/best weights, optimizer, AMP and
@@ -190,3 +198,34 @@ Task metric reports retain their existing value fields and add `task`,
 and explicit `direction`. Checkpoint selection reads the overall metric record.
 Ranking sample counts refer to queries; Decision ordinal-error counts refer only
 to score decisions. See the [architecture guide](docs/architecture.md) for the contract.
+
+
+## LLM Base and Instruct fine-tuning v1
+
+[Base notebook](notebooks/llm/base/01_finetune.ipynb) implements continued pre-training;
+[Instruct notebook](notebooks/llm/instruct/01_finetune.ipynb) implements assistant-only SFT.
+Both independently own data, loss, metrics, evaluation, training assembly, model facade,
+CLI and publication. Transformers supplies the original decoder/LM head and Trainer;
+PEFT supplies configurable LoRA. Native weight tying and forward behavior are retained.
+
+```bash
+python -m pip install -e '.[llm-base,llm-instruct,notebooks,dev]'
+python -m advai_notebooks.llm.base validate --config configs/llm/base/smoke.yaml
+python -m advai_notebooks.llm.base run --config configs/llm/base/smoke.yaml
+python -m advai_notebooks.llm.instruct run --config configs/llm/instruct/smoke.yaml
+```
+
+Use each task's `lora.yaml` for adapter training. `BaseModel.generate` returns continuations;
+`InstructModel.chat` returns an assistant response using the exported chat template.
+Base full/merged exports can optionally initialize Instruct through native files,
+without importing Base task code. Validation token-weighted NLL selects checkpoints,
+including epoch zero; test is report-only. Instruct also supports greedy exact-match
+and JSON-validity evaluation. Metrics remain task-owned.
+
+Full models, portable adapters and merged full exports can be reloaded and published.
+Publication defaults to private and offline dry-run previews; no LLM repository is
+uploaded automatically. Complete native Trainer checkpoints support strict epoch
+recovery, while inference exports exclude optimizer/RNG state.
+See [the LLM guide](docs/llm.md) for schemas, configuration, CLI and current limits.
+The offline tiny decoder and synthetic samples verify functionality, not domain quality.
+QLoRA, packing, distributed and preference training are not implemented in v1.

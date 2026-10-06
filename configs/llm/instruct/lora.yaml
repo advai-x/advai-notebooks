@@ -1,0 +1,24 @@
+model:
+  id: tiny
+  max_len: 128
+data:
+  samples: data/sample/llm/instruct.jsonl
+  reject_truncation: true
+training:
+  method: lora
+  epochs: 2
+  batch_size: 2
+  gradient_accumulation: 2
+  learning_rate: 0.01
+  lora_rank: 4
+  lora_alpha: 8
+  lora_dropout: 0.0
+  lora_target_modules: [q_proj, v_proj]
+  seed: 42
+runtime:
+  device: cpu
+  precision: fp32
+  num_threads: 2
+generation:
+  max_new_tokens: 8
+output_dir: outputs/llm/instruct/lora-run

@@ -1,1 +1,1 @@
-"""Instruction-tuning utilities."""
+"""Independent instruct causal language-model fine-tuning."""

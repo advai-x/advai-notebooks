@@ -88,12 +88,15 @@ class RankerModel:
         )
 
     @classmethod
-    def load(cls, path, device="cpu"):
+    def load(cls, path, device="cpu", *, revision=None, token=None, cache_dir=None,
+             local_files_only=False):
         import json
 
+        from advai_notebooks.common.hub import resolve_export
         from advai_notebooks.ranker.config import ModelConfig
 
-        path = Path(path).resolve()
+        path = resolve_export(path, revision=revision, token=token, cache_dir=cache_dir,
+                              local_files_only=local_files_only)
         metadata = json.loads((path / "advai_metadata.json").read_text())["model"]
         metadata.pop("pooling", None)  # Older exports stored the shared embedding setting.
         settings = ModelConfig(**metadata)

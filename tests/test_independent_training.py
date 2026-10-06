@@ -45,6 +45,8 @@ else:
     assert len(model.score([("reset password", "account login password reset")])) == 1
 cli = importlib.import_module(prefix + ".cli")
 cli.main(["validate", "--config", str(root / "configs" / kind / "smoke.yaml")])
+cli.main(["publish", "--export-dir", report["export"], "--repo-id", "test/" + kind,
+          "--dry-run"])
 assert not any(n == "advai_notebooks." + other or n.startswith("advai_notebooks." + other + ".") for n in sys.modules)
 print("INDEPENDENCE_OK")
 """

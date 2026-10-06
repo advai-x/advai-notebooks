@@ -3,12 +3,15 @@
 import argparse
 import json
 
+from advai_notebooks.common.cli import hub_arguments, hub_options, publish_parser, publish_result
+
 
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description="Decision-model validation, fine-tuning and inference"
     )
     commands = parser.add_subparsers(dest="command", required=True)
+    publish_parser(commands)
     for name in ("validate", "run", "evaluate"):
         command = commands.add_parser(name)
         command.add_argument("--config", required=True)
@@ -19,6 +22,7 @@ def main(argv=None):
             command.add_argument("--resume", help="Original experiment's output_dir/latest")
         if name == "evaluate":
             command.add_argument("--model", required=True, help="Exported model directory")
+            hub_arguments(command)
             command.add_argument(
                 "--split", choices=["validation", "calibration", "test"], default="test"
             )
@@ -30,8 +34,14 @@ def main(argv=None):
     )
     predict.add_argument("--device", choices=["auto", "cpu", "cuda", "mps"], default="auto")
     predict.add_argument("--min-confidence", type=float)
+    hub_arguments(predict)
     args = parser.parse_args(argv)
     try:
+        if args.command == "publish":
+            from .publish import publish
+
+            publish_result(args, publish)
+            return
         if args.command == "run":
             from .pipeline import run_experiment
 
@@ -46,7 +56,7 @@ def main(argv=None):
             from .model import DecisionModel
 
             device = resolve_device(args.device)
-            model = DecisionModel.load(args.model, device)
+            model = DecisionModel.load(args.model, device, **hub_options(args))
             try:
                 state = json.loads(args.state)
             except json.JSONDecodeError:
@@ -67,7 +77,10 @@ def main(argv=None):
                 from .model import DecisionModel
                 from .runtime import setup
 
-                model = DecisionModel.load(cfg.path(args.model), setup(cfg))
+                local = cfg.path(args.model)
+                model = DecisionModel.load(
+                    local if local.is_dir() else args.model, setup(cfg), **hub_options(args)
+                )
                 items = prepare_training_items(
                     [r for r in records if r["split"] == args.split],
                     tasks,

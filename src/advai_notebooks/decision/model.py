@@ -109,14 +109,18 @@ class DecisionModel(nn.Module):
         return model._bind_metadata(tokenizer, _model_config(settings), source, tasks)
 
     @classmethod
-    def load(cls, path, device="cpu", *, weights=None):
+    def load(cls, path, device="cpu", *, weights=None, revision=None, token=None,
+             cache_dir=None, local_files_only=False):
         from safetensors.torch import load_file
         from transformers import AutoConfig, AutoModel, AutoTokenizer
+
+        from advai_notebooks.common.hub import resolve_export
 
         from .decoding import build_decoder
         from .encoding import build_input_encoder
 
-        path = Path(path)
+        path = resolve_export(path, revision=revision, token=token, cache_dir=cache_dir,
+                              local_files_only=local_files_only)
         config_path = path / "decision_config.json"
         if not config_path.is_file():
             raise ValueError(

@@ -102,12 +102,15 @@ class EmbeddingModel:
         )
 
     @classmethod
-    def load(cls, path, device="cpu"):
+    def load(cls, path, device="cpu", *, revision=None, token=None, cache_dir=None,
+             local_files_only=False):
         import json
 
+        from advai_notebooks.common.hub import resolve_export
         from advai_notebooks.embedding.config import ModelConfig
 
-        path = Path(path).resolve()
+        path = resolve_export(path, revision=revision, token=token, cache_dir=cache_dir,
+                              local_files_only=local_files_only)
         settings = ModelConfig(**json.loads((path / "advai_metadata.json").read_text())["model"])
         settings.id, settings.revision, settings.pooling = str(path), None, "model"
         return cls(settings, device)

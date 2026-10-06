@@ -4,6 +4,10 @@ Thumbs.db
 .env.*
 !.env.example
 .secrets/
+.credentials/
+.huggingface/
+.hf/
+/.config/huggingface/
 
 # Python
 __pycache__/
@@ -26,9 +30,9 @@ coverage.xml
 htmlcov/
 
 # Local caches, logs and machine-specific configuration
-/.cache/
-/hf_cache/
-/.hf_cache/
+.cache/
+hf_cache/
+.hf_cache/
 *.log
 configs/local/
 *.local.yaml
@@ -41,6 +45,10 @@ configs/local/
 wandb/
 mlruns/
 lightning_logs/
+tensorboard_logs/
+events.out.tfevents.*
+/logs/
+/runs/
 
 # Model artifacts
 *.ckpt
@@ -51,6 +59,7 @@ lightning_logs/
 *.bin
 *.h5
 *.hdf5
+*.keras
 *.tflite
 *.gguf
 *.ggml
@@ -64,7 +73,12 @@ lightning_logs/
 # Local datasets and generated outputs. Keep directory documentation only.
 data/**
 !data/**/
-!data/**/README.md
+!data/README.md
+!data/manifests/README.md
+!data/sample/README.md
+!data/sample/decision/README.md
+!data/sample/retrieval/README.md
+!data/sample/llm/README.md
 # Deliberately small synthetic fixtures only.
 !data/sample/decision/triage.jsonl
 !data/sample/retrieval/corpus.jsonl
@@ -73,6 +87,13 @@ data/**
 !data/sample/retrieval/embedding_samples.json
 !data/sample/retrieval/ranker_samples.json
 !data/sample/retrieval/candidates.json
+!data/sample/llm/base.jsonl
+!data/sample/llm/instruct.jsonl
 outputs/**
 !outputs/**/
-!outputs/**/README.md
+!outputs/README.md
+!outputs/decision/README.md
+!outputs/embedding/README.md
+!outputs/ranker/README.md
+!outputs/llm/base/README.md
+!outputs/llm/instruct/README.md

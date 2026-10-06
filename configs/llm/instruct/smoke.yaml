@@ -1,0 +1,24 @@
+model:
+  id: tiny
+  max_len: 128
+data:
+  samples: data/sample/llm/instruct.jsonl
+  reject_truncation: true
+training:
+  method: full
+  epochs: 2
+  batch_size: 2
+  gradient_accumulation: 2
+  learning_rate: 0.003
+  seed: 42
+runtime:
+  device: cpu
+  precision: fp32
+  num_threads: 2
+evaluation:
+  selection_metric: nll
+  generation_metrics: [exact_match]
+generation:
+  max_new_tokens: 8
+  do_sample: false
+output_dir: outputs/llm/instruct/run
