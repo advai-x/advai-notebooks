@@ -1,0 +1,8 @@
+{"id": "ppo-0", "group_id": "problem-0", "split": "train", "messages": [{"role": "user", "content": "what color is the sky ?"}], "reference": "blue"}
+{"id": "ppo-1", "group_id": "problem-1", "split": "train", "messages": [{"role": "user", "content": "what color is grass ?"}], "reference": "green"}
+{"id": "ppo-2", "group_id": "problem-2", "split": "train", "messages": [{"role": "user", "content": "what color is water ?"}], "reference": "blue"}
+{"id": "ppo-3", "group_id": "problem-3", "split": "train", "messages": [{"role": "user", "content": "what is the capital of France ?"}], "reference": "Paris"}
+{"id": "ppo-4", "group_id": "problem-4", "split": "validation", "messages": [{"role": "user", "content": "what is the capital of Italy ?"}], "reference": "Rome"}
+{"id": "ppo-5", "group_id": "problem-5", "split": "validation", "messages": [{"role": "user", "content": "what is the capital of Germany ?"}], "reference": "Berlin"}
+{"id": "ppo-6", "group_id": "problem-6", "split": "test", "messages": [{"role": "user", "content": "compute 1 and 1"}], "reference": "2"}
+{"id": "ppo-7", "group_id": "problem-7", "split": "test", "messages": [{"role": "user", "content": "compute 2 and 2"}], "reference": "4"}

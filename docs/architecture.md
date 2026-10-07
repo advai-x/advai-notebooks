@@ -1,8 +1,8 @@
 # 项目架构：独立微调任务与自研 Decision Model
 
-本项目提供五条独立的模型训练与推理路径：Embedding、Ranker、Decision、LLM Base 和 LLM Instruct。
+本项目提供七条独立的模型训练与推理路径：Embedding、Ranker、Decision、LLM Base、LLM Instruct、LLM PPO 和 LLM GRPO。
 每条路径拥有自己的配置、数据校验、采样、损失、优化器、评估、训练组装、导出和 CLI。
-五类任务可以分别训练、部署和调整，应用层按需要组合它们。
+七类任务可以分别训练、部署和调整，应用层按需要组合它们。
 
 Decision 的定位是本项目自行实现的决策模型。Laya 仅作为思想参考：将问题与候选选项显式建模，
 输出可解释的类型化概率，并关注概率校准。输入编码、模型组合、决策 head、损失、奖励、
@@ -12,12 +12,12 @@ Decision 的定位是本项目自行实现的决策模型。Laya 仅作为思想
 
 ## 1. 模型任务并行，应用组合单独表达
 
-Embedding、Ranker、Decision、LLM Base、LLM Instruct 是同一级的任务模块，各自从数据到训练、评估、导出、推理形成闭环。
+Embedding、Ranker、Decision、LLM Base、LLM Instruct、LLM PPO、LLM GRPO 是同一级的任务模块，各自从数据到训练、评估、导出、推理形成闭环。
 图中的并行表示独立且同级，不表示必须同时训练。它们可以分别选择基座、参数、设备和部署方式。
 
 ```mermaid
 flowchart TB
-    subgraph TASKS[五条独立模型路径]
+    subgraph TASKS[七条独立模型路径]
         direction LR
         subgraph EMB[Embedding]
             direction TB
@@ -64,15 +64,33 @@ flowchart TB
             IX --> IH[可选 Hub 发布]
             IH --> II
         end
+        subgraph PPO[LLM PPO]
+            direction TB
+            PD[问题与奖励参考] --> PT[在线采样与 PPO 更新]
+            PT --> PV[validation reward 选模]
+            PV --> PX[actor 与价值头导出]
+            PX --> PI[推理：generate / chat]
+            PX --> PH[可选 Hub 发布]
+            PH --> PI
+        end
+        subgraph GRPO[LLM GRPO]
+            direction TB
+            GD[问题与奖励参考] --> GT[组内采样与 GRPO 更新]
+            GT --> GV[validation reward 选模]
+            GV --> GX[actor 导出]
+            GX --> GI[推理：generate / chat]
+            GX --> GH[可选 Hub 发布]
+            GH --> GI
+        end
     end
 ```
 
-五条路径各自使用中立的配置/运行/checkpoint/产物/来源追踪工具。
-依赖方向为任务模块 → `common`；五个任务不互相导入。
-Base/Instruct 另复用 `llm/` 下的 SDK、运行参数、配置校验与文件读取工具，损失、指标、选模和训练组装归各任务。
+七条路径各自使用中立的配置/运行/checkpoint/产物/来源追踪工具。
+依赖方向为任务模块 → `common`；七个任务不互相导入。
+四个 LLM 任务另复用 `llm/` 下的 SDK、运行参数、配置校验与文件读取工具，损失、指标、选模和训练组装归各任务。
 当前 Decision 使用自己的训练循环，Embedding/Ranker 使用共享检索训练循环；
-Base/Instruct 各自组装 Transformers Trainer。训练器差异不意味着模型任务存在上下游关系。
-Base full/merged 导出可作为 Instruct 的初始模型，这是可选的产物衔接，不是模块依赖。
+Base/Instruct 各自组装 Transformers Trainer，PPO/GRPO 各自实现在线 RL 训练循环。训练器差异不意味着模型任务存在上下游关系。
+Base full/merged 导出可作为 Instruct 的初始模型，SFT full/merged 导出可作为 PPO/GRPO 的初始模型；这些都是可选的产物衔接，不是模块依赖。
 
 离线准备及应用组合属于另一个层次，因此不放进主模型图：
 
@@ -84,7 +102,7 @@ Base full/merged 导出可作为 Instruct 的初始模型，这是可选的产�
 
 ### 1.1 统一职责、契约与生命周期
 
-统一目标是：五条任务提供相同的工程入口、职责划分与实验阶段，每类任务保留自己的请求、
+统一目标是：七条任务提供相同的工程入口、职责划分与实验阶段，每类任务保留自己的请求、
 batch、loss、指标和输出语义。现有代码尚未全部达到这个目标。
 
 ```text
@@ -100,7 +118,7 @@ Model.load → predict(任务请求) → 任务结果
 
 Postprocess 是可选阶段：Decision 可以拟合温度；当前 Embedding/Ranker 没有拟合步骤。
 实际指标和 batch 形状由任务实现，不要求不同任务采用相同张量或同一个损失。
-下表对比 Embedding/Ranker/Decision 的现有入口；LLM Base/Instruct 的对应实现见第 8 节。
+下表对比 Embedding/Ranker/Decision 的现有入口；LLM Base/Instruct 的对应实现见第 8 节，PPO/GRPO 见第 9 节。
 
 | 统一维度 | 当前代码差异 | 统一目标 | 保留的任务语义 |
 |---|---|---|---|
@@ -175,6 +193,7 @@ src/advai_notebooks/
     publish.py                    # 原生 Decision 文件契约、模型卡与发布入口
   llm/
     configuration.py native.py runtime.py records.py  # 中立 SDK / 运行 / 文件工具
+    rollout.py rl_runtime.py                         # 采样机械操作、RL checkpoint/RNG
     base/
       config.py backbones.py heads.py model.py         # 模型门面：generate
       data.py sampling.py losses.py optimizer.py       # 文档 CLM
@@ -183,37 +202,45 @@ src/advai_notebooks/
       config.py backbones.py heads.py model.py         # 模型门面：chat
       data.py sampling.py losses.py optimizer.py       # 助手回复 SFT
       train.py evaluate.py metrics.py pipeline.py cli.py publish.py
+    ppo/ grpo/                                       # 同级独立 RL 任务
+      config.py backbones.py heads.py model.py         # 模型门面：generate/chat
+      data.py sampling.py reward.py losses.py optimizer.py
+      train.py evaluate.py metrics.py pipeline.py cli.py publish.py
   data_preparation/ workflows/     # 可选组合层
 notebooks/                        # 调用同一套 Python 实现的可运行示例
 tests/                           # 组件、生命周期及任务独立性验证
 ```
+
+PPO/GRPO 的目录同样位于 `src/advai_notebooks/llm/`，各自包含
+`config.py backbones.py heads.py model.py data.py sampling.py reward.py losses.py optimizer.py train.py
+metrics.py evaluate.py pipeline.py cli.py publish.py`。配置在 `configs/llm/{ppo,grpo}/`。
 
 ### 2.1 当前职责位置
 
 同一职责可能已被拆成多个内部文件，因此不以文件数量衡量架构是否统一。
 模型配置、模型定义、加载/保存、评估、指标、推理应分别列出：
 
-| 职责 | Embedding 当前入口 | Ranker 当前入口 | Decision 当前入口 | LLM Base 当前入口 | LLM Instruct 当前入口 |
-|---|---|---|---|---|---|
-| 配置 | `config.py` | `config.py` | `config.py` | `config.py` | `config.py` |
-| 模型门面/组合 | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` |
-| 网络组件 | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` |
-| 加载与原生导出入口 | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` |
-| 数据与输入入口 | `data.py`，`model.py` 的 prefix/features | `data.py`，`model.py` 的 pair/features | `data.py`，`model.py` 的 prepare/features | `data.py`，`model.py` 的 `prepare` | `data.py`，`model.py` 的 `prepare` |
-| 采样 | `sampling.py` | `sampling.py` | `sampling.py` | `sampling.py` | `sampling.py` |
-| 损失 | `losses.py` | `losses.py` | `losses.py` | `losses.py` | `losses.py` |
-| 优化器 | `optimizer.py` | `optimizer.py` | `optimizer.py` | `optimizer.py` | `optimizer.py` |
-| 训练组装 | `train.py` | `train.py` | `train.py` | `train.py` | `train.py` |
-| 评估编排 | `evaluate.py` | `evaluate.py` | `evaluate.py` | `evaluate.py` | `evaluate.py` |
-| 指标入口 | `metrics.py` | `metrics.py` | `metrics.py` | `metrics.py` | `metrics.py` |
-| 推理入口 | `model.py` 的 `encode` | `model.py` 的 `score` | `model.py` 的 `system_one` | `model.py` 的 `generate` | `model.py` 的 `chat` |
-| 可选后处理 | 当前无拟合步骤 | 当前无拟合步骤 | `calibrate.py` | 当前无拟合步骤 | 当前无拟合步骤 |
-| 生命周期与 CLI | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` |
-| 可选 Hub 发布 | `publish.py`, `cli.py` | `publish.py`, `cli.py` | `publish.py`, `cli.py` | `publish.py`, `cli.py` | `publish.py`, `cli.py` |
+| 职责 | Embedding 当前入口 | Ranker 当前入口 | Decision 当前入口 | LLM Base 当前入口 | LLM Instruct 当前入口 | LLM PPO 当前入口 | LLM GRPO 当前入口 |
+|---|---|---|---|---|---| --- | --- |
+| 配置 | `config.py` | `config.py` | `config.py` | `config.py` | `config.py` | `config.py` | `config.py` |
+| 模型门面/组合 | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` |
+| 网络组件 | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`、`heads.py`（含价值头） | `backbones.py`、`heads.py` |
+| 加载与原生导出入口 | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` |
+| 数据与输入入口 | `data.py`，`model.py` 的 prefix/features | `data.py`，`model.py` 的 pair/features | `data.py`，`model.py` 的 prepare/features | `data.py`，`model.py` 的 `prepare` | `data.py`，`model.py` 的 `prepare` | `data.py`、`model.py` 的 prepare | `data.py`、`model.py` 的 prepare |
+| 采样 | `sampling.py` | `sampling.py` | `sampling.py` | `sampling.py` | `sampling.py` | `sampling.py`：每问题一条 completion | `sampling.py`：每问题 G 条 completion |
+| 损失 | `losses.py` | `losses.py` | `losses.py` | `losses.py` | `losses.py` | `losses.py`：GAE、policy/value clipping | `losses.py`：组内 advantage、clipping/KL |
+| 优化器 | `optimizer.py` | `optimizer.py` | `optimizer.py` | `optimizer.py` | `optimizer.py` | `optimizer.py` | `optimizer.py` |
+| 训练组装 | `train.py` | `train.py` | `train.py` | `train.py` | `train.py` | `train.py` | `train.py` |
+| 评估编排 | `evaluate.py` | `evaluate.py` | `evaluate.py` | `evaluate.py` | `evaluate.py` | `evaluate.py` | `evaluate.py` |
+| 指标入口 | `metrics.py` | `metrics.py` | `metrics.py` | `metrics.py` | `metrics.py` | `metrics.py` | `metrics.py` |
+| 推理入口 | `model.py` 的 `encode` | `model.py` 的 `score` | `model.py` 的 `system_one` | `model.py` 的 `generate` | `model.py` 的 `chat` | `model.py` 的 generate/chat | `model.py` 的 generate/chat |
+| 可选后处理 | 当前无拟合步骤 | 当前无拟合步骤 | `calibrate.py` | 当前无拟合步骤 | 当前无拟合步骤 | 无拟合步骤 | 无拟合步骤 |
+| 生命周期与 CLI | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`、`cli.py` | `pipeline.py`、`cli.py` |
+| 可选 Hub 发布 | `publish.py`, `cli.py` | `publish.py`, `cli.py` | `publish.py`, `cli.py` | `publish.py`, `cli.py` | `publish.py`, `cli.py` | `publish.py`、`cli.py` | `publish.py`、`cli.py` |
 
-表中路径相对各自任务目录；LLM 两列分别对应 `llm/base/`、`llm/instruct/`。
+表中路径相对各自任务目录；LLM 四列分别对应 `llm/base/`、`llm/instruct/`、`llm/ppo/`、`llm/grpo/`。
 这张表列职责入口，网络组件单列；内部实现细节在目录树和下文说明。
-五个任务各自维护 `metrics.py`，不共享指标实现。
+七个任务各自维护 `metrics.py`，不共享指标实现。
 
 Base 的 `data.py` 负责文档分组、EOS 与保留边界目标的切片；Instruct 的 `data.py` 负责对话校验、
 chat template 与助手回复掩码。两者的 `train.py` 分别组装 Trainer、采样、loss、optimizer 和验证选模回调。
@@ -231,11 +258,11 @@ Decision 的红色差异已按当前 Embedding/Ranker 边界对齐：
 `DecisionModel` 同时是原生 PyTorch 模块，`.model` 暴露其训练模块，保持 SDK 适配器风格。
 直接构造 backbone/head 仍支持网络实验；完整输入/导出/推理需要通过 `from_config` 或 `load` 绑定 tokenizer 与元数据。
 旧 provider 模块及 Bundle 包装已移除，调用方直接使用 `DecisionModel`；`inference.py` 保留函数式推理兼容入口。原生权重命名/schema 和概率语义保持兼容。
-五个任务已有共同的指标记录规范；完整评估类型、实验报告/配置仍未完全统一，以下目标结构继续作为后续约定。
+Embedding、Ranker、Decision、Base/Instruct 已有共同的指标记录规范；PPO/GRPO 当前返回任务身份、split、指标及预测，未接入该指标记录类型；完整评估类型、实验报告/配置仍未完全统一，以下目标结构继续作为后续约定。
 
 ### 2.1.1 网络组件的统一边界
 
-五个任务均通过各自 `backbones.py` 和 `heads.py` 提供组件或原生组件视图，`model.py` 负责加载基础模型、
+七个任务均通过各自 `backbones.py` 和 `heads.py` 提供组件或原生组件视图，`model.py` 负责加载基础模型、
 组合组件、保存/重载以及公开推理。调用第三方库不会改变这个职责划分，组件不跨任务共享。
 
 | 组件 | Embedding | Ranker | Decision | LLM Base | LLM Instruct |
@@ -631,3 +658,20 @@ Inference export 不参与恢复。格式统一到职责和生命周期，原生
 LoRA 是两任务均可选择的训练方式。Hub 基座固定 revision，tiny/本地基座 adapter 附带冻结快照。
 合并导出加载副本，不修改训练模型。第一版单设备 full/LoRA 已实现；QLoRA、packing、分布式和
 偏好训练尚未实现。CPU/fp32 功能检查不能代替 CUDA/MPS、AMP 或真实领域模型验证。
+
+## 9. LLM PPO 与 GRPO：独立在线强化学习
+
+两条任务独立于 Instruct SFT；完整配置、算法、奖励和恢复契约见 [RL guide](rl.md)。
+PPO 组合 HF causal LM 和共享 decoder 表示的线性价值头，训练 token GAE、clipped policy/value
+objective；GRPO 不包含 critic，为同一问题采样多条 completion，使用组内标准化奖励和 clipping/KL。
+各自的 `reward.py` 提供规则奖励及可插拔 scalar 回调，各自维护 `metrics.py`，按 validation
+reward_mean 最大选模；test 不参与训练或选模。
+
+`llm/rollout.py` 仅复用 token 采样、左 padding position IDs、log probabilities 与 EOS mask；
+`llm/rl_runtime.py` 仅复用 checkpoint/RNG 传输和签名。Advantage、loss、奖励、选模与训练循环
+均由各任务实现。网络组合、加载、保存、generate/chat 公开推理均位于任务的 `model.py`。
+PPO 价值头单独保存；生成只使用 actor。Full/merged actor 可使用原生 HF 推理，LoRA 可使用 PEFT。
+
+产物区分 validation 选出的 `export/` 和最后实际更新后的 `latest_export/`；完整恢复 checkpoint
+包含 policy、冻结 reference、价值头（PPO）、optimizer、RNG 和实验签名。首版支持单设备 fp32、
+full/LoRA、梯度累积，不支持混合精度、分布式或 gradient checkpointing；配置明确拒绝。

@@ -89,6 +89,8 @@ data/**
 !data/sample/retrieval/candidates.json
 !data/sample/llm/base.jsonl
 !data/sample/llm/instruct.jsonl
+!data/sample/llm/ppo.jsonl
+!data/sample/llm/grpo.jsonl
 outputs/**
 !outputs/**/
 !outputs/README.md
@@ -97,3 +99,5 @@ outputs/**
 !outputs/ranker/README.md
 !outputs/llm/base/README.md
 !outputs/llm/instruct/README.md
+!outputs/llm/ppo/README.md
+!outputs/llm/grpo/README.md

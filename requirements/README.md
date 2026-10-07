@@ -22,3 +22,7 @@ Transformers 5.18.0, PEFT 0.18.1 and Accelerate 1.15.0. Install both with
 `python -m pip install -e '.[llm-base,llm-instruct,notebooks,dev]'`.
 The first version supports full/LoRA single-device training; QLoRA and distributed
 training require later implementations, not additional flags alone.
+
+`llm-ppo.txt` and `llm-grpo.txt` install the independent online RL task extras.
+These first RL implementations use single-device fp32, full/LoRA and PyTorch training loops;
+see [the RL guide](../docs/rl.md) for algorithm and checkpoint contracts.

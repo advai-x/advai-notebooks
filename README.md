@@ -59,7 +59,7 @@ have not been trained or benchmarked here.
 See [the architecture and adjustment map](docs/architecture.md) for module
 boundaries, file contracts and migration details.
 
-All five tasks own `backbones.py` and `heads.py` for their network components;
+All seven tasks own `backbones.py` and `heads.py` for their network components;
 `model.py` composes them and implements loading, saving and public inference.
 Embedding and ranker also each have `config.py`, `data.py`, `sampling.py`, `losses.py`,
 `train.py`, `metrics.py`, `evaluate.py`, `optimizer.py`, `pipeline.py` and `cli.py`. Change the corresponding
@@ -125,6 +125,11 @@ model repository; training data and resumable state stay local. All three `Model
 methods accept Hub repository IDs and a versioned `revision` as well as local paths.
 See [the publication guide](docs/publishing.md) for authentication, upload previews,
 private/public repositories and loading a pinned commit for inference.
+
+Published demo models are associated with five independent private demo datasets. Their model
+cards identify the dataset IDs and pinned data revisions; dataset repositories
+preserve the original source files and explicit loading subsets/splits.
+See [the dataset guide](docs/datasets.md) for mappings and verified loading examples.
 
 All three tasks support `run --resume <output_dir>/latest` at completed epoch
 boundaries. Checkpoints atomically store current/best weights, optimizer, AMP and
@@ -229,3 +234,24 @@ recovery, while inference exports exclude optimizer/RNG state.
 See [the LLM guide](docs/llm.md) for schemas, configuration, CLI and current limits.
 The offline tiny decoder and synthetic samples verify functionality, not domain quality.
 QLoRA, packing, distributed and preference training are not implemented in v1.
+
+## LLM PPO and GRPO
+
+Two independent online RL tasks now live in `src/advai_notebooks/llm/ppo/` and
+`src/advai_notebooks/llm/grpo/`. PPO trains a shared-backbone value head with GAE
+and clipped policy/value objectives. GRPO uses multiple completions per prompt,
+group-relative advantages, clipping and reference KL, without a critic.
+Both own their reward functions, metrics, trainers, model facade and CLI.
+Instruct remains assistant-only SFT.
+
+```bash
+python -m pip install -e '.[llm-ppo,llm-grpo,dev]'
+python -m advai_notebooks.llm.ppo run --config configs/llm/ppo/smoke.yaml
+python -m advai_notebooks.llm.grpo run --config configs/llm/grpo/smoke.yaml
+```
+
+Each supports full/LoRA, deterministic held-out reward evaluation, epoch recovery,
+native HF actor exports, generate/chat and explicit offline publication previews.
+The first version uses single-device fp32 and rule/custom terminal rewards.
+Tiny fixtures validate behavior; they do not establish model quality.
+See [the RL guide](docs/rl.md) for algorithm details and limits.

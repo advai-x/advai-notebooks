@@ -6,6 +6,8 @@ tags:
 - demo
 - synthetic-data
 - random-initialization
+datasets:
+- widebluesky/wbs-decision-demo
 ---
 
 # widebluesky/wbs-decision-demo
@@ -87,3 +89,29 @@ These results describe the published weights on synthetic examples only.
 Only inference weights, tokenizer, model configuration and required runtime
 metadata are included. Raw training records, optimizer state, checkpoints for
 resuming training and local machine paths are not part of this publication.
+
+## Training and evaluation dataset
+
+Dataset: [widebluesky/wbs-decision-demo](https://huggingface.co/datasets/widebluesky/wbs-decision-demo).
+Verified dataset revision: [`ccdf91daf6b2810dbf63eda37e69dd2ab3af8f6c`](https://huggingface.co/datasets/widebluesky/wbs-decision-demo/tree/ccdf91daf6b2810dbf63eda37e69dd2ab3af8f6c) (`demo-v1`).
+
+This is the synthetic source dataset used for this trained demo release.
+Its record fingerprint matches the saved training-run provenance; the published
+dataset was reloaded and checked record-by-record before associating it with this model.
+
+The `triage` configuration contains 12 train, 4 validation, 10 calibration and 4 test messages.
+Each message has choice, score and noul labels. Calibration records are used only for
+temperature fitting. Question and option definitions are preserved in `source/tasks.json`.
+
+```python
+from datasets import load_dataset
+
+data = load_dataset(
+    "widebluesky/wbs-decision-demo", "triage",
+    revision="ccdf91daf6b2810dbf63eda37e69dd2ab3af8f6c", token=True,
+)
+```
+
+Access uses the existing Hugging Face login; both model and dataset repositories are private.
+Original project-native data files are available under `source/` in the dataset repository.
+Canonical dataset fingerprint: `2ed63814602e43b30c66678574f4808d06b3fd01e829eab4c06f039d16be4c11`.

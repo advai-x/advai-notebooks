@@ -159,8 +159,10 @@ Hub 加载支持 `revision`、`cache_dir`、`local_files_only`，部署建议固
 
 已实现 Base CPT、Instruct SFT、full/LoRA、单设备、原生导出/重载、验证选模、epoch 恢复、
 CLI、Notebook 和发布入口。离线 tiny 数据只用于功能验证。
-QLoRA、跨文档 packing、多卡/分布式、streaming、DPO/GRPO 和领域 benchmark 属于后续扩展。
+QLoRA、跨文档 packing、多卡/分布式、streaming、DPO 和领域 benchmark 属于后续扩展。
 
 参考：[Transformers Trainer](https://huggingface.co/docs/transformers/main_classes/trainer)、
 [Chat templates](https://huggingface.co/docs/transformers/chat_templating)、
 [PEFT checkpoint](https://huggingface.co/docs/peft/developer_guides/checkpoint)。
+
+PPO/GRPO 已作为独立任务实现，不属于 Instruct SFT；见 [RL guide](rl.md)。

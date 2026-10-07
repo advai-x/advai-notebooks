@@ -7,6 +7,8 @@ tags:
 - synthetic-data
 - random-initialization
 pipeline_tag: sentence-similarity
+datasets:
+- widebluesky/wbs-embedding-demo
 ---
 
 # widebluesky/wbs-embedding-demo
@@ -87,3 +89,36 @@ These results describe the published weights on synthetic examples only.
 Only inference weights, tokenizer, model configuration and required runtime
 metadata are included. Raw training records, optimizer state, checkpoints for
 resuming training and local machine paths are not part of this publication.
+
+## Training and evaluation dataset
+
+Dataset: [widebluesky/wbs-embedding-demo](https://huggingface.co/datasets/widebluesky/wbs-embedding-demo).
+Verified dataset revision: [`d5d422450670f840377c9f8bb3b11b7919cdadfa`](https://huggingface.co/datasets/widebluesky/wbs-embedding-demo/tree/d5d422450670f840377c9f8bb3b11b7919cdadfa) (`demo-v1`).
+
+This independently versioned task dataset contains the exact synthetic records used
+for this trained demo release. It includes its own training samples and a complete
+local copy of the evaluation benchmark. No other dataset repository is required.
+All records were reloaded from the pinned Hub revision and checked against the
+original training provenance before associating this dataset with the model.
+
+Training uses `embedding_training` (24 query-positive contrastive samples).
+Evaluation uses `queries` (12 train / 3 validation / 3 test), `corpus` (12 documents)
+and `qrels` (216 judgments). Ranker training pairs and candidates are not included.
+
+```python
+from datasets import load_dataset
+
+data = load_dataset(
+    "widebluesky/wbs-embedding-demo", "embedding_training",
+    revision="d5d422450670f840377c9f8bb3b11b7919cdadfa", token=True,
+)
+```
+
+Access uses the existing Hugging Face login; both model and dataset repositories are private.
+Original project-native data files are available under `source/` in the dataset repository.
+Canonical benchmark fingerprint: `f96589e88e79ce684f3c8733ae1a3c98a8f028459f6e82e3477efeb2867b2a19`.
+Training sample fingerprint: `cebc151f0e9c04eae8c92a1d79a8c3ae6771b1a81fb7484e7a13a34555ee9173`.
+
+This association supersedes the former shared retrieval dataset association.
+The original `widebluesky/wbs-retrieval-demo` dataset and its pinned `demo-v1` revision
+remain available for historical reproducibility.

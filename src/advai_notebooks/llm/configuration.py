@@ -62,7 +62,7 @@ class ExperimentSettings:
         return {**asdict(self), "root": str(self.root)}
 
 
-def load_settings(path, kind, sections, cls, root=None):
+def load_settings(path, kind, sections, cls, root=None, *, validator=None):
     path = Path(path).resolve()
     raw = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(raw, dict) or set(raw) - (set(sections) | {"output_dir"}):
@@ -81,11 +81,11 @@ def load_settings(path, kind, sections, cls, root=None):
     cfg = cls(
         kind=kind, root=root, output_dir=raw.get("output_dir", f"outputs/{kind}/run"), **values
     )
-    validate(cfg)
+    (validator or validate)(cfg)
     return cfg
 
 
-def validate(cfg):
+def validate(cfg, *, selection_metric="nll"):
     for name, value in (
         ("model.id", cfg.model.id),
         ("output_dir", cfg.output_dir),
@@ -156,5 +156,5 @@ def validate(cfg):
     positive_number("top_p", cfg.generation.top_p)
     if cfg.generation.top_p > 1:
         raise ValueError("top_p must be in (0, 1]")
-    if cfg.evaluation.selection_metric != "nll":
-        raise ValueError("First-version checkpoint selection uses validation nll")
+    if cfg.evaluation.selection_metric != selection_metric:
+        raise ValueError(f"Checkpoint selection requires validation {selection_metric}")

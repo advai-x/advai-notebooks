@@ -1,0 +1,32 @@
+model:
+  id: tiny
+  max_len: 64
+data:
+  samples: data/sample/llm/grpo.jsonl
+training:
+  method: lora
+  lora_rank: 4
+  lora_alpha: 8
+  epochs: 2
+  batch_size: 2
+  learning_rate: 0.0005
+  weight_decay: 0.0
+  seed: 42
+runtime:
+  device: cpu
+  precision: fp32
+  num_threads: 2
+algorithm:
+  max_new_tokens: 8
+  update_epochs: 2
+  minibatch_size: 2
+  kl_coefficient: 0.05
+  group_size: 4
+reward:
+  exact_match_weight: 1.0
+  token_overlap_weight: 1.0
+  length_weight: 0.2
+  target_length: 4
+generation:
+  max_new_tokens: 8
+output_dir: outputs/llm/grpo/lora
