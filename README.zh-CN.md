@@ -1,3 +1,5 @@
+![advai-notebooks — 基于 Notebook 的实用、可复现模型训练](docs/assets/readme-hero.png)
+
 # advai-notebooks
 
 [English](README.md) | 简体中文

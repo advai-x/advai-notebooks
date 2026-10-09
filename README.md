@@ -1,3 +1,5 @@
+![advai-notebooks — practical, reproducible model training with notebooks](docs/assets/readme-hero.png)
+
 # advai-notebooks
 
 English | [简体中文](README.zh-CN.md)
