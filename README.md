@@ -39,6 +39,21 @@ Google Colab, then move the same configuration to a local machine or GPU environ
 | LLM GRPO | Language-model policy without a critic | Group-relative advantages, clipping, reference KL, full/LoRA | [RL guide](docs/rl.md) · [Configs](configs/llm/grpo/) |
 | Diffusion | Latent text-to-image model | Full UNet fine-tuning, attention LoRA | [Notebook](notebooks/diffusion/01_finetune.ipynb) · [Guide](docs/diffusion.md) · [Open in Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/diffusion/01_finetune.ipynb) |
 
+### Upcoming guides
+
+These tracks have directory scaffolds and guide outlines. Training code, executable
+notebooks, dependency extras and model-specific presets will be added as each backend
+is implemented. They are not runnable yet.
+
+| Track | Model family | Planned input → output | Guide outline |
+| --- | --- | --- | --- |
+| VLM | Vision-Language Model | Images or video + text → text responses | [Guide](docs/vlm.md) · [Notebook directory](notebooks/vlm/) |
+| VLA | Vision-Language-Action Model | Visual observations + instructions + optional robot state → actions | [Guide](docs/vla.md) · [Notebook directory](notebooks/vla/) |
+| VM | World Model | Observations + optional actions → future states or observations | [Guide](docs/vm.md) · [Notebook directory](notebooks/vm/) |
+
+VLM, VLA and VM are independent model families alongside `llm/`. In this repository,
+`vm/` means **World Model**, rather than a vision-only or video-only model.
+
 There is also an optional
 [retrieval comparison notebook](notebooks/workflows/01_retrieval_comparison.ipynb)
 for evaluating embedding retrieval and reranking together. The two models remain
@@ -118,7 +133,7 @@ package versions must still match the original run.
 
 ## What makes these guides different?
 
-- **Executable, not pseudocode.** Each guide covers validation, training, evaluation,
+- **End-to-end guides.** Each implemented guide covers validation, training, evaluation,
   checkpointing, export and reload.
 - **Notebook and CLI parity.** Interactive notebooks call the same modules as automated
   command-line runs.
@@ -179,6 +194,9 @@ advai-notebooks/
 │   ├── ranker/
 │   ├── decision/
 │   ├── llm/{base,instruct}/
+│   ├── vlm/                    # Planned vision-language guide
+│   ├── vla/                    # Planned vision-language-action guide
+│   ├── vm/                     # Planned world-model guide
 │   ├── diffusion/
 │   └── workflows/
 ├── configs/                    # Smoke, real-model and LoRA experiment presets
@@ -187,6 +205,9 @@ advai-notebooks/
 │   ├── ranker/
 │   ├── decision/
 │   ├── llm/{base,instruct,ppo,grpo}/
+│   ├── vlm/                    # Package scaffold
+│   ├── vla/                    # Package scaffold
+│   ├── vm/                     # Package scaffold
 │   ├── diffusion/
 │   ├── data_preparation/
 │   ├── workflows/
@@ -206,6 +227,9 @@ advai-notebooks/
 - [Decision-model guide](notebooks/decision/README.md)
 - [LLM base and instruct guide](docs/llm.md)
 - [PPO and GRPO guide](docs/rl.md)
+- [VLM guide outline](docs/vlm.md)
+- [VLA guide outline](docs/vla.md)
+- [VM / World Model guide outline](docs/vm.md)
 - [Diffusion guide](docs/diffusion.md)
 - [Hugging Face publication guide](docs/publishing.md)
 - [Retrieval data contract](data/sample/retrieval/README.md)

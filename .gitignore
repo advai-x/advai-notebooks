@@ -79,6 +79,9 @@ data/**
 !data/sample/decision/README.md
 !data/sample/retrieval/README.md
 !data/sample/llm/README.md
+!data/sample/vlm/README.md
+!data/sample/vla/README.md
+!data/sample/vm/README.md
 # Deliberately small synthetic fixtures only.
 !data/sample/decision/triage.jsonl
 !data/sample/retrieval/corpus.jsonl
@@ -111,5 +114,8 @@ outputs/**
 !outputs/llm/instruct/README.md
 !outputs/llm/ppo/README.md
 !outputs/llm/grpo/README.md
+!outputs/vlm/README.md
+!outputs/vla/README.md
+!outputs/vm/README.md
 
 !outputs/diffusion/README.md

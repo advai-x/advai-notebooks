@@ -13,3 +13,14 @@ the six-way comparison. Core task notebooks have executed offline CPU examples w
 tiny synthetic models verify interfaces; they do not establish domain quality.
 
 - [Diffusion](diffusion/01_finetune.ipynb): offline full/LoRA latent image training, fixed-noise evaluation, native reload, generated samples and an explicit publication preview.
+
+## Upcoming model families
+
+These directories contain guide outlines; executable notebooks will accompany their
+training implementations:
+
+- [VLM](vlm/README.md): vision-language training with image/video and text inputs.
+- [VLA](vla/README.md): vision-language-action training on instruction-conditioned episodes.
+- [VM](vm/README.md): World Model training for future-state and observation prediction.
+
+All three are peers of `llm/`; `vm/` is reserved for World Models.
