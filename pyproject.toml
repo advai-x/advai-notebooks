@@ -10,6 +10,9 @@ requires-python = ">=3.10"
 dependencies = ["PyYAML>=6,<7"]
 
 [project.optional-dependencies]
+vlm = ["transformers==5.18.0", "torch>=2.4,<3", "peft==0.18.1", "safetensors>=0.8,<1", "numpy>=1.26,<3", "Pillow>=10,<13"]
+vla = ["transformers==5.18.0", "torch>=2.4,<3", "safetensors>=0.8,<1", "numpy>=1.26,<3", "Pillow>=10,<13"]
+vm = ["torch>=2.4,<3", "safetensors>=0.4,<1", "numpy>=1.26,<3", "huggingface-hub>=0.34,<2"]
 decision = ["transformers==5.18.0", "torch>=2.4,<3", "safetensors>=0.4,<1", "numpy>=1.26,<3"]
 embedding = ["sentence-transformers==5.7.0", "torch>=2.4,<3"]
 ranker = ["sentence-transformers==5.7.0", "torch>=2.4,<3"]
@@ -18,11 +21,14 @@ llm-instruct = ["transformers==5.18.0", "torch>=2.4,<3", "peft==0.18.1", "accele
 llm-ppo = ["transformers==5.18.0", "torch>=2.4,<3", "peft==0.18.1", "accelerate==1.15.0", "safetensors>=0.4,<1", "numpy>=1.26,<3"]
 llm-grpo = ["transformers==5.18.0", "torch>=2.4,<3", "peft==0.18.1", "accelerate==1.15.0", "safetensors>=0.4,<1", "numpy>=1.26,<3"]
 diffusion = ["diffusers==0.41.0", "transformers==5.18.0", "torch>=2.4,<3", "peft==0.18.1", "accelerate==1.15.0", "safetensors>=0.8,<1", "numpy>=1.26,<3", "Pillow>=10,<13"]
-publish = ["huggingface-hub>=1,<2"]
-notebooks = ["nbformat>=5.10,<6", "nbclient>=0.10,<1", "ipykernel>=6,<8", "ipywidgets>=8,<9", "matplotlib>=3.9,<4"]
+publish = ["huggingface-hub>=0.34,<2"]
+notebooks = ["nbformat>=5.10,<6", "nbclient>=0.10,<1", "nbconvert>=7.16,<8", "ipykernel>=6,<8", "ipywidgets>=8,<9", "matplotlib>=3.9,<4"]
 dev = ["pytest>=8,<10", "ruff>=0.9,<1"]
 
 [project.scripts]
+advai-vlm = "advai_notebooks.vlm.cli:main"
+advai-vla = "advai_notebooks.vla.cli:main"
+advai-vm = "advai_notebooks.vm.cli:main"
 advai-diffusion = "advai_notebooks.diffusion.cli:main"
 advai-decision = "advai_notebooks.decision.cli:main"
 advai-embedding = "advai_notebooks.embedding.cli:main"

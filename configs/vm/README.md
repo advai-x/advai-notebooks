@@ -1,7 +1,8 @@
-# VM — World Models configs
+# VM configs
 
-Reserved for model, data, preprocessing, training, evaluation and export settings.
-No runnable YAML presets or CLI are available yet.
+- `smoke.yaml`: random residual MLP on numerical state/action episodes.
+- `finetune.yaml`: first run smoke, then fine-tune its native export into a new output directory. Preserves normalization and state semantics.
 
-See the [guide outline](../../docs/vm.md). Backend-specific smoke and real-model
-presets will be added alongside implementation and validation.
+All support single-process, single-device fp32. Model/data configuration is strict: unknown fields fail.
+Use a fresh output directory for new experiments; `--resume` requires the original config/data/source/environment.
+[Commands and field contracts](../../docs/vm.md).

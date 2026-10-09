@@ -1,6 +1,11 @@
-# VLA — Vision-Language-Action Models tests
+# VLA tests
 
-Future checks should cover episode splits, observation/action alignment, action normalization, chunk masking and export/reload.
+`test_vla_native.py` covers task-specific model behavior, native exports and inference.
+Shared lifecycle regressions are in [test_multimodal_lifecycle.py](../test_multimodal_lifecycle.py),
+including exact interrupted epoch recovery, offline whitelist publication and independent imports.
 
-This directory is reserved for backend tests; it contains no executable tests yet.
-See the [guide outline](../../docs/vla.md).
+```bash
+python -m pytest tests/vla tests/test_multimodal_lifecycle.py -q
+```
+
+Tests use random tiny models and local synthetic data; GPU and real task quality are not implied.

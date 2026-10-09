@@ -1,0 +1,15 @@
+output_dir: outputs/vla/full
+model:
+  id: tiny
+  freeze_backbone: false
+data:
+  samples: data/sample/vla/episodes.jsonl
+training:
+  epochs: 2
+  batch_size: 2
+  learning_rate: 0.001
+  seed: 42
+runtime:
+  device: cpu
+  precision: fp32
+  num_threads: 1

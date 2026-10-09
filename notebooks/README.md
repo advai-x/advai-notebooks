@@ -1,26 +1,16 @@
 # Notebooks
 
-Use numbered notebooks for a repeatable lifecycle: `01_prepare_data`, `02_train`, `03_evaluate`, `04_inference`, and `05_export`. Shared implementation should be moved into `src/advai_notebooks`.
+Core tutorials explain the same implementation used by the CLI. Each `01_finetune.ipynb` walks through validation, training, evaluation, export/reload and inference.
 
-The first v1 notebooks each walk through the complete lifecycle in one file:
+- [Embedding](embedding/01_finetune.ipynb): MNRL and retrieval evaluation.
+- [Ranker](ranker/01_finetune.ipynb): BCE and held-out ranking.
+- [Decision](decision/01_finetune.ipynb): native encoder, option scoring and calibration.
+- [LLM Base](llm/base/01_finetune.ipynb) / [Instruct](llm/instruct/01_finetune.ipynb): continued pre-training and assistant SFT.
+- [Diffusion](diffusion/01_finetune.ipynb): latent text-to-image full/LoRA.
+- [VLM](vlm/01_finetune.ipynb): native LLaVA image QA, full/LoRA and multimodal processor reload.
+- [VLA](vla/01_finetune.ipynb): CLIP + state continuous action chunks, episode masks and physical units.
+- [VM](vm/01_finetune.ipynb): numerical World Model dynamics, native fine-tuning and recursive rollouts.
 
-- [Embedding](embedding/01_finetune.ipynb): shared data, negatives, MNRL, retrieval metrics and export.
-- [Ranker](ranker/01_finetune.ipynb): prepared pairs, fixed candidates, BCE and export.
-- [Decision](decision/01_finetune.ipynb): native HF encoder + option scorer, CE/RLCD, calibration, metrics and export.
-
-The optional [combined workflow](workflows/01_retrieval_comparison.ipynb) contains
-the six-way comparison. Core task notebooks have executed offline CPU examples with saved cell outputs. Their
-tiny synthetic models verify interfaces; they do not establish domain quality.
-
-- [Diffusion](diffusion/01_finetune.ipynb): offline full/LoRA latent image training, fixed-noise evaluation, native reload, generated samples and an explicit publication preview.
-
-## Upcoming model families
-
-These directories contain guide outlines; executable notebooks will accompany their
-training implementations:
-
-- [VLM](vlm/README.md): vision-language training with image/video and text inputs.
-- [VLA](vla/README.md): vision-language-action training on instruction-conditioned episodes.
-- [VM](vm/README.md): World Model training for future-state and observation prediction.
-
-All three are peers of `llm/`; `vm/` is reserved for World Models.
+The [optional retrieval comparison](workflows/01_retrieval_comparison.ipynb) combines independently trained embedding and ranker models.
+Tiny random models and synthetic CPU examples validate interfaces, not real-world quality.
+Colab cells install task-specific extras; persistent data/checkpoint storage is required for longer experiments.

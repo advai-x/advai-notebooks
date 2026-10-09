@@ -1,6 +1,11 @@
-# VLM — Vision-Language Models tests
+# VLM tests
 
-Future checks should cover media references, grouped splits, multimodal label masking, processor persistence and export/reload.
+`test_vlm_native.py` covers task-specific model behavior, native exports and inference.
+Shared lifecycle regressions are in [test_multimodal_lifecycle.py](../test_multimodal_lifecycle.py),
+including exact interrupted epoch recovery, offline whitelist publication and independent imports.
 
-This directory is reserved for backend tests; it contains no executable tests yet.
-See the [guide outline](../../docs/vlm.md).
+```bash
+python -m pytest tests/vlm tests/test_multimodal_lifecycle.py -q
+```
+
+Tests use random tiny models and local synthetic data; GPU and real task quality are not implied.

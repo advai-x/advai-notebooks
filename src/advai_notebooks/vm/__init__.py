@@ -1,1 +1,1 @@
-"""Planned world models workflow; training backend not implemented."""
+"""Action-conditioned numerical World Model dynamics and rollouts."""

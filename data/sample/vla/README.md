@@ -1,6 +1,10 @@
-# VLA — Vision-Language-Action Models samples
+# VLA synthetic fixtures
 
-Reserve small synthetic observation/action episodes here. The first backend must define timestamps, camera layout, action units and normalization.
+`episodes.jsonl`: 4 instruction-conditioned episodes, each 3 steps, split train 2 / validation 1 / test 1.
+Each step has a timestamp, image, 2D state and 2D displacement action.
+Control frequency is 10 Hz, units meters, coordinate frame world; horizon defaults to 2.
+Colors can repeat within a split, but decoded images never cross splits.
 
-No fixtures are included yet. Sample files require explicit Git ignore exceptions when
-added. See the [guide outline](../../../docs/vla.md).
+These deliberately tiny fixtures are versioned via explicit Git ignore exceptions.
+They test data contracts and lifecycle mechanics, not model capability.
+[Schema and validation](../../../docs/vla.md).

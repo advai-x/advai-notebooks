@@ -1,1 +1,1 @@
-"""Planned vision-language-action models workflow; training backend not implemented."""
+"""CLIP/state continuous-action behavior-cloning baseline."""

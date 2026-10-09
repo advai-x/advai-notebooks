@@ -83,6 +83,25 @@ data/**
 !data/sample/vla/README.md
 !data/sample/vm/README.md
 # Deliberately small synthetic fixtures only.
+!data/sample/vlm/samples.jsonl
+!data/sample/vlm/images/red.ppm
+!data/sample/vlm/images/green.ppm
+!data/sample/vlm/images/blue.ppm
+!data/sample/vlm/images/yellow.ppm
+!data/sample/vlm/images/purple.ppm
+!data/sample/vlm/images/orange.ppm
+!data/sample/vlm/images/cyan.ppm
+!data/sample/vlm/images/pink.ppm
+!data/sample/vla/episodes.jsonl
+!data/sample/vla/images/red.ppm
+!data/sample/vla/images/green.ppm
+!data/sample/vla/images/blue.ppm
+!data/sample/vla/images/yellow.ppm
+!data/sample/vla/images/purple.ppm
+!data/sample/vla/images/orange.ppm
+!data/sample/vla/images/cyan.ppm
+!data/sample/vla/images/pink.ppm
+!data/sample/vm/episodes.jsonl
 !data/sample/decision/triage.jsonl
 !data/sample/retrieval/corpus.jsonl
 !data/sample/retrieval/queries.jsonl

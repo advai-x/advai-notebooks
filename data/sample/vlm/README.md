@@ -1,6 +1,9 @@
-# VLM — Vision-Language Models samples
+# VLM synthetic fixtures
 
-Reserve small synthetic image/conversation fixtures here. Media ordering and message-to-media alignment will be defined by the first backend.
+`samples.jsonl`: 8 single-image color QA examples, split train 4 / validation 2 / test 2.
+`images/*.ppm`: small RGB fixtures. Paths are relative to the JSONL.
+Samples have unique scene groups; decoded images never cross splits.
 
-No fixtures are included yet. Sample files require explicit Git ignore exceptions when
-added. See the [guide outline](../../../docs/vlm.md).
+These deliberately tiny fixtures are versioned via explicit Git ignore exceptions.
+They test data contracts and lifecycle mechanics, not model capability.
+[Schema and validation](../../../docs/vlm.md).

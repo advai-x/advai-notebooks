@@ -1,0 +1,6 @@
+{"id":"trajectory-0","group_id":"trajectory-0","split":"train","timestamps":[0,0.1,0.2,0.3],"observations":[[0,0],[0,0.2],[0.1,0.2],[0.3,0.1]],"actions":[[0,0.2],[0.1,0],[0.2,-0.1]]}
+{"id":"trajectory-1","group_id":"trajectory-1","split":"train","timestamps":[0,0.1,0.2,0.3],"observations":[[1,0],[1.2,0],[1.2,0.1],[1.1,0.3]],"actions":[[0.2,0],[0,0.1],[-0.1,0.2]]}
+{"id":"trajectory-2","group_id":"trajectory-2","split":"train","timestamps":[0,0.1,0.2,0.3],"observations":[[0,1],[0,1.2],[0.1,1.2],[0.3,1.1]],"actions":[[0,0.2],[0.1,0],[0.2,-0.1]]}
+{"id":"trajectory-3","group_id":"trajectory-3","split":"validation","timestamps":[0,0.1,0.2,0.3],"observations":[[0.5,0.5],[0.7,0.5],[0.7,0.6],[0.6,0.8]],"actions":[[0.2,0],[0,0.1],[-0.1,0.2]]}
+{"id":"trajectory-4","group_id":"trajectory-4","split":"validation","timestamps":[0,0.1,0.2,0.3],"observations":[[1,0.5],[1,0.7],[1.1,0.7],[1.3,0.6]],"actions":[[0,0.2],[0.1,0],[0.2,-0.1]]}
+{"id":"trajectory-5","group_id":"trajectory-5","split":"test","timestamps":[0,0.1,0.2,0.3],"observations":[[0.5,1],[0.7,1],[0.7,1.1],[0.6,1.3]],"actions":[[0.2,0],[0,0.1],[-0.1,0.2]]}

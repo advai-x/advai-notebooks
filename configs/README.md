@@ -1,9 +1,10 @@
 # Configs
 
-Store versioned YAML or JSON experiment configuration here. Secrets, local paths and generated state must not be committed.
+Store versioned YAML experiment configurations here. Keep credentials, machine-specific overrides and generated state outside Git.
 
-Diffusion full/LoRA and configurable Stable Diffusion examples live in [diffusion](diffusion/README.md).
+Each task has an offline `smoke.yaml`. Larger model presets are templates: replace the data/output paths, inspect memory requirements and validate before training.
 
-The upcoming [VLM](vlm/README.md), [VLA](vla/README.md) and
-[VM / World Model](vm/README.md) tracks have reserved configuration directories.
-Runnable YAML presets will be added with the corresponding training backends.
+- [Diffusion](diffusion/README.md): full/LoRA and Stable Diffusion.
+- [VLM](vlm/README.md): native LLaVA full/LoRA; fixed 7B Hub revision template.
+- [VLA](vla/README.md): CLIP continuous-action head; frozen/full encoder updates.
+- [VM / World Model](vm/README.md): state dynamics and fine-tuning a previous export.

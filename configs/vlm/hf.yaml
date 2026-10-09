@@ -1,0 +1,24 @@
+# Native LLaVA only. 7B fp32 weights alone take about 28 GB; not a free-Colab preset.
+# This is a template for your own image QA data, not a tested 7B training run.
+output_dir: outputs/vlm/llava-7b-lora
+model:
+  id: llava-hf/llava-1.5-7b-hf
+  revision: b234b804b114d9e37bb655e11cbbb5f5e971b7a9
+  max_len: 1024
+  max_new_tokens: 64
+  freeze_vision: true
+data:
+  samples: data/local/vlm/samples.jsonl
+training:
+  method: lora
+  lora_rank: 8
+  lora_alpha: 16
+  epochs: 3
+  batch_size: 1
+  gradient_accumulation: 8
+  learning_rate: 0.0001
+  seed: 42
+runtime:
+  device: cuda
+  precision: fp32
+  num_threads: 1

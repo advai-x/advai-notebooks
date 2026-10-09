@@ -1,7 +1,9 @@
-# VLA — Vision-Language-Action Models configs
+# VLA configs
 
-Reserved for model, data, preprocessing, training, evaluation and export settings.
-No runnable YAML presets or CLI are available yet.
+- `smoke.yaml`: tiny CLIP, frozen encoder and trainable action head.
+- `full.yaml`: update the tiny encoder and action head together.
+- `hf.yaml`: fixed pretrained CLIP revision + random action head on your own episodes; not OpenVLA.
 
-See the [guide outline](../../docs/vla.md). Backend-specific smoke and real-model
-presets will be added alongside implementation and validation.
+All support single-process, single-device fp32. Model/data configuration is strict: unknown fields fail.
+Use a fresh output directory for new experiments; `--resume` requires the original config/data/source/environment.
+[Commands and field contracts](../../docs/vla.md).

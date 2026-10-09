@@ -1,1 +1,1 @@
-"""Planned vision-language models workflow; training backend not implemented."""
+"""Native LLaVA single-image QA training and inference."""

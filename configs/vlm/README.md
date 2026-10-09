@@ -1,7 +1,9 @@
-# VLM — Vision-Language Models configs
+# VLM configs
 
-Reserved for model, data, preprocessing, training, evaluation and export settings.
-No runnable YAML presets or CLI are available yet.
+- `smoke.yaml`: tiny native LLaVA full update (frozen vision).
+- `lora.yaml`: language q_proj/v_proj adapters on the tiny model.
+- `hf.yaml`: fixed LLaVA 7B revision, LoRA template on your own image QA. High fp32 memory requirements; 7B GPU training is not validated.
 
-See the [guide outline](../../docs/vlm.md). Backend-specific smoke and real-model
-presets will be added alongside implementation and validation.
+All support single-process, single-device fp32. Model/data configuration is strict: unknown fields fail.
+Use a fresh output directory for new experiments; `--resume` requires the original config/data/source/environment.
+[Commands and field contracts](../../docs/vlm.md).

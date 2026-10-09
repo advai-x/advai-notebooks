@@ -38,21 +38,15 @@ Google Colab, then move the same configuration to a local machine or GPU environ
 | LLM PPO | Language-model policy with value head | GAE, clipped policy/value objectives, full/LoRA | [RL guide](docs/rl.md) · [Configs](configs/llm/ppo/) |
 | LLM GRPO | Language-model policy without a critic | Group-relative advantages, clipping, reference KL, full/LoRA | [RL guide](docs/rl.md) · [Configs](configs/llm/grpo/) |
 | Diffusion | Latent text-to-image model | Full UNet fine-tuning, attention LoRA | [Notebook](notebooks/diffusion/01_finetune.ipynb) · [Guide](docs/diffusion.md) · [Open in Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/diffusion/01_finetune.ipynb) |
-
-### Upcoming guides
-
-These tracks have directory scaffolds and guide outlines. Training code, executable
-notebooks, dependency extras and model-specific presets will be added as each backend
-is implemented. They are not runnable yet.
-
-| Track | Model family | Planned input → output | Guide outline |
-| --- | --- | --- | --- |
-| VLM | Vision-Language Model | Images or video + text → text responses | [Guide](docs/vlm.md) · [Notebook directory](notebooks/vlm/) |
-| VLA | Vision-Language-Action Model | Visual observations + instructions + optional robot state → actions | [Guide](docs/vla.md) · [Notebook directory](notebooks/vla/) |
-| VM | World Model | Observations + optional actions → future states or observations | [Guide](docs/vm.md) · [Notebook directory](notebooks/vm/) |
+| VLM | Native LLaVA single-image question answering | Answer-only full / language LoRA fine-tuning | [Notebook](notebooks/vlm/01_finetune.ipynb) · [Guide](docs/vlm.md) · [Open in Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/vlm/01_finetune.ipynb) |
+| VLA | CLIP + language + state → continuous action chunks | Behavior-cloning baseline; frozen or full encoder updates | [Notebook](notebooks/vla/01_finetune.ipynb) · [Guide](docs/vla.md) · [Open in Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/vla/01_finetune.ipynb) |
+| VM | Action-conditioned numerical World Model | Residual dynamics, native checkpoint fine-tuning, recursive rollouts | [Notebook](notebooks/vm/01_finetune.ipynb) · [Guide](docs/vm.md) · [Open in Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/vm/01_finetune.ipynb) |
 
 VLM, VLA and VM are independent model families alongside `llm/`. In this repository,
 `vm/` means **World Model**, rather than a vision-only or video-only model.
+These first backends have narrow, explicit scope: VLM does not implement video/Qwen-VL,
+VLA does not load OpenVLA checkpoints, and VM does not generate video. VLA/VM are
+trainable baselines, not demonstrated robotics or planning capabilities.
 
 There is also an optional
 [retrieval comparison notebook](notebooks/workflows/01_retrieval_comparison.ipynb)
@@ -74,7 +68,7 @@ Open a notebook from the table above, then prepare the repository in the Colab r
 
 Replace `embedding` with the extra for your chosen track:
 `ranker`, `decision`, `llm-base`, `llm-instruct`, `llm-ppo`,
-`llm-grpo` or `diffusion`.
+`llm-grpo`, `diffusion`, `vlm`, `vla` or `vm`.
 
 For real training, keep datasets and checkpoints in persistent storage such as
 Google Drive. A disconnected Colab runtime deletes files stored only under
@@ -105,7 +99,8 @@ under `outputs/`, which is ignored by Git.
 1. Pick the closest guide and run its smoke configuration unchanged.
 2. Copy the corresponding `hf.yaml`, `bge.yaml` or `lora.yaml` configuration.
 3. Pin a model ID and revision, then point the config at your own grouped data splits.
-4. Run the task's `validate` command before allocating a GPU.
+4. Validate the smoke config first. Model-aware validation of a real config loads its
+   weights and may require the target hardware and memory budget.
 5. Train into a fresh output directory and keep the configuration with the run.
 6. Evaluate on held-out data, inspect the report, then export or publish deliberately.
 
@@ -141,7 +136,7 @@ package versions must still match the original run.
   and data-contract problems before expensive training.
 - **Config-driven experiments.** Model IDs, data paths, runtime choices and
   hyperparameters live in versionable YAML files.
-- **Task isolation.** Embedding, ranker, decision, LLM and diffusion implementations own
+- **Task isolation.** Embedding, ranker, decision, LLM, diffusion, VLM, VLA and VM own
   their model-specific data, losses and metrics.
 - **Leakage-aware validation.** The data loaders validate split boundaries, groups and
   task-specific label contracts.
@@ -170,6 +165,9 @@ python -m advai_notebooks.llm.instruct run --config configs/llm/instruct/smoke.y
 python -m advai_notebooks.llm.ppo run     --config configs/llm/ppo/smoke.yaml
 python -m advai_notebooks.llm.grpo run    --config configs/llm/grpo/smoke.yaml
 python -m advai_notebooks.diffusion run   --config configs/diffusion/smoke.yaml
+python -m advai_notebooks.vlm run         --config configs/vlm/smoke.yaml
+python -m advai_notebooks.vla run         --config configs/vla/smoke.yaml
+python -m advai_notebooks.vm run          --config configs/vm/smoke.yaml
 ```
 
 Data preparation and combined retrieval evaluation are separate, optional stages:
@@ -194,9 +192,9 @@ advai-notebooks/
 │   ├── ranker/
 │   ├── decision/
 │   ├── llm/{base,instruct}/
-│   ├── vlm/                    # Planned vision-language guide
-│   ├── vla/                    # Planned vision-language-action guide
-│   ├── vm/                     # Planned world-model guide
+│   ├── vlm/                    # Native LLaVA image QA
+│   ├── vla/                    # Continuous-action behavior cloning
+│   ├── vm/                     # Numerical world dynamics
 │   ├── diffusion/
 │   └── workflows/
 ├── configs/                    # Smoke, real-model and LoRA experiment presets
@@ -205,9 +203,9 @@ advai-notebooks/
 │   ├── ranker/
 │   ├── decision/
 │   ├── llm/{base,instruct,ppo,grpo}/
-│   ├── vlm/                    # Package scaffold
-│   ├── vla/                    # Package scaffold
-│   ├── vm/                     # Package scaffold
+│   ├── vlm/
+│   ├── vla/
+│   ├── vm/
 │   ├── diffusion/
 │   ├── data_preparation/
 │   ├── workflows/
@@ -227,9 +225,9 @@ advai-notebooks/
 - [Decision-model guide](notebooks/decision/README.md)
 - [LLM base and instruct guide](docs/llm.md)
 - [PPO and GRPO guide](docs/rl.md)
-- [VLM guide outline](docs/vlm.md)
-- [VLA guide outline](docs/vla.md)
-- [VM / World Model guide outline](docs/vm.md)
+- [VLM fine-tuning guide](docs/vlm.md)
+- [VLA action-training guide](docs/vla.md)
+- [VM / World Model guide](docs/vm.md)
 - [Diffusion guide](docs/diffusion.md)
 - [Hugging Face publication guide](docs/publishing.md)
 - [Retrieval data contract](data/sample/retrieval/README.md)

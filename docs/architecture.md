@@ -1,13 +1,13 @@
 # 项目架构：独立微调任务与自研 Decision Model
 
-本项目提供八条独立的模型训练与推理路径：Embedding、Ranker、Decision、LLM Base、LLM Instruct、LLM PPO、LLM GRPO 和 Diffusion。
+本项目提供十一条独立的模型训练与推理路径：Embedding、Ranker、Decision、LLM Base、LLM Instruct、LLM PPO、LLM GRPO、Diffusion、VLM、VLA 和 VM。
 每条路径拥有自己的配置、数据校验、采样、损失、优化器、评估、训练组装、导出和 CLI。
-八类任务可以分别训练、部署和调整，应用层按需要组合它们。
+各类任务可以分别训练、部署和调整，应用层按需要组合它们。
 
-另外预留了与 `llm/` 平级的 `vlm/`、`vla/`、`vm/` 三个模型方向。
-它们目前只有目录骨架和 Guide 规划，不计入上述八条可运行路径。
+与 `llm/` 平级的 `vlm/`、`vla/`、`vm/` 已分别实现原生 LLaVA 单图问答、
+CLIP/state 连续动作行为克隆基线和数值状态空间 dynamics 基线。
 `vm/` 在本项目中表示 World Model（世界模型）。
-训练目标与数据规划见 [VLM](vlm.md)、[VLA](vla.md)、[VM](vm.md)。
+完整范围与数据契约见 [VLM](vlm.md)、[VLA](vla.md)、[VM](vm.md)；组件实现见第 11 节。
 
 Decision 的定位是本项目自行实现的决策模型。Laya 仅作为思想参考：将问题与候选选项显式建模，
 输出可解释的类型化概率，并关注概率校准。输入编码、模型组合、决策 head、损失、奖励、
@@ -17,12 +17,12 @@ Decision 的定位是本项目自行实现的决策模型。Laya 仅作为思想
 
 ## 1. 模型任务并行，应用组合单独表达
 
-Embedding、Ranker、Decision、LLM Base、LLM Instruct、LLM PPO、LLM GRPO、Diffusion 是同一级的任务模块，各自从数据到训练、评估、导出、推理形成闭环。
+Embedding、Ranker、Decision、LLM Base、LLM Instruct、LLM PPO、LLM GRPO、Diffusion、VLM、VLA、VM 是同一级的任务模块，各自从数据到训练、评估、导出、推理形成闭环。
 图中的并行表示独立且同级，不表示必须同时训练。它们可以分别选择基座、参数、设备和部署方式。
 
 ```mermaid
 flowchart TB
-    subgraph TASKS[八条独立模型路径]
+    subgraph TASKS[十一条独立模型路径]
         direction LR
         subgraph EMB[Embedding]
             direction TB
@@ -96,14 +96,23 @@ flowchart TB
             FX --> FH[可选 Hub 发布]
             FH --> FI
         end
+        subgraph MULTIMODAL[VLM / VLA / VM 三条同级路径]
+            direction TB
+            MD[各自图片 QA / 动作 episode / 状态轨迹] --> MT[各自监督目标训练]
+            MT --> MV[各自 validation 指标选模]
+            MV --> MX[原生权重与预处理/物理语义导出]
+            MX --> MI[chat / predict / rollout]
+            MX --> MH[可选推理包 Hub 发布]
+        end
     end
 ```
 
-八条路径各自使用中立的配置/运行/checkpoint/产物/来源追踪工具。
-依赖方向为任务模块 → `common`；八个任务不互相导入。
+各路径使用中立的配置/运行/checkpoint/产物/来源追踪工具。
+依赖方向为任务模块 → `common`；模型任务不互相导入。
 四个 LLM 任务另复用 `llm/` 下的 SDK、运行参数、配置校验与文件读取工具，损失、指标、选模和训练组装归各任务。
 当前 Decision 使用自己的训练循环，Embedding/Ranker 使用共享检索训练循环；
 Base/Instruct 各自组装 Transformers Trainer，PPO/GRPO 各自实现在线 RL 训练循环，Diffusion 自己实现去噪训练循环。训练器差异不意味着模型任务存在上下游关系。
+VLM/VLA/VM 各自注入模型、数据、loss、评估和持久化，复用中立的 epoch 执行机制。
 Base full/merged 导出可作为 Instruct 的初始模型，SFT full/merged 导出可作为 PPO/GRPO 的初始模型；这些都是可选的产物衔接，不是模块依赖。
 
 离线准备及应用组合属于另一个层次，因此不放进主模型图：
@@ -116,7 +125,7 @@ Base full/merged 导出可作为 Instruct 的初始模型，SFT full/merged 导�
 
 ### 1.1 统一职责、契约与生命周期
 
-统一目标是：八条任务提供相同的工程入口、职责划分与实验阶段，每类任务保留自己的请求、
+统一目标是：各任务提供相同的工程入口、职责划分与实验阶段，每类任务保留自己的请求、
 batch、loss、指标和输出语义。现有代码尚未全部达到这个目标。
 
 ```text
@@ -260,7 +269,7 @@ metrics.py evaluate.py pipeline.py cli.py publish.py`。配置在 `configs/llm/{
 
 表中路径相对各自任务目录；LLM 四列分别对应 `llm/base/`、`llm/instruct/`、`llm/ppo/`、`llm/grpo/`。
 这张表列职责入口，网络组件单列；内部实现细节在目录树和下文说明。
-八个任务各自维护 `metrics.py`，不共享指标实现。
+表中八个任务各自维护 `metrics.py`，不共享指标实现；新增三类基线的指标目前直接由各自 `evaluate.py` 计算，见第 11 节。
 
 Base 的 `data.py` 负责文档分组、EOS 与保留边界目标的切片；Instruct 的 `data.py` 负责对话校验、
 chat template 与助手回复掩码。两者的 `train.py` 分别组装 Trainer、采样、loss、optimizer 和验证选模回调。
@@ -282,7 +291,7 @@ Embedding、Ranker、Decision、Base/Instruct、Diffusion 已有共同的指标�
 
 ### 2.1.1 网络组件的统一边界
 
-八个任务均通过各自 `backbones.py` 和 `heads.py` 提供组件或原生组件视图，`model.py` 负责加载基础模型、
+上述八个任务均通过各自 `backbones.py` 和 `heads.py` 提供组件或原生组件视图，`model.py` 负责加载基础模型、
 组合组件、保存/重载以及公开推理。调用第三方库不会改变这个职责划分，组件不跨任务共享。
 
 | 组件 | Embedding | Ranker | Decision | LLM Base | LLM Instruct |
@@ -721,3 +730,31 @@ Full 只训练完整 UNet；LoRA 只训练 UNet 适配层，VAE 与文本编码�
 
 CPU fp32 tiny full/LoRA 链路及精确恢复已验证；设备可配置，CUDA/MPS 和真实大模型需目标环境验证。
 首版明确不支持 AMP、多卡、SDXL/DiT/视频、img2img、inpainting；更换模型 ID 不会自动获得这些能力。
+
+## 11. VLM / VLA / VM：三个独立基线
+
+| 任务 | `model.py` 组件与推理 | 任务局部数据/loss/评估 |
+| --- | --- | --- |
+| VLM | 原生 LLaVA + processor，full/语言 LoRA，`chat` | 单图 QA、assistant-only labels，token 加权 NLL/PPL |
+| VLA | CLIP image/text encoder + state + action MLP，`predict` | episode 内连续 action chunks、尾部 mask，原始动作 MSE/MAE |
+| VM | action-conditioned residual MLP，`predict/rollout` | 数值轨迹的未来窗口、递归 multi-step loss，单步/rollout MSE |
+
+三个任务各自拥有 `config.py`、`data.py`、`model.py`、`losses.py`、`evaluate.py`、
+`pipeline.py`、`cli.py` 和 `publish.py`，没有彼此之间或对文本 LLM 的导入。
+首版较小组件直接在 `model.py` 组合，指标直接在各自 `evaluate.py` 计算，不借用其他任务的指标。
+
+`common/task_configuration.py` 只提供 dataclass/YAML 校验机制，任务扩展字段归本地配置。
+`common/media.py` 处理本地 RGB 图片、JSONL/分组与数值维度验证。
+`common/native_training.py` 接收任务注入的模型、数据处理、loss、evaluate，执行按监督目标数加权的
+梯度累积、epoch checkpoint、严格恢复和 baseline/validation/test 生命周期。
+VLA/VM 的归一化及物理语义均由任务数据处理实现，不进入共享训练器。
+
+`latest/state.json` 原子指向最新完整 checkpoint，checkpoint 内保存原生模型、optimizer、RNG 与来源签名。
+`export/` 为最佳 validation（包括 epoch 0），`latest_export/` 为最后一轮，test 仅报告。
+VLM LoRA 导出包含冻结基座；VLA 导出包含完整 CLIP 编码器/processor、动作 head、统计量与动作语义；
+VM 导出仅包含 dynamics safetensors 与架构/统计/状态语义，不隐式依赖原始轨迹。
+
+三个 `publish.py` 注入各自的模型和模型卡，`common/native_publication.py` 仅复用白名单打包机制，
+并在 `common/hub.py` 上传前重载推理包。不会上传 raw data/媒体、optimizer 或日志。
+设备可配，首版限定单进程、单设备 fp32；默认 tiny CPU 和合成数据只验证接口，不证明真实任务质量。
+VLM 尚无视频/Qwen-VL 后端，VLA 不是 OpenVLA 适配，VM 不是视频世界模型。

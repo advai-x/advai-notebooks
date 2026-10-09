@@ -1,6 +1,9 @@
-# VLA — Vision-Language-Action Models
+# VLA training guide
 
-Visual observations, instructions and optional robot state → actions.
+[Open the executable tutorial](01_finetune.ipynb) · [Open in Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/vla/01_finetune.ipynb)
 
-Status: guide outline only. Executable notebooks will be added with the training backend.
-See the [guide outline](../../docs/vla.md) for the planned workflow and data contract.
+CLIP vision/language + state → continuous action chunks; a behavior-cloning baseline, not OpenVLA.
+
+The tutorial contains executed offline CPU outputs and checks for data validation, training, native reload, inference, epoch recovery and dry-run publication.
+Synthetic fixtures and random tiny models do not establish real-world quality.
+See the [full guide](../../docs/vla.md) for data contracts and backend limitations.

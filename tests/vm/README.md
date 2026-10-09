@@ -1,6 +1,11 @@
-# VM — World Models tests
+# VM tests
 
-Future checks should cover episode/window boundaries, temporal alignment, one-step and rollout evaluation, preprocessing persistence and export/reload.
+`test_vm_native.py` covers task-specific model behavior, native exports and inference.
+Shared lifecycle regressions are in [test_multimodal_lifecycle.py](../test_multimodal_lifecycle.py),
+including exact interrupted epoch recovery, offline whitelist publication and independent imports.
 
-This directory is reserved for backend tests; it contains no executable tests yet.
-See the [guide outline](../../docs/vm.md).
+```bash
+python -m pytest tests/vm tests/test_multimodal_lifecycle.py -q
+```
+
+Tests use random tiny models and local synthetic data; GPU and real task quality are not implied.

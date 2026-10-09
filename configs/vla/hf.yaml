@@ -1,0 +1,29 @@
+# Pretrained CLIP encoder + randomly initialized continuous-action head.
+# Not a pretrained OpenVLA model. Requires your own grouped robot episodes.
+output_dir: outputs/vla/clip-action
+model:
+  id: openai/clip-vit-base-patch32
+  revision: 3d74acf9a28c67741b2f4f2ea7635f0aaf6f0268
+  hidden_size: 256
+  state_dim: 2
+  action_dim: 2
+  horizon: 4
+  max_len: 77
+  freeze_backbone: true
+data:
+  samples: data/local/vla/episodes.jsonl
+  state_names: [x, y]
+  state_units: meters
+  action_names: [dx, dy]
+  action_units: meters
+  coordinate_frame: world
+  control_frequency_hz: 10.0
+training:
+  epochs: 10
+  batch_size: 8
+  learning_rate: 0.001
+  seed: 42
+runtime:
+  device: cuda
+  precision: fp32
+  num_threads: 1

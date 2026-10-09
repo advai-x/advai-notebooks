@@ -1,0 +1,8 @@
+{"id":"color-0","group_id":"scene-0","split":"train","image":"images/red.ppm","prompt":"what color is the square ?","answer":"red"}
+{"id":"color-1","group_id":"scene-1","split":"train","image":"images/green.ppm","prompt":"what color is the square ?","answer":"green"}
+{"id":"color-2","group_id":"scene-2","split":"train","image":"images/blue.ppm","prompt":"what color is the square ?","answer":"blue"}
+{"id":"color-3","group_id":"scene-3","split":"train","image":"images/yellow.ppm","prompt":"what color is the square ?","answer":"yellow"}
+{"id":"color-4","group_id":"scene-4","split":"validation","image":"images/purple.ppm","prompt":"what color is the square ?","answer":"purple"}
+{"id":"color-5","group_id":"scene-5","split":"validation","image":"images/orange.ppm","prompt":"what color is the square ?","answer":"orange"}
+{"id":"color-6","group_id":"scene-6","split":"test","image":"images/cyan.ppm","prompt":"what color is the square ?","answer":"cyan"}
+{"id":"color-7","group_id":"scene-7","split":"test","image":"images/pink.ppm","prompt":"what color is the square ?","answer":"pink"}

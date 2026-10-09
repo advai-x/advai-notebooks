@@ -1,8 +1,8 @@
 # 将模型发布到 Hugging Face
 
 完整链路现在为：数据 → 训练/微调 → 评估/选模 → 原生导出 → 可选发布 → 按版本加载推理。
-Embedding、Ranker、Decision、LLM Base、LLM Instruct、LLM PPO、LLM GRPO、Diffusion 各自发布到独立 model 仓库，使用相同命令参数。
-发布是显式动作，`run` 不会自动上传。五个微调 Notebook 的最后一节也提供发布入口，默认只做离线预览。
+Embedding、Ranker、Decision、LLM Base、LLM Instruct、LLM PPO、LLM GRPO、Diffusion、VLM、VLA、VM 各自发布到独立 model 仓库，使用相同命令参数。
+发布是显式动作，`run` 不会自动上传。微调 Notebook 的发布示例默认只做离线预览。
 
 ## 安装和认证
 
@@ -51,10 +51,14 @@ candidate 文件、优化器/随机状态、运行日志或 `.env`。
 | LLM PPO | full/adapter actor、value head、tokenizer/chat template、generation config | `PPOModel.load/generate/chat` |
 | LLM GRPO | full/adapter actor、tokenizer/chat template、generation config | `GRPOModel.load/generate/chat` |
 | Diffusion | 原生 full pipeline / LoRA 与 bundled base、组件配置、noise scheduler | `DiffusionModel.load/generate` |
+| VLM | 原生 LLaVA full / LoRA 与 bundled base、processor/tokenizer/chat template | `VLMModel.load/chat` |
+| VLA | CLIP encoder/processor、动作 head、train-only 统计量、物理语义 | `VLAModel.load/predict` |
+| VM | 数值 dynamics safetensors、架构、统计量与状态/动作语义 | `VMModel.load/predict/rollout` |
 
 任务定义中的问题、选项和规则属于 Decision 推理契约，`tasks.json` 会随模型发布。
 生成的 `README.md` 提供模型卡、推理示例及随机 tiny 模型说明；如果导出旁有匹配的运行报告，
-还会包含选中的 epoch 和测试集汇总指标。完整实验报告和样例预测不上传。
+部分任务还会包含选中的 epoch 和测试集汇总指标。VLM/VLA/VM 首版模型卡说明后端范围和重载入口，
+真实发布时应补充自己的数据来源、许可证与评估。完整实验报告和样例预测不上传。
 发布用的标准模型元数据会去除认证字段，并将绝对的本地模型路径替换为 `local`；权重和任务定义不改动。
 
 ## 实际发布
