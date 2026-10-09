@@ -338,6 +338,12 @@ report = importlib.import_module(prefix + ".pipeline").run(cfg)
 cli = importlib.import_module(prefix + ".cli")
 cli.main(["validate", "--config", str(root / f"configs/llm/{kind}/smoke.yaml")])
 cli.main(["publish", "--export-dir", report["export"], "--repo-id", "test/" + kind, "--dry-run"])
+publication = importlib.import_module(prefix + ".publish").publish(
+    report["export"], "test/" + kind, dry_run=True
+)
+card = publication["model_card"]
+assert "proximal policy optimization (PPO)" in card if kind == "ppo" else "group relative policy optimization (GRPO)" in card
+assert "Supervised" not in card and "assistant-only next-token labels" not in card
 print("RL_INDEPENDENT_OK")
 """
     result = subprocess.run(

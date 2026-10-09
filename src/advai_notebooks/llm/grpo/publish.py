@@ -1,4 +1,4 @@
-"""Instruct publication owns its native full/adapter contract and English card."""
+"""GRPO publication owns its native actor contract and English card."""
 
 import json
 from pathlib import Path
@@ -32,7 +32,9 @@ def publish(export_dir, repo_id, *, license=None, model_card=None, **options):
     if template_dir.is_dir():
         templates = [p.name for p in template_dir.iterdir() if p.suffix == ".jinja"]
         files.extend(collect_files(root, names=templates, directories=["chat_templates"]))
-    body = """Supervised grpoion tuning with assistant-only next-token labels.
+    body = """Online group relative policy optimization (GRPO) with rule-based
+rewards, group-normalized advantages, a clipped policy objective, and a frozen
+reference policy for KL regularization. This task uses no separate value head.
 
 Install this project's `llm-grpo` extra and load the versioned export:
 

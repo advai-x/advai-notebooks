@@ -1,7 +1,7 @@
 # 将模型发布到 Hugging Face
 
 完整链路现在为：数据 → 训练/微调 → 评估/选模 → 原生导出 → 可选发布 → 按版本加载推理。
-Embedding、Ranker、Decision、LLM Base、LLM Instruct 各自发布到独立 model 仓库，使用相同命令参数。
+Embedding、Ranker、Decision、LLM Base、LLM Instruct、LLM PPO、LLM GRPO、Diffusion 各自发布到独立 model 仓库，使用相同命令参数。
 发布是显式动作，`run` 不会自动上传。五个微调 Notebook 的最后一节也提供发布入口，默认只做离线预览。
 
 ## 安装和认证
@@ -48,6 +48,9 @@ candidate 文件、优化器/随机状态、运行日志或 `.env`。
 | Decision | 完整 backbone/head 权重、encoder 配置、tokenizer、任务定义和校准参数 | `DecisionModel.load/system_one` |
 | LLM Base | full/adapter 权重、tokenizer、generation config、基座来源 | `BaseModel.load/generate` |
 | LLM Instruct | full/adapter 权重、tokenizer/chat template、generation config、基座来源 | `InstructModel.load/chat` |
+| LLM PPO | full/adapter actor、value head、tokenizer/chat template、generation config | `PPOModel.load/generate/chat` |
+| LLM GRPO | full/adapter actor、tokenizer/chat template、generation config | `GRPOModel.load/generate/chat` |
+| Diffusion | 原生 full pipeline / LoRA 与 bundled base、组件配置、noise scheduler | `DiffusionModel.load/generate` |
 
 任务定义中的问题、选项和规则属于 Decision 推理契约，`tasks.json` 会随模型发布。
 生成的 `README.md` 提供模型卡、推理示例及随机 tiny 模型说明；如果导出旁有匹配的运行报告，
@@ -66,7 +69,7 @@ python -m advai_notebooks.decision publish \
   --output outputs/publishing/decision-result.json
 ```
 
-Embedding、Ranker 使用完全相同的参数。新仓库默认私有；加 `--public` 发布到公开仓库。
+其余任务使用完全相同的参数。新仓库默认私有；加 `--public` 发布到公开仓库。
 对于已有仓库，所选可见性必须与已有设置一致；发布命令不会自动修改已有仓库的可见性。
 每个仓库存放一种模型。更新仓库会添加/覆盖本次发布文件，不删除远端其他文件。
 
@@ -87,7 +90,7 @@ Embedding、Ranker 使用完全相同的参数。新仓库默认私有；加 `--
 
 ## 按版本加载推理
 
-三个 `Model.load` 均接受本地导出路径或本项目发布的 `namespace/model`，以及 `revision`、`token`、`cache_dir`、
+各任务 `Model.load` 均接受本地导出路径或本项目发布的 `namespace/model`，以及 `revision`、`token`、`cache_dir`、
 `local_files_only`。Hub 通过 snapshot 下载完整模型，之后走已有原生加载器。
 
 ```python
@@ -141,4 +144,15 @@ python -m advai_notebooks.llm.instruct publish \
   --repo-id widebluesky/wbs-llm-instruct-demo --dry-run
 ```
 
-这两个命名是后续 demo 发布目标，本次补齐框架没有创建或上传 LLM 仓库。
+Base、Instruct、PPO、GRPO 的 demo 模型和各自 Dataset 已发布到私有仓库，模型卡使用英文并关联固定数据版本。
+PPO/GRPO 的发布包经过本地加载，再从 Hub 固定 SHA 重载验证文件哈希、原生/门面/CLI 推理与测试报告。
+PPO 发布 `value_head.safetensors` 以支持完整模型门面，原生 causal-LM 推理仅使用 actor。
+固定模型与数据提交见 [Dataset 映射](datasets.md) 与 [RL 发布记录](releases/20261008-rl-demo-v1.json)。
+
+## Diffusion 发布包
+
+`python -m advai_notebooks.diffusion publish` 使用同样的参数，默认私有，可先 `--dry-run`。
+任务自身筛选 Diffusers 的 `model_index.json`、组件目录、safetensors、tokenizer、scheduler，
+LoRA 额外包含冻结初始 pipeline 和原生 adapter 元数据。筛选后实际加载验证再发布。
+不包含原始图片或生成 PNG。未来 demo 可以使用 `widebluesky/wbs-diffusion-demo`；
+本次实现没有上传 Diffusion 模型或 Dataset。详见 [Diffusion guide](diffusion.md)。

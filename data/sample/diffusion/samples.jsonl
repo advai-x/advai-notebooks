@@ -1,0 +1,8 @@
+{"id": "image-0", "group_id": "group-0", "split": "train", "image": "images/red.ppm", "caption": "a red square pattern"}
+{"id": "image-1", "group_id": "group-1", "split": "train", "image": "images/green.ppm", "caption": "a green square pattern"}
+{"id": "image-2", "group_id": "group-2", "split": "train", "image": "images/blue.ppm", "caption": "a blue square pattern"}
+{"id": "image-3", "group_id": "group-3", "split": "train", "image": "images/yellow.ppm", "caption": "a yellow square pattern"}
+{"id": "image-4", "group_id": "group-4", "split": "validation", "image": "images/purple.ppm", "caption": "a purple square pattern"}
+{"id": "image-5", "group_id": "group-5", "split": "validation", "image": "images/orange.ppm", "caption": "a orange square pattern"}
+{"id": "image-6", "group_id": "group-6", "split": "test", "image": "images/cyan.ppm", "caption": "a cyan square pattern"}
+{"id": "image-7", "group_id": "group-7", "split": "test", "image": "images/pink.ppm", "caption": "a pink square pattern"}

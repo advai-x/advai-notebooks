@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-08",
+  "status": "published_and_verified",
+  "private": true,
+  "tag": "demo-v1",
+  "training_run": "20261007-6dfcf34d",
+  "implementation_commit": "370b95d9448f8914871f01a268fca028640e12e8",
+  "models": {
+    "ppo": {
+      "repo_id": "widebluesky/wbs-llm-ppo-demo",
+      "commit": "25beb2018bbd7a493a36ef5a5793c4ca149b2dec",
+      "commit_url": "https://huggingface.co/widebluesky/wbs-llm-ppo-demo/commit/25beb2018bbd7a493a36ef5a5793c4ca149b2dec",
+      "private": true,
+      "repo_url": "https://huggingface.co/widebluesky/wbs-llm-ppo-demo",
+      "status": "published",
+      "tag": "demo-v1",
+      "actor_sha256": "a2fa5c45ba36e2defc8033ca28b72e8381a40e6023b15f0bdb352c0e768767a9",
+      "dataset_id": "widebluesky/wbs-llm-ppo-demo",
+      "dataset_revision": "5b621b1b02f8f097a2036c0aa0f915e4df5b8e31",
+      "verification": {
+        "model_revision": "25beb2018bbd7a493a36ef5a5793c4ca149b2dec",
+        "dataset_revision": "5b621b1b02f8f097a2036c0aa0f915e4df5b8e31",
+        "private": true,
+        "tag_verified": true,
+        "all_files_sha256_verified": true,
+        "dataset_association_verified": true,
+        "native_and_facade_logits_equal": true,
+        "local_and_hub_inference_equal": true,
+        "hub_cli_api_equal": true,
+        "hub_dataset_evaluation_equal": true,
+        "test_metrics": {
+          "reward_mean": 0.0,
+          "exact_match": 0.0,
+          "completion_tokens_mean": 8.0
+        },
+        "actor_sha256": "a2fa5c45ba36e2defc8033ca28b72e8381a40e6023b15f0bdb352c0e768767a9"
+      }
+    },
+    "grpo": {
+      "repo_id": "widebluesky/wbs-llm-grpo-demo",
+      "commit": "fdbe74d2c76db0a7c43d432af70a5839e87442e7",
+      "commit_url": "https://huggingface.co/widebluesky/wbs-llm-grpo-demo/commit/fdbe74d2c76db0a7c43d432af70a5839e87442e7",
+      "private": true,
+      "repo_url": "https://huggingface.co/widebluesky/wbs-llm-grpo-demo",
+      "status": "published",
+      "tag": "demo-v1",
+      "actor_sha256": "f2341a67da544accd9408439219bf270dcbe0a844db7f02db096728bf38df320",
+      "dataset_id": "widebluesky/wbs-llm-grpo-demo",
+      "dataset_revision": "3246400626f9c419fd1eaa4b36a1594b53089be2",
+      "verification": {
+        "model_revision": "fdbe74d2c76db0a7c43d432af70a5839e87442e7",
+        "dataset_revision": "3246400626f9c419fd1eaa4b36a1594b53089be2",
+        "private": true,
+        "tag_verified": true,
+        "all_files_sha256_verified": true,
+        "dataset_association_verified": true,
+        "native_and_facade_logits_equal": true,
+        "local_and_hub_inference_equal": true,
+        "hub_cli_api_equal": true,
+        "hub_dataset_evaluation_equal": true,
+        "test_metrics": {
+          "reward_mean": 0.0,
+          "exact_match": 0.0,
+          "completion_tokens_mean": 8.0
+        },
+        "actor_sha256": "f2341a67da544accd9408439219bf270dcbe0a844db7f02db096728bf38df320"
+      }
+    }
+  },
+  "datasets": {
+    "ppo": {
+      "repo_id": "widebluesky/wbs-llm-ppo-demo",
+      "commit": "5b621b1b02f8f097a2036c0aa0f915e4df5b8e31",
+      "commit_url": "https://huggingface.co/datasets/widebluesky/wbs-llm-ppo-demo/commit/5b621b1b02f8f097a2036c0aa0f915e4df5b8e31",
+      "private": true,
+      "repo_url": "https://huggingface.co/datasets/widebluesky/wbs-llm-ppo-demo",
+      "tag": "demo-v1",
+      "status": "published",
+      "config": "ppo",
+      "splits": {
+        "train": 4,
+        "validation": 2,
+        "test": 2
+      },
+      "data_fingerprint": "04b2f598deba4e7938744a820410d8cea211713d93180ba4b02e6929369f4c09"
+    },
+    "grpo": {
+      "repo_id": "widebluesky/wbs-llm-grpo-demo",
+      "commit": "3246400626f9c419fd1eaa4b36a1594b53089be2",
+      "commit_url": "https://huggingface.co/datasets/widebluesky/wbs-llm-grpo-demo/commit/3246400626f9c419fd1eaa4b36a1594b53089be2",
+      "private": true,
+      "repo_url": "https://huggingface.co/datasets/widebluesky/wbs-llm-grpo-demo",
+      "tag": "demo-v1",
+      "status": "published",
+      "config": "grpo",
+      "splits": {
+        "train": 4,
+        "validation": 2,
+        "test": 2
+      },
+      "data_fingerprint": "67c5366f7d4f3a2f4c83fb5fab8e7fb12c2356e8c76e5cc0acb494260c0ce4a0"
+    }
+  }
+}

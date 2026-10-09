@@ -91,6 +91,16 @@ data/**
 !data/sample/llm/instruct.jsonl
 !data/sample/llm/ppo.jsonl
 !data/sample/llm/grpo.jsonl
+!data/sample/diffusion/README.md
+!data/sample/diffusion/samples.jsonl
+!data/sample/diffusion/images/red.ppm
+!data/sample/diffusion/images/green.ppm
+!data/sample/diffusion/images/blue.ppm
+!data/sample/diffusion/images/yellow.ppm
+!data/sample/diffusion/images/purple.ppm
+!data/sample/diffusion/images/orange.ppm
+!data/sample/diffusion/images/cyan.ppm
+!data/sample/diffusion/images/pink.ppm
 outputs/**
 !outputs/**/
 !outputs/README.md
@@ -101,3 +111,5 @@ outputs/**
 !outputs/llm/instruct/README.md
 !outputs/llm/ppo/README.md
 !outputs/llm/grpo/README.md
+
+!outputs/diffusion/README.md

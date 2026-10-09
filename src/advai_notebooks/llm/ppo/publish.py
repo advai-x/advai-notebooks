@@ -1,4 +1,4 @@
-"""Instruct publication owns its native full/adapter contract and English card."""
+"""PPO publication owns its actor/value-head contract and English card."""
 
 import json
 from pathlib import Path
@@ -33,7 +33,9 @@ def publish(export_dir, repo_id, *, license=None, model_card=None, **options):
     if template_dir.is_dir():
         templates = [p.name for p in template_dir.iterdir() if p.suffix == ".jinja"]
         files.extend(collect_files(root, names=templates, directories=["chat_templates"]))
-    body = """Supervised ppoion tuning with assistant-only next-token labels.
+    body = """Online proximal policy optimization (PPO) with rule-based rewards,
+a frozen reference policy, generalized advantage estimation, and clipped policy
+and value objectives. The exported value head accompanies the causal language model.
 
 Install this project's `llm-ppo` extra and load the versioned export:
 

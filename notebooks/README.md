@@ -11,3 +11,5 @@ The first v1 notebooks each walk through the complete lifecycle in one file:
 The optional [combined workflow](workflows/01_retrieval_comparison.ipynb) contains
 the six-way comparison. Core task notebooks have executed offline CPU examples with saved cell outputs. Their
 tiny synthetic models verify interfaces; they do not establish domain quality.
+
+- [Diffusion](diffusion/01_finetune.ipynb): offline full/LoRA latent image training, fixed-noise evaluation, native reload, generated samples and an explicit publication preview.

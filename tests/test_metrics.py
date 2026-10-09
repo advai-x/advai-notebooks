@@ -15,7 +15,7 @@ from advai_notebooks.embedding import metrics as embedding_module
 from advai_notebooks.ranker import metrics as ranker_module
 
 
-@pytest.mark.parametrize("task", ["embedding", "ranker", "decision"])
+@pytest.mark.parametrize("task", ["embedding", "ranker", "decision", "diffusion"])
 def test_metrics_work_without_common_or_other_task_metrics(task):
     code = """
 import importlib

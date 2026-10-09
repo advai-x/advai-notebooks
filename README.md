@@ -126,7 +126,7 @@ methods accept Hub repository IDs and a versioned `revision` as well as local pa
 See [the publication guide](docs/publishing.md) for authentication, upload previews,
 private/public repositories and loading a pinned commit for inference.
 
-Published demo models are associated with five independent private demo datasets. Their model
+Published demo models are associated with seven independent private demo datasets. Their model
 cards identify the dataset IDs and pinned data revisions; dataset repositories
 preserve the original source files and explicit loading subsets/splits.
 See [the dataset guide](docs/datasets.md) for mappings and verified loading examples.
@@ -255,3 +255,33 @@ native HF actor exports, generate/chat and explicit offline publication previews
 The first version uses single-device fp32 and rule/custom terminal rewards.
 Tiny fixtures validate behavior; they do not establish model quality.
 See [the RL guide](docs/rl.md) for algorithm details and limits.
+
+PPO and GRPO trained demo models and their separate datasets are published privately
+under `widebluesky/wbs-llm-ppo-demo` and `widebluesky/wbs-llm-grpo-demo` (`demo-v1`).
+English cards identify the initial SFT policy and pinned dataset revisions. Fresh Hub
+reload reproduced native/facade/CLI inference and held-out evaluation. Both models
+have zero held-out exact match; these tiny synthetic releases validate the lifecycle
+only. See [the release record](docs/releases/20261008-rl-demo-v1.json).
+
+## Diffusion image fine-tuning
+
+`diffusion/` is an independent peer of Embedding, Ranker, Decision and LLM.
+The first backend uses native Diffusers Stable Diffusion components. Full updates
+only the UNet; LoRA updates its attention adapters. The VAE and text encoder stay
+frozen. Model loading, saving and image generation live in `DiffusionModel`.
+
+```bash
+python -m pip install -e '.[diffusion,notebooks,dev]'
+python -m advai_notebooks.diffusion validate --config configs/diffusion/smoke.yaml
+python -m advai_notebooks.diffusion run --config configs/diffusion/smoke.yaml
+python -m advai_notebooks.diffusion run --config configs/diffusion/lora.yaml
+```
+
+Each task owns its data, noise sampling, denoising losses, optimizer, metrics,
+validation selection, checkpoints, CLI and publication contract. Offline tiny
+full/LoRA exports and native reload are supported, including portable bundled-base
+adapters and merged full pipelines. Fixed-noise validation includes epoch zero;
+held-out test is report-only. Generated examples use fixed seeds.
+Single-device fp32 is supported; CUDA/MPS and real pretrained image quality need
+hardware-specific validation. SDXL/DiT/video and AMP are outside the first backend.
+See [the guide](docs/diffusion.md) and [the notebook](notebooks/diffusion/01_finetune.ipynb).

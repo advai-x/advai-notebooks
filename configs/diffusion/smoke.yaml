@@ -1,0 +1,27 @@
+model:
+  id: tiny
+  resolution: 16
+data:
+  samples: data/sample/diffusion/samples.jsonl
+training:
+  method: full
+  epochs: 2
+  batch_size: 2
+  learning_rate: 0.001
+  weight_decay: 0.0
+  seed: 42
+runtime:
+  device: cpu
+  precision: fp32
+  num_threads: 2
+scheduler:
+  inference: ddim
+generation:
+  num_inference_steps: 4
+  guidance_scale: 1.0
+  seed: 123
+evaluation:
+  seed: 1729
+  noise_draws: 2
+  sample_count: 2
+output_dir: outputs/diffusion/smoke

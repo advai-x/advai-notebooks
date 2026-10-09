@@ -1,8 +1,8 @@
 # 项目架构：独立微调任务与自研 Decision Model
 
-本项目提供七条独立的模型训练与推理路径：Embedding、Ranker、Decision、LLM Base、LLM Instruct、LLM PPO 和 LLM GRPO。
+本项目提供八条独立的模型训练与推理路径：Embedding、Ranker、Decision、LLM Base、LLM Instruct、LLM PPO、LLM GRPO 和 Diffusion。
 每条路径拥有自己的配置、数据校验、采样、损失、优化器、评估、训练组装、导出和 CLI。
-七类任务可以分别训练、部署和调整，应用层按需要组合它们。
+八类任务可以分别训练、部署和调整，应用层按需要组合它们。
 
 Decision 的定位是本项目自行实现的决策模型。Laya 仅作为思想参考：将问题与候选选项显式建模，
 输出可解释的类型化概率，并关注概率校准。输入编码、模型组合、决策 head、损失、奖励、
@@ -12,12 +12,12 @@ Decision 的定位是本项目自行实现的决策模型。Laya 仅作为思想
 
 ## 1. 模型任务并行，应用组合单独表达
 
-Embedding、Ranker、Decision、LLM Base、LLM Instruct、LLM PPO、LLM GRPO 是同一级的任务模块，各自从数据到训练、评估、导出、推理形成闭环。
+Embedding、Ranker、Decision、LLM Base、LLM Instruct、LLM PPO、LLM GRPO、Diffusion 是同一级的任务模块，各自从数据到训练、评估、导出、推理形成闭环。
 图中的并行表示独立且同级，不表示必须同时训练。它们可以分别选择基座、参数、设备和部署方式。
 
 ```mermaid
 flowchart TB
-    subgraph TASKS[七条独立模型路径]
+    subgraph TASKS[八条独立模型路径]
         direction LR
         subgraph EMB[Embedding]
             direction TB
@@ -82,14 +82,23 @@ flowchart TB
             GX --> GH[可选 Hub 发布]
             GH --> GI
         end
+        subgraph DIF[Diffusion]
+            direction TB
+            FD[图片与 caption] --> FT[独立 full / LoRA 训练]
+            FT --> FV[validation 去噪 MSE 选模]
+            FV --> FX[原生 full / LoRA 导出]
+            FX --> FI[推理：generate → 图片]
+            FX --> FH[可选 Hub 发布]
+            FH --> FI
+        end
     end
 ```
 
-七条路径各自使用中立的配置/运行/checkpoint/产物/来源追踪工具。
-依赖方向为任务模块 → `common`；七个任务不互相导入。
+八条路径各自使用中立的配置/运行/checkpoint/产物/来源追踪工具。
+依赖方向为任务模块 → `common`；八个任务不互相导入。
 四个 LLM 任务另复用 `llm/` 下的 SDK、运行参数、配置校验与文件读取工具，损失、指标、选模和训练组装归各任务。
 当前 Decision 使用自己的训练循环，Embedding/Ranker 使用共享检索训练循环；
-Base/Instruct 各自组装 Transformers Trainer，PPO/GRPO 各自实现在线 RL 训练循环。训练器差异不意味着模型任务存在上下游关系。
+Base/Instruct 各自组装 Transformers Trainer，PPO/GRPO 各自实现在线 RL 训练循环，Diffusion 自己实现去噪训练循环。训练器差异不意味着模型任务存在上下游关系。
 Base full/merged 导出可作为 Instruct 的初始模型，SFT full/merged 导出可作为 PPO/GRPO 的初始模型；这些都是可选的产物衔接，不是模块依赖。
 
 离线准备及应用组合属于另一个层次，因此不放进主模型图：
@@ -102,7 +111,7 @@ Base full/merged 导出可作为 Instruct 的初始模型，SFT full/merged 导�
 
 ### 1.1 统一职责、契约与生命周期
 
-统一目标是：七条任务提供相同的工程入口、职责划分与实验阶段，每类任务保留自己的请求、
+统一目标是：八条任务提供相同的工程入口、职责划分与实验阶段，每类任务保留自己的请求、
 batch、loss、指标和输出语义。现有代码尚未全部达到这个目标。
 
 ```text
@@ -118,7 +127,7 @@ Model.load → predict(任务请求) → 任务结果
 
 Postprocess 是可选阶段：Decision 可以拟合温度；当前 Embedding/Ranker 没有拟合步骤。
 实际指标和 batch 形状由任务实现，不要求不同任务采用相同张量或同一个损失。
-下表对比 Embedding/Ranker/Decision 的现有入口；LLM Base/Instruct 的对应实现见第 8 节，PPO/GRPO 见第 9 节。
+下表对比 Embedding/Ranker/Decision 的现有入口；LLM Base/Instruct 的对应实现见第 8 节，PPO/GRPO 见第 9 节，Diffusion 见第 10 节。
 
 | 统一维度 | 当前代码差异 | 统一目标 | 保留的任务语义 |
 |---|---|---|---|
@@ -154,7 +163,7 @@ Metrics 使用任务自己的字段名及选模方向，不能把 ranker 原始 
 
 ```text
 configs/
-  embedding/ ranker/ decision/     # 分别配置模型、数据、训练、运行、评估
+  embedding/ ranker/ decision/ diffusion/  # 分别配置模型、数据、训练、运行、评估
   data_preparation/ workflows/     # 可选准备与组合评估配置
 src/advai_notebooks/
   common/                         # 运行设备、原子产物、checkpoint、来源指纹、训练执行等
@@ -206,6 +215,12 @@ src/advai_notebooks/
       config.py backbones.py heads.py model.py         # 模型门面：generate/chat
       data.py sampling.py reward.py losses.py optimizer.py
       train.py evaluate.py metrics.py pipeline.py cli.py publish.py
+  diffusion/
+    config.py data.py sampling.py losses.py optimizer.py train.py
+    backbones.py heads.py model.py          # 原生 UNet/VAE/文本编码器；generate
+    schedulers.py                          # 扩散加噪/去噪 scheduler
+    metrics.py evaluate.py pipeline.py cli.py publish.py
+    runtime.py                             # 严格来源签名、原子 checkpoint 与 RNG 恢复
   data_preparation/ workflows/     # 可选组合层
 notebooks/                        # 调用同一套 Python 实现的可运行示例
 tests/                           # 组件、生命周期及任务独立性验证
@@ -220,27 +235,27 @@ metrics.py evaluate.py pipeline.py cli.py publish.py`。配置在 `configs/llm/{
 同一职责可能已被拆成多个内部文件，因此不以文件数量衡量架构是否统一。
 模型配置、模型定义、加载/保存、评估、指标、推理应分别列出：
 
-| 职责 | Embedding 当前入口 | Ranker 当前入口 | Decision 当前入口 | LLM Base 当前入口 | LLM Instruct 当前入口 | LLM PPO 当前入口 | LLM GRPO 当前入口 |
-|---|---|---|---|---|---| --- | --- |
-| 配置 | `config.py` | `config.py` | `config.py` | `config.py` | `config.py` | `config.py` | `config.py` |
-| 模型门面/组合 | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` |
-| 网络组件 | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`、`heads.py`（含价值头） | `backbones.py`、`heads.py` |
-| 加载与原生导出入口 | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` |
-| 数据与输入入口 | `data.py`，`model.py` 的 prefix/features | `data.py`，`model.py` 的 pair/features | `data.py`，`model.py` 的 prepare/features | `data.py`，`model.py` 的 `prepare` | `data.py`，`model.py` 的 `prepare` | `data.py`、`model.py` 的 prepare | `data.py`、`model.py` 的 prepare |
-| 采样 | `sampling.py` | `sampling.py` | `sampling.py` | `sampling.py` | `sampling.py` | `sampling.py`：每问题一条 completion | `sampling.py`：每问题 G 条 completion |
-| 损失 | `losses.py` | `losses.py` | `losses.py` | `losses.py` | `losses.py` | `losses.py`：GAE、policy/value clipping | `losses.py`：组内 advantage、clipping/KL |
-| 优化器 | `optimizer.py` | `optimizer.py` | `optimizer.py` | `optimizer.py` | `optimizer.py` | `optimizer.py` | `optimizer.py` |
-| 训练组装 | `train.py` | `train.py` | `train.py` | `train.py` | `train.py` | `train.py` | `train.py` |
-| 评估编排 | `evaluate.py` | `evaluate.py` | `evaluate.py` | `evaluate.py` | `evaluate.py` | `evaluate.py` | `evaluate.py` |
-| 指标入口 | `metrics.py` | `metrics.py` | `metrics.py` | `metrics.py` | `metrics.py` | `metrics.py` | `metrics.py` |
-| 推理入口 | `model.py` 的 `encode` | `model.py` 的 `score` | `model.py` 的 `system_one` | `model.py` 的 `generate` | `model.py` 的 `chat` | `model.py` 的 generate/chat | `model.py` 的 generate/chat |
-| 可选后处理 | 当前无拟合步骤 | 当前无拟合步骤 | `calibrate.py` | 当前无拟合步骤 | 当前无拟合步骤 | 无拟合步骤 | 无拟合步骤 |
-| 生命周期与 CLI | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`、`cli.py` | `pipeline.py`、`cli.py` |
-| 可选 Hub 发布 | `publish.py`, `cli.py` | `publish.py`, `cli.py` | `publish.py`, `cli.py` | `publish.py`, `cli.py` | `publish.py`, `cli.py` | `publish.py`、`cli.py` | `publish.py`、`cli.py` |
+| 职责 | Embedding 当前入口 | Ranker 当前入口 | Decision 当前入口 | LLM Base 当前入口 | LLM Instruct 当前入口 | LLM PPO 当前入口 | LLM GRPO 当前入口 | Diffusion 当前入口 |
+|---|---|---|---|---|---| --- | --- | --- |
+| 配置 | `config.py` | `config.py` | `config.py` | `config.py` | `config.py` | `config.py` | `config.py` | `config.py` |
+| 模型门面/组合 | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` |
+| 网络组件 | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`, `heads.py` | `backbones.py`、`heads.py`（含价值头） | `backbones.py`、`heads.py` | `backbones.py`、`heads.py`（原生 UNet 输出层视图） |
+| 加载与原生导出入口 | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` | `model.py` |
+| 数据与输入入口 | `data.py`，`model.py` 的 prefix/features | `data.py`，`model.py` 的 pair/features | `data.py`，`model.py` 的 prepare/features | `data.py`，`model.py` 的 `prepare` | `data.py`，`model.py` 的 `prepare` | `data.py`、`model.py` 的 prepare | `data.py`、`model.py` 的 prepare | `data.py`，`model.py` 的 prompt 校验 |
+| 采样 | `sampling.py` | `sampling.py` | `sampling.py` | `sampling.py` | `sampling.py` | `sampling.py`：每问题一条 completion | `sampling.py`：每问题 G 条 completion | `sampling.py`：批次、噪声与时间步 |
+| 损失 | `losses.py` | `losses.py` | `losses.py` | `losses.py` | `losses.py` | `losses.py`：GAE、policy/value clipping | `losses.py`：组内 advantage、clipping/KL | `losses.py`：epsilon / velocity MSE |
+| 优化器 | `optimizer.py` | `optimizer.py` | `optimizer.py` | `optimizer.py` | `optimizer.py` | `optimizer.py` | `optimizer.py` | `optimizer.py` |
+| 训练组装 | `train.py` | `train.py` | `train.py` | `train.py` | `train.py` | `train.py` | `train.py` | `train.py` |
+| 评估编排 | `evaluate.py` | `evaluate.py` | `evaluate.py` | `evaluate.py` | `evaluate.py` | `evaluate.py` | `evaluate.py` | `evaluate.py` |
+| 指标入口 | `metrics.py` | `metrics.py` | `metrics.py` | `metrics.py` | `metrics.py` | `metrics.py` | `metrics.py` | `metrics.py` |
+| 推理入口 | `model.py` 的 `encode` | `model.py` 的 `score` | `model.py` 的 `system_one` | `model.py` 的 `generate` | `model.py` 的 `chat` | `model.py` 的 generate/chat | `model.py` 的 generate/chat | `model.py` 的 `generate` |
+| 可选后处理 | 当前无拟合步骤 | 当前无拟合步骤 | `calibrate.py` | 当前无拟合步骤 | 当前无拟合步骤 | 无拟合步骤 | 无拟合步骤 | 无拟合步骤 |
+| 生命周期与 CLI | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`, `cli.py` | `pipeline.py`、`cli.py` | `pipeline.py`、`cli.py` | `pipeline.py`、`cli.py` |
+| 可选 Hub 发布 | `publish.py`, `cli.py` | `publish.py`, `cli.py` | `publish.py`, `cli.py` | `publish.py`, `cli.py` | `publish.py`, `cli.py` | `publish.py`、`cli.py` | `publish.py`、`cli.py` | `publish.py`、`cli.py` |
 
 表中路径相对各自任务目录；LLM 四列分别对应 `llm/base/`、`llm/instruct/`、`llm/ppo/`、`llm/grpo/`。
 这张表列职责入口，网络组件单列；内部实现细节在目录树和下文说明。
-七个任务各自维护 `metrics.py`，不共享指标实现。
+八个任务各自维护 `metrics.py`，不共享指标实现。
 
 Base 的 `data.py` 负责文档分组、EOS 与保留边界目标的切片；Instruct 的 `data.py` 负责对话校验、
 chat template 与助手回复掩码。两者的 `train.py` 分别组装 Trainer、采样、loss、optimizer 和验证选模回调。
@@ -258,11 +273,11 @@ Decision 的红色差异已按当前 Embedding/Ranker 边界对齐：
 `DecisionModel` 同时是原生 PyTorch 模块，`.model` 暴露其训练模块，保持 SDK 适配器风格。
 直接构造 backbone/head 仍支持网络实验；完整输入/导出/推理需要通过 `from_config` 或 `load` 绑定 tokenizer 与元数据。
 旧 provider 模块及 Bundle 包装已移除，调用方直接使用 `DecisionModel`；`inference.py` 保留函数式推理兼容入口。原生权重命名/schema 和概率语义保持兼容。
-Embedding、Ranker、Decision、Base/Instruct 已有共同的指标记录规范；PPO/GRPO 当前返回任务身份、split、指标及预测，未接入该指标记录类型；完整评估类型、实验报告/配置仍未完全统一，以下目标结构继续作为后续约定。
+Embedding、Ranker、Decision、Base/Instruct、Diffusion 已有共同的指标记录规范；PPO/GRPO 当前返回任务身份、split、指标及预测，未接入该指标记录类型；完整评估类型、实验报告/配置仍未完全统一，以下目标结构继续作为后续约定。
 
 ### 2.1.1 网络组件的统一边界
 
-七个任务均通过各自 `backbones.py` 和 `heads.py` 提供组件或原生组件视图，`model.py` 负责加载基础模型、
+八个任务均通过各自 `backbones.py` 和 `heads.py` 提供组件或原生组件视图，`model.py` 负责加载基础模型、
 组合组件、保存/重载以及公开推理。调用第三方库不会改变这个职责划分，组件不跨任务共享。
 
 | 组件 | Embedding | Ranker | Decision | LLM Base | LLM Instruct |
@@ -384,6 +399,7 @@ Recall/MRR/nDCG，初始公式一致，后续可分别调整。Recall 分母与 
 - 排序 overall 的 `n` 为 query 数，per-query 指标为 1。
 - Decision 普通指标的 `n` 为决策数，`normalized_score_mae` 的 `n` 仅计 score 决策。
 - Recall/MRR/nDCG/Accuracy 为 maximize；NLL/Brier/ECE/等级误差为 minimize。
+- Diffusion 的 denoising_mse 为 minimize，`n` 为图片数，不是固定噪声 draw 次数。
 
 指标单位和总体定义仍由任务说明，跨任务数值需要在同一业务口径下比较。
 当前配置允许的选模指标范围保持原样；方向存在并不意味着该指标自动成为可配置的选模选项。
@@ -675,3 +691,28 @@ PPO 价值头单独保存；生成只使用 actor。Full/merged actor 可使用�
 产物区分 validation 选出的 `export/` 和最后实际更新后的 `latest_export/`；完整恢复 checkpoint
 包含 policy、冻结 reference、价值头（PPO）、optimizer、RNG 和实验签名。首版支持单设备 fp32、
 full/LoRA、梯度累积，不支持混合精度、分布式或 gradient checkpointing；配置明确拒绝。
+
+## 10. Diffusion：独立 latent 文生图模型
+
+`diffusion/` 与 Embedding/Ranker/Decision/LLM 平级，独立维护同名职责入口及 metrics。
+首版使用 Diffusers 的 StableDiffusionPipeline，支持单个 CLIP 文本编码器、VAE 与 UNet。
+UNet、VAE、文本编码器在 `backbones.py` 组装；`heads.py` 只引用 UNet 原生输出层，
+不另建预测网络。`model.py` 统一初始化、加载、保存、模型组合及 `generate`。
+Diffusion 的文本编码器不依赖项目 Embedding；它是自身条件输入组件。
+
+`schedulers.py` 管理训练加噪过程及 DDIM/DDPM 推理调度，区别于学习率 scheduler。
+`sampling.py` 管批次、噪声和时间步；`losses.py` 管 epsilon/v_prediction 的逐图 MSE。
+Full 只训练完整 UNet；LoRA 只训练 UNet 适配层，VAE 与文本编码器固定。
+独立 validation 去噪 MSE 最小选模，包含 epoch 0，test 只报告。
+每条评估图片固定噪声/time draws 并使用 VAE mode；生成样例固定 seed。
+去噪指标提供同样的 task/schema/name/value/n/group/direction 记录，无共享 metrics。
+首版不实现 FID/CLIP score 或拟合后处理。
+
+原生 full export 保存完整 pipeline；LoRA export 保存 adapter 及冻结 `base_model/`，
+合并导出加载副本而不改动训练模型。`publish.py` 自己定义 native 文件契约，
+复用 `common/hub.py` 传输；原始图片、生成样例和 checkpoint 不进入发布包。
+训练状态在完整 epoch checkpoint 中原子保存 optimizer、RNG 和来源签名，使用 latest 指针恢复。
+配置和 Notebook 位于 `configs/diffusion/`、`notebooks/diffusion/`，完整契约见 [Diffusion guide](diffusion.md)。
+
+CPU fp32 tiny full/LoRA 链路及精确恢复已验证；设备可配置，CUDA/MPS 和真实大模型需目标环境验证。
+首版明确不支持 AMP、多卡、SDXL/DiT/视频、img2img、inpainting；更换模型 ID 不会自动获得这些能力。

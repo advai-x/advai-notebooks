@@ -1,0 +1,34 @@
+# Stable Diffusion v1/v2-style, single CLIP text encoder + UNet.
+# For reproducible initial weights, set revision to an immutable model commit SHA.
+model:
+  id: stable-diffusion-v1-5/stable-diffusion-v1-5
+  resolution: 512
+  revision: null
+data:
+  samples: data/domain/diffusion/samples.jsonl
+training:
+  method: lora
+  lora_rank: 8
+  lora_alpha: 8
+  epochs: 2
+  batch_size: 1
+  gradient_accumulation: 4
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  gradient_checkpointing: true
+  seed: 42
+runtime:
+  device: auto
+  precision: fp32
+  num_threads: 2
+scheduler:
+  inference: ddim
+generation:
+  num_inference_steps: 30
+  guidance_scale: 7.5
+  seed: 123
+evaluation:
+  seed: 1729
+  noise_draws: 2
+  sample_count: 2
+output_dir: outputs/diffusion/domain

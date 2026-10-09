@@ -138,7 +138,7 @@ print(grpo.generate(["hello world"]))
 ```
 
 `generate` 接受文本列表；`chat` 接受一组 messages。CLI 同样支持 generate/chat、Hub revision/cache
-选项，以及 export/publish。`publish --dry-run` 离线校验英文模型卡和包；未请求实际上传任何 PPO/GRPO 模型。
+选项，以及 export/publish。`publish --dry-run` 离线校验英文模型卡和包。
 发布排除 optimizer、reference checkpoint、原始数据、日志；PPO 附带小型价值头以支持完整门面加载。
 
 ## 首版边界
@@ -147,3 +147,18 @@ print(grpo.generate(["hello world"]))
 fp16/bf16、gradient checkpointing、QLoRA、多卡、异步/vLLM rollout、长上下文性能优化尚未实现，
 不支持的配置明确拒绝。当前采样使用逐 token 全序列前向，侧重可读性与算法验证；大模型需评估内存与吞吐。
 两任务均保留自己的 metrics、loss、reward、采样组织与训练文件，后续可分别调整。
+
+## 已发布的 demo
+
+两份模型从既有 tiny Instruct SFT 权重开始，分别完成 2 个 epoch 的 full 训练。
+PPO 为 8 次 optimizer update；GRPO 为 32 次。选中 epoch 2 后发布到私有仓库，使用英文模型卡。
+
+| 任务 | 模型固定 SHA | Dataset 固定 SHA |
+|---|---|---|
+| [PPO](https://huggingface.co/widebluesky/wbs-llm-ppo-demo) | `25beb2018bbd7a493a36ef5a5793c4ca149b2dec` | `5b621b1b02f8f097a2036c0aa0f915e4df5b8e31` |
+| [GRPO](https://huggingface.co/widebluesky/wbs-llm-grpo-demo) | `fdbe74d2c76db0a7c43d432af70a5839e87442e7` | `3246400626f9c419fd1eaa4b36a1594b53089be2` |
+
+模型与各自 Dataset 均有 `demo-v1` 标签；数据关联和原始记录指纹已验证。
+Hub 下载后逐文件 SHA256、原生 Transformers/门面 logits、CLI/API generate/chat 输出及测试报告均与本地一致。
+两份模型的测试 exact match 与 mean reward 均为 0.0，不代表有效的回答能力或 RL 效果提升。
+模型卡提供安装和推理示例，完整记录见 [发布记录](releases/20261008-rl-demo-v1.json)。
