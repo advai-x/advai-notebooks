@@ -1,5 +1,7 @@
 # Notebooks
 
+English | [简体中文](README.zh-CN.md)
+
 Core tutorials explain the same implementation used by the CLI. Each `01_finetune.ipynb` walks through validation, training, evaluation, export/reload and inference.
 
 - [Embedding](embedding/01_finetune.ipynb): MNRL and retrieval evaluation.
@@ -14,3 +16,7 @@ Core tutorials explain the same implementation used by the CLI. Each `01_finetun
 The [optional retrieval comparison](workflows/01_retrieval_comparison.ipynb) combines independently trained embedding and ranker models.
 Tiny random models and synthetic CPU examples validate interfaces, not real-world quality.
 Colab cells install task-specific extras; persistent data/checkpoint storage is required for longer experiments.
+
+English is the default. Each tutorial has a `*.zh-CN.ipynb` companion with a language
+switch in its opening cell. Both versions use the same executable workflow; model
+inputs and language-specific prefixes are not translated as documentation.

@@ -1,95 +1,113 @@
 # VM — World Model
 
-VM 在本项目明确表示 **World Model**。已实现动作条件、数值状态空间的 residual MLP：
-当前 observation + action → 下一 observation，并递归预测多步未来状态。
-支持从随机 tiny dynamics 训练，也支持从本项目导出的已有 VM 权重继续微调。
-这是小型 dynamics 基线，**不是视频世界模型、Dreamer 或机器人规划系统**。
+English | [简体中文](vm.zh-CN.md)
 
-## 开始运行
+In this repository, VM means World Model. This track implements an action-conditioned
+residual MLP in numerical state space: current observation + action → next observation,
+with recursive multi-step prediction. Train tiny dynamics from random initialization
+or fine-tune an existing native VM export. This is a small dynamics baseline,
+**not a video world model, Dreamer implementation or robot planning system**.
+
+## Quick start
 
 ```bash
 python -m pip install -e '.[vm,notebooks,dev]'
 python -m advai_notebooks.vm validate --config configs/vm/smoke.yaml
 python -m advai_notebooks.vm run --config configs/vm/smoke.yaml
-# 以刚才的 export 为基座，新输出目录继续微调
+# Fine-tune the preceding export in a new output directory
 python -m advai_notebooks.vm run --config configs/vm/finetune.yaml
 ```
 
-[Notebook](../notebooks/vm/01_finetune.ipynb) 已执行初次训练、原生权重微调与 rollout。
-Tiny 合成轨迹使用 `next_state = state + action`；指标只用于工程回归，不证明世界建模能力。
+The [notebook](../notebooks/vm/01_finetune.ipynb) executes initial training, native
+weight fine-tuning and rollout. Synthetic trajectories use `next_state = state + action`;
+metrics are engineering regression checks, not evidence of real-world modeling quality.
 
-## Episode 与时序对齐
+## Episodes and temporal alignment
 
-JSONL 一行一个 episode：N 个 observation/timestamp，对应 N-1 个 action。
-第 t 个 action 连接 observation[t] 与 observation[t+1]。
+Each JSONL line contains one episode: N observations/timestamps and N−1 actions.
+Action t connects `observations[t]` to `observations[t+1]`.
 
 ```json
 {"id":"trajectory-1","group_id":"session-1","split":"train","timestamps":[0.0,0.1,0.2],"observations":[[0.0,0.0],[0.1,0.0],[0.1,0.2]],"actions":[[0.1,0.0],[0.0,0.2]]}
 ```
 
-- 必须有非空 train/validation/test，ID 唯一；group 和完全重复轨迹不能跨 split。
-- observation/action 维度与模型一致，所有值有限；至少两个 observation。
-- timestamps 严格递增，间隔匹配 `1 / data.control_frequency_hz`；当前固定时间步。
-- 状态/动作维度名称和单位、控制频率是模型契约，保存在 export；不支持任意图片或视频输入。
-- horizon 窗口不能跨 episode，尾部通过 mask 排除。
-- 归一化只统计 train 中每个原始 observation/action 一次，不重算重叠窗口统计。
+- Train/validation/test must all be nonempty, with unique IDs. Groups and identical trajectories cannot cross splits.
+- Observation/action dimensions must match the model; values must be finite. Each episode needs at least two observations.
+- Timestamps must increase strictly at `1 / data.control_frequency_hz` intervals. Only fixed time steps are supported.
+- State/action names, units and control frequency are part of the exported model contract. Arbitrary image/video inputs are unsupported.
+- Horizon windows cannot cross episode boundaries; masks exclude tail padding.
+- Normalization counts each original training observation/action once, not repeatedly through overlapping windows.
 
-## 模型与训练目标
+## Model and training objective
 
-将 observation/action 标准化后拼接，MLP 预测 observation delta；`predict_delta: false`
-可改为直接预测标准化下一状态。训练从当前真实 observation 出发，后续递归使用自己的预测，
-而不是把真实未来状态喂给模型。Loss 为有效 horizon/状态维度上的 masked MSE。
-梯度累积按有效状态标量数加权。
+The MLP concatenates normalized observations/actions and predicts an observation
+delta. Set `predict_delta: false` to predict the normalized next state directly.
+Training starts from the actual current observation, then recursively feeds back its
+own predictions rather than ground-truth future states. Loss is masked MSE over
+valid horizon/state scalars; gradient accumulation uses the same scalar weighting.
 
-评估报告包含原始单位的 `state_mse`（单步）与 `rollout_mse`（多步）；
-条件为预测状态 + 给定真实动作序列，**不是闭环动作规划**。
-默认用 validation rollout MSE 最小的 epoch 选模，含 baseline；test 不参与选模。
+Evaluation reports `state_mse` (one step) and `rollout_mse` (multiple steps) in
+original units. Predictions are conditioned on a supplied ground-truth action
+sequence; **this is not closed-loop action planning**. Selection minimizes validation
+rollout MSE, including the baseline. Test data does not select models.
 
-## 微调与断点恢复
+## Fine-tuning versus checkpoint recovery
 
-`model.id` 可设为本项目 VM 的本地 export 或 Hub 仓库；Hub 基座必须固定 revision。
-observation/action 维度、hidden_size、predict_delta 必须与基座一致。
-保留基座归一化，防止改变已学习权重的物理含义；数据名称/单位/频率必须匹配。
-更改训练数据或参数应创建新实验，而不是使用 `--resume`。
+`model.id` can point to a native local VM export or Hub repository; a Hub base requires
+a pinned revision. Observation/action dimensions, `hidden_size` and `predict_delta`
+must match the base. Base normalization is preserved so learned weights retain their
+physical meaning. Data names, units and frequency must also match. Start a new
+experiment when changing training data or settings; do not use `--resume` for this.
 
 ```bash
-python -m advai_notebooks.vm run --config configs/vm/smoke.yaml \\
+python -m advai_notebooks.vm run --config configs/vm/smoke.yaml \
   --resume outputs/vm/smoke/latest
-python -m advai_notebooks.vm evaluate --config configs/vm/smoke.yaml \\
+python -m advai_notebooks.vm evaluate --config configs/vm/smoke.yaml \
   --checkpoint outputs/vm/smoke/export --output outputs/vm/test.json
 ```
 
-单进程、单设备 fp32，checkpoint 保存优化器/RNG；恢复要求配置、数据、源码与相关依赖不变。
+Training is single-process, single-device fp32. Checkpoints save optimizer/RNG state;
+recovery requires unchanged configuration, data, source and relevant dependencies.
 
-## Predict、rollout 和推理包
+## Predict, rollout and inference packages
 
 ```python
 from advai_notebooks.vm.model import VMModel
+
 model = VMModel.load("outputs/vm/smoke/export")
 next_state = model.predict([0.0, 0.0], [0.1, 0.0])
 future = model.rollout([0.0, 0.0], [[0.1, 0.0], [0.0, 0.1]])
 # future["observations"]: len(actions) × observation_dim
 ```
 
-动作序列必须非空且不超过模型的 horizon。
-CLI `rollout --checkpoint ... --input requests.json --output future.json` 输入 JSON 数组：
-`[{"observation":[0.0,0.0],"actions":[[0.1,0.0],[0.0,0.1]]}]`。
+Action sequences must be nonempty and no longer than the model's horizon.
+CLI `rollout --checkpoint ... --input requests.json --output future.json` accepts:
 
-`export/` 为最佳模型，`latest_export/` 为最后一轮。推理包由 safetensors 权重与包含
-架构、归一化、状态/动作语义的 metadata 构成，不需要训练数据。
+```json
+[{"observation":[0.0,0.0],"actions":[[0.1,0.0],[0.0,0.1]]}]
+```
+
+`export/` contains the selected model; `latest_export/` contains the final epoch.
+Inference packages include safetensors weights and metadata describing architecture,
+normalization and state/action semantics. Training trajectories are not required.
 
 ```bash
-python -m advai_notebooks.vm export --checkpoint outputs/vm/smoke/export \\
+python -m advai_notebooks.vm export --checkpoint outputs/vm/smoke/export \
   --output outputs/vm/copied
-python -m advai_notebooks.vm publish --export-dir outputs/vm/copied \\
+python -m advai_notebooks.vm publish --export-dir outputs/vm/copied \
   --repo-id your-org/your-world-model --dry-run
 ```
 
-预览会实际重新加载推理包，但不访问 Hub；不上传轨迹、优化器或日志。
+The preview actually reloads the package but does not access the Hub. Trajectories,
+optimizer state and logs are excluded.
 
-## 验证边界
+## Validation limits
 
-CPU regression 覆盖 episode 对齐、padding mask、train-only normalization、多步递归梯度、
-推理重载、已有 VM 微调、严格恢复与发布预览。没有验证 CUDA/MPS、真实机器人/游戏环境、
-视频/图像预测、latent stochastic dynamics、reward/done prediction 或规划能力。
-真实应用需检查 Markov 状态假设、不同 horizon 的累积误差及分布外轨迹；本基线不维护循环隐状态。
+CPU regression tests cover episode alignment, padding masks, train-only normalization,
+recursive multi-step gradients, inference reload, fine-tuning existing VM weights,
+strict recovery and publication previews. CUDA/MPS, real robot/game environments,
+video/image prediction, latent stochastic dynamics, reward/done prediction and
+planning have not been verified or implemented as applicable.
+Real applications need checks of the Markov-state assumption, accumulated error at
+different horizons and out-of-distribution trajectories. This baseline has no
+recurrent hidden state.

@@ -1,4 +1,6 @@
-# AdvAI Notebooks
+# advai-notebooks
+
+English | [简体中文](README.zh-CN.md)
 
 > Practical, reproducible training guides for modern AI models — from a tiny offline
 > smoke run to a configurable experiment on your own data.
@@ -9,7 +11,7 @@
 [![Hugging Face](https://img.shields.io/badge/Hugging%20Face-export%20ready-FFD21E)](docs/publishing.md)
 [![Status](https://img.shields.io/badge/status-active%20development-blue)](#project-status)
 
-AdvAI Notebooks is a collection of executable notebooks, YAML configurations and
+advai-notebooks is a collection of executable notebooks, YAML configurations and
 reusable Python modules for learning and applying mainstream model-training workflows.
 Every guide is designed to show the complete lifecycle:
 
@@ -149,7 +151,7 @@ package versions must still match the original run.
 
 All task CLIs follow the same general shape:
 
-```bash
+```text
 python -m advai_notebooks.<task> validate --config <config.yaml>
 python -m advai_notebooks.<task> run      --config <config.yaml>
 ```
@@ -265,6 +267,12 @@ Issues, corrections and new training guides are welcome. For a focused contribut
 4. Add tests for data contracts, metrics, checkpoint recovery and export/reload behavior.
 5. Update the relevant guide with supported hardware and known limitations.
 6. Do not commit private datasets, access tokens or large model artifacts.
+
+Use English for the default guides, notebook explanations, comments and reader-facing messages.
+Keep Chinese companions in `*.zh-CN.md` and `*.zh-CN.ipynb`, with language-switch
+links between versions, and update both when a documented contract changes.
+Keep model-required prompts and dataset examples in their original language when
+that language is part of the training or inference contract.
 
 ## Project status
 

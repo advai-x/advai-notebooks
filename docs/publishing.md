@@ -1,69 +1,77 @@
-# 将模型发布到 Hugging Face
+# Publish models to Hugging Face
 
-完整链路现在为：数据 → 训练/微调 → 评估/选模 → 原生导出 → 可选发布 → 按版本加载推理。
-Embedding、Ranker、Decision、LLM Base、LLM Instruct、LLM PPO、LLM GRPO、Diffusion、VLM、VLA、VM 各自发布到独立 model 仓库，使用相同命令参数。
-发布是显式动作，`run` 不会自动上传。微调 Notebook 的发布示例默认只做离线预览。
+English | [简体中文](publishing.zh-CN.md)
 
-## 安装和认证
+The lifecycle is data → train/fine-tune → evaluate/select → native export → optional
+publication → revision-pinned inference. All eleven tasks publish to independent
+model repositories with the same publication arguments. Publication is explicit:
+`run` never uploads automatically, and notebook examples default to offline previews.
+
+## Installation and authentication
 
 ```bash
 python -m pip install -e '.[embedding,ranker,decision,publish]'
 hf auth login
 ```
 
-也可以通过环境变量 `HF_TOKEN` 使用具备目标仓库写权限的凭据。
-Token 不放进 YAML、模型卡、发布清单或命令行参数。Python API 的 `token` 仅传给 Hub 客户端。
+Install the extra for your selected task instead when using another model family.
+Alternatively, set `HF_TOKEN` to a credential with write access to the target repository.
+Never put tokens in YAML, model cards, manifests or command-line arguments.
+The Python API's `token` argument is passed only to the Hub client.
 
-## 先验证发布包
+## Validate the package first
 
-`--export-dir` 指向推理导出目录，例如 `run` 生成的 `output_dir/export`。
-程序会筛选推理文件、生成模型卡，再从筛选后的发布包实际加载模型；缺少必需文件会在上传前失败。
-离线预览不访问 Hub，也不读取登录凭据。
+`--export-dir` points to an inference export, such as `output_dir/export` produced
+by `run`. Publication filters inference files, creates a model card and actually
+reloads the filtered package. Missing required files fail before upload.
+Dry runs do not access the Hub or read login credentials.
 
 ```bash
 python -m advai_notebooks.embedding publish \
   --export-dir outputs/embedding/smoke/export \
   --repo-id your-org/your-embedding --dry-run \
   --output outputs/publishing/embedding-plan.json
-
 python -m advai_notebooks.ranker publish \
   --export-dir outputs/ranker/smoke/export \
   --repo-id your-org/your-ranker --dry-run \
   --output outputs/publishing/ranker-plan.json
-
 python -m advai_notebooks.decision publish \
   --export-dir outputs/decision/smoke/export \
   --repo-id your-org/your-decision --dry-run \
   --output outputs/publishing/decision-plan.json
 ```
 
-预览结果包括仓库、可见性、目标分支、文件大小/SHA256 和完整模型卡。
-它不会改动原始导出。只有原始导出模型文件会被筛选上传，不上传运行目录、原始数据、训练标签、
-candidate 文件、优化器/随机状态、运行日志或 `.env`。
+Previews include repository, visibility, branch, file sizes/SHA256 and the full
+model card. They do not alter the original export. Packages exclude run directories,
+raw data, training labels, candidates, optimizer/RNG state, logs and `.env` files.
 
-| 任务 | 发布内容 | 加载/推理 |
-|---|---|---|
-| Embedding | SentenceTransformer 原生组件、权重、tokenizer、prefix 元数据 | `EmbeddingModel.load/encode`，或原生 SentenceTransformer |
-| Ranker | CrossEncoder 原生组件、权重、tokenizer、prefix/原始分数元数据 | `RankerModel.load/score`，或原生 CrossEncoder |
-| Decision | 完整 backbone/head 权重、encoder 配置、tokenizer、任务定义和校准参数 | `DecisionModel.load/system_one` |
-| LLM Base | full/adapter 权重、tokenizer、generation config、基座来源 | `BaseModel.load/generate` |
-| LLM Instruct | full/adapter 权重、tokenizer/chat template、generation config、基座来源 | `InstructModel.load/chat` |
-| LLM PPO | full/adapter actor、value head、tokenizer/chat template、generation config | `PPOModel.load/generate/chat` |
-| LLM GRPO | full/adapter actor、tokenizer/chat template、generation config | `GRPOModel.load/generate/chat` |
-| Diffusion | 原生 full pipeline / LoRA 与 bundled base、组件配置、noise scheduler | `DiffusionModel.load/generate` |
-| VLM | 原生 LLaVA full / LoRA 与 bundled base、processor/tokenizer/chat template | `VLMModel.load/chat` |
-| VLA | CLIP encoder/processor、动作 head、train-only 统计量、物理语义 | `VLAModel.load/predict` |
-| VM | 数值 dynamics safetensors、架构、统计量与状态/动作语义 | `VMModel.load/predict/rollout` |
+| Task | Published assets | Loading/inference |
+| --- | --- | --- |
+| Embedding | Native SentenceTransformer components/weights/tokenizer and prefix metadata | `EmbeddingModel.load/encode`, or native SentenceTransformer |
+| Ranker | Native CrossEncoder components/weights/tokenizer and prefix/raw-score metadata | `RankerModel.load/score`, or native CrossEncoder |
+| Decision | Full backbone/head weights, encoder config, tokenizer, task definitions and calibration | `DecisionModel.load/system_one` |
+| LLM Base | Full/adapter weights, tokenizer, generation config, base provenance | `BaseModel.load/generate` |
+| LLM Instruct | Full/adapter weights, tokenizer/chat template, generation config, base provenance | `InstructModel.load/chat` |
+| LLM PPO | Full/adapter actor, value head, tokenizer/template, generation config | `PPOModel.load/generate/chat` |
+| LLM GRPO | Full/adapter actor, tokenizer/template, generation config | `GRPOModel.load/generate/chat` |
+| Diffusion | Native full pipeline or LoRA/bundled base, component configs and noise scheduler | `DiffusionModel.load/generate` |
+| VLM | Native LLaVA full or LoRA/bundled base, processor/tokenizer/template | `VLMModel.load/chat` |
+| VLA | CLIP encoder/processor, action head, train-only statistics and physical semantics | `VLAModel.load/predict` |
+| VM | Numerical dynamics safetensors, architecture, statistics and state/action semantics | `VMModel.load/predict/rollout` |
 
-任务定义中的问题、选项和规则属于 Decision 推理契约，`tasks.json` 会随模型发布。
-生成的 `README.md` 提供模型卡、推理示例及随机 tiny 模型说明；如果导出旁有匹配的运行报告，
-部分任务还会包含选中的 epoch 和测试集汇总指标。VLM/VLA/VM 首版模型卡说明后端范围和重载入口，
-真实发布时应补充自己的数据来源、许可证与评估。完整实验报告和样例预测不上传。
-发布用的标准模型元数据会去除认证字段，并将绝对的本地模型路径替换为 `local`；权重和任务定义不改动。
+Decision questions, options and rules belong to its inference contract; `tasks.json`
+is published. Generated `README.md` cards include loading examples and tiny-random
+model caveats. Some tasks also include selected epochs and test summaries when a
+matching run report is present. First VLM/VLA/VM cards explain backend scope and
+reload entry points; supplement them with your data provenance, license and
+evaluation before real publication. Full reports and sample predictions are excluded.
+Standard published metadata strips authentication fields and replaces absolute
+local base paths with `local`; weights and task definitions are unchanged.
 
-## 实际发布
+## Upload explicitly
 
-确认使用自己的仓库名和经过领域验证的模型后，去掉 `--dry-run`：
+After choosing your repository and validating the model on domain data, remove
+`--dry-run`:
 
 ```bash
 python -m advai_notebooks.decision publish \
@@ -73,29 +81,33 @@ python -m advai_notebooks.decision publish \
   --output outputs/publishing/decision-result.json
 ```
 
-其余任务使用完全相同的参数。新仓库默认私有；加 `--public` 发布到公开仓库。
-对于已有仓库，所选可见性必须与已有设置一致；发布命令不会自动修改已有仓库的可见性。
-每个仓库存放一种模型。更新仓库会添加/覆盖本次发布文件，不删除远端其他文件。
+The custom card path above is a file you create, not a checked-in template.
+Other tasks use the same arguments. New repositories default to private; `--public`
+requests public visibility. Existing repository visibility must match the requested
+setting; publication does not change it automatically. Use one model per repository.
+Updates add/overwrite package files without deleting unrelated remote files.
 
-`--revision` 默认为 `main`，其他值需要对应已存在的可写分支。
-可以通过 `--license` 设置生成模型卡的 license 标识；默认不推断许可证。
-通过 `--model-card` 提供的自定义 Markdown 会原样使用，包括其中的许可证和训练/评估说明。
-自定义卡优先于自动生成的卡。
+`--revision` defaults to `main`; other values must identify an existing writable
+branch. `--license` sets a generated-card license identifier; no license is inferred.
+Custom Markdown supplied with `--model-card` is used verbatim, including its license,
+training and evaluation statements, and overrides the generated card.
 
-发布到 Hub 的模型卡使用英文。当前 demo 的英文源文件保存在
-[`docs/model-cards/wbs-embedding-demo.md`](model-cards/wbs-embedding-demo.md)、
-[`docs/model-cards/wbs-ranker-demo.md`](model-cards/wbs-ranker-demo.md)、
-[`docs/model-cards/wbs-decision-demo.md`](model-cards/wbs-decision-demo.md)，
-可以通过 `--model-card` 显式使用。模型的输入语言和 tokenizer 内容仍由模型本身决定。
+Use English Hub model cards. Recorded examples include
+[Embedding](model-cards/wbs-embedding-demo.md),
+[Ranker](model-cards/wbs-ranker-demo.md) and
+[Decision](model-cards/wbs-decision-demo.md).
+Input languages and tokenizer contents remain model-specific.
 
-发布包包含 `publish_manifest.json`，记录 schema 版本、任务身份及每个推理文件的 SHA256。
-成功结果包含仓库 URL、commit SHA 和 commit URL；保留此结果便于部署时固定版本。
-网络或权限错误会直接返回失败，不会记成发布成功。
+Packages include `publish_manifest.json` with schema version, task identity and
+inference-file SHA256 values. Successful results contain repository URL, commit SHA
+and commit URL; retain them for pinned deployment. Network/permission errors fail
+explicitly and are not reported as successful publication.
 
-## 按版本加载推理
+## Load a pinned revision
 
-各任务 `Model.load` 均接受本地导出路径或本项目发布的 `namespace/model`，以及 `revision`、`token`、`cache_dir`、
-`local_files_only`。Hub 通过 snapshot 下载完整模型，之后走已有原生加载器。
+Each task's `Model.load` accepts a local export or a project-published
+`namespace/model`, plus `revision`, `token`, `cache_dir` and `local_files_only`.
+Hub snapshots are downloaded before the task's native loader is used.
 
 ```python
 from advai_notebooks.embedding.model import EmbeddingModel
@@ -112,51 +124,59 @@ decision = DecisionModel.load("your-org/your-decision", revision="DECISION_COMMI
 answers = decision.system_one("Customer message", task="your-task-id")
 ```
 
-CLI 的 `encode` / `rerank` / `predict` / `evaluate` 也支持 `--revision`、`--cache-dir`、
-`--local-files-only`。私有仓库加载使用登录凭据或 `HF_TOKEN`。
-Decision 是本项目自有架构，需安装本项目后使用其加载器；普通 Transformers `AutoModel`
-不会重建决策 head、输入编码或类型化解码。上传模型文件也不会自动部署托管推理服务。
+CLI `encode`/`rerank`/`predict`/`evaluate` support `--revision`, `--cache-dir` and
+`--local-files-only`. Private repositories require login or `HF_TOKEN`.
+Decision is project-owned architecture: install this project and use its loader.
+Ordinary Transformers `AutoModel` will not recreate its head, input encoder or
+typed decoder. Uploading files does not deploy a hosted inference service.
 
-## 实现与验证
+## Implementation and validation
 
-各任务 `publish.py` 决定自己的文件契约和模型卡，`common/hub.py` 只处理目录筛选、打包、
-Hub 上传和 snapshot 下载，不导入其他任务或任何指标实现。
-Token/模型卡/仓库设置不加入训练 YAML，训练依赖独立性继续保持。
+Each task's `publish.py` owns file contracts/cards. `common/hub.py` handles neutral
+filtering, packaging, upload and snapshot download, not task networks or metrics.
+Repository/card/token settings stay outside training YAML to preserve task isolation.
+VLM/VLA/VM additionally reuse neutral whitelist logic in `common/native_publication.py`.
 
-验证覆盖三个真实 tiny 原生导出的打包、离线 CLI、模拟上传、模拟 Hub 下载重载、
-prefix/分数/三种决策输出一致、任务与校准参数保留、文件哈希、路径检查和已有仓库可见性检查。
-离线测试不会创建真实 Hub 仓库；真实上传需要用户提供目标仓库和登录凭据。
+The original retrieval/Decision checks cover real tiny native exports, offline CLI,
+mock uploads/downloads, prefix/score/typed-output equality, task/calibration retention,
+hashes, safe paths and existing-repository visibility. Later task suites cover their
+own native exports and publication contracts. Offline tests never create Hub
+repositories. Real uploads require a chosen target and authorized credentials.
 
-官方参考：[文件上传](https://huggingface.co/docs/huggingface_hub/guides/upload)、
-[模型卡](https://huggingface.co/docs/huggingface_hub/guides/model-cards)、
-[snapshot 下载](https://huggingface.co/docs/huggingface_hub/guides/download)。
+Official references: [file uploads](https://huggingface.co/docs/huggingface_hub/guides/upload),
+[model cards](https://huggingface.co/docs/huggingface_hub/guides/model-cards),
+[snapshot downloads](https://huggingface.co/docs/huggingface_hub/guides/download).
 
+## LLM full/adapter packages
 
-## LLM full/adapter 发布
-
-Base/Instruct 使用相同 `publish` 参数。完整模型可直接原生加载，adapter 必须加载固定基座；
-bundled base 会随包上传，外部基座记录不可变 SHA。Chat template `.jinja` 及多模板目录一并筛选。
-离线预览校验 adapter 时仅使用缓存，缺少远程基座缓存会失败而不会下载。
-使用 `export --merged` 生成不依赖 adapter 的完整模型；详见 [LLM guide](llm.md)。
+Base/Instruct use the same arguments. Full models load natively; adapters need their
+pinned base. Bundled bases are uploaded, external bases record immutable SHAs, and
+chat-template `.jinja` files/multi-template directories are included. Offline adapter
+preview uses cache only and fails when an external base is unavailable.
+`export --merged` produces a standalone full model; see the [LLM guide](llm.md).
 
 ```bash
 python -m advai_notebooks.llm.base publish \
   --export-dir outputs/llm/base/run/export \
-  --repo-id widebluesky/wbs-llm-base-demo --dry-run
+  --repo-id your-org/your-llm-base --dry-run
 python -m advai_notebooks.llm.instruct publish \
   --export-dir outputs/llm/instruct/run/export \
-  --repo-id widebluesky/wbs-llm-instruct-demo --dry-run
+  --repo-id your-org/your-llm-instruct --dry-run
 ```
 
-Base、Instruct、PPO、GRPO 的 demo 模型和各自 Dataset 已发布到私有仓库，模型卡使用英文并关联固定数据版本。
-PPO/GRPO 的发布包经过本地加载，再从 Hub 固定 SHA 重载验证文件哈希、原生/门面/CLI 推理与测试报告。
-PPO 发布 `value_head.safetensors` 以支持完整模型门面，原生 causal-LM 推理仅使用 actor。
-固定模型与数据提交见 [Dataset 映射](datasets.md) 与 [RL 发布记录](releases/20261008-rl-demo-v1.json)。
+Recorded Base/Instruct/PPO/GRPO private demos have independent Datasets and English
+cards with pinned data revisions. PPO/GRPO release verification reloaded local
+packages and pinned Hub snapshots, comparing hashes, native/facade/CLI inference
+and test reports. PPO includes `value_head.safetensors` for facade loading; native
+causal-LM generation uses only the actor. See [Dataset mappings](datasets.md) and
+the [historical RL release record](releases/20261008-rl-demo-v1.json).
 
-## Diffusion 发布包
+## Diffusion packages
 
-`python -m advai_notebooks.diffusion publish` 使用同样的参数，默认私有，可先 `--dry-run`。
-任务自身筛选 Diffusers 的 `model_index.json`、组件目录、safetensors、tokenizer、scheduler，
-LoRA 额外包含冻结初始 pipeline 和原生 adapter 元数据。筛选后实际加载验证再发布。
-不包含原始图片或生成 PNG。未来 demo 可以使用 `widebluesky/wbs-diffusion-demo`；
-本次实现没有上传 Diffusion 模型或 Dataset。详见 [Diffusion guide](diffusion.md)。
+`python -m advai_notebooks.diffusion publish` uses the same arguments and private
+default. Start with `--dry-run`. Its whitelist selects native Diffusers
+`model_index.json`, component directories, safetensors, tokenizer and scheduler;
+LoRA adds a frozen initial pipeline and native adapter metadata. Filtered packages
+are reloaded before upload, excluding original images and generated PNGs.
+The implementation did not upload a Diffusion model or Dataset.
+See the [Diffusion guide](diffusion.md).
