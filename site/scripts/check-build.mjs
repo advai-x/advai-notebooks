@@ -1,7 +1,7 @@
 import { access, readdir, readFile } from 'node:fs/promises';
 import { relative, resolve, sep } from 'node:path';
 import { load } from 'cheerio';
-import { BASE_PATH, LOCALES, README_PAGES, SITE_ORIGIN, SOURCE_PAGES, TRACKS, colabUrl, notebookPath, route } from './catalog.mjs';
+import { BASE_PATH, LOCALES, README_PAGES, REPOSITORY, SITE_ORIGIN, SOURCE_PAGES, TRACKS, colabUrl, notebookPath, route } from './catalog.mjs';
 import { SITE_ROOT } from './content.mjs';
 import { notebookCount } from './landing.mjs';
 
@@ -60,6 +60,9 @@ export async function checkBuild() {
       if (!$) { errors.push(`Missing language route: ${route(locale, slug)}`); continue; }
       const expectedLanguage = locale === 'en' ? 'en' : 'zh-CN';
       if ($('html').attr('lang') !== expectedLanguage) errors.push(`Wrong document language: ${route(locale, slug)}`);
+      const editLinks = $(`a[href^="${REPOSITORY}/edit/main/"]`);
+      if (!slug && editLinks.length) errors.push(`Homepage should not display an edit link: ${locale}`);
+      if (slug && !editLinks.length) errors.push(`Reading page source edit link is missing: ${route(locale, slug)}`);
       const brand = $('a.brand-title');
       if (brand.length !== 1 || brand.attr('aria-label') !== 'advai-notebooks' || brand.attr('href') !== route(locale, '')) {
         errors.push(`Brand link is missing, inaccessible or uses the wrong locale: ${route(locale, slug)}`);

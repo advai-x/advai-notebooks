@@ -1,11 +1,13 @@
 [build-system]
-requires = ["setuptools>=77"]
+requires = ["setuptools>=77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "advai-notebooks"
 version = "0.1.0"
 description = "Configurable model fine-tuning and evaluation for local and Colab runs"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.10"
 dependencies = ["PyYAML>=6,<7"]
 

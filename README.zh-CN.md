@@ -14,6 +14,7 @@
 </p>
 
 <p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="许可证：MIT"></a>
   <a href="pyproject.toml"><img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&amp;logoColor=white" alt="Python 3.10+"></a>
   <a href="https://pytorch.org/"><img src="https://img.shields.io/badge/PyTorch-training-EE4C2C?logo=pytorch&amp;logoColor=white" alt="PyTorch 训练"></a>
   <a href="notebooks/"><img src="https://img.shields.io/badge/Google%20Colab-ready-F9AB00?logo=googlecolab&amp;logoColor=white" alt="支持 Google Colab"></a>
@@ -212,4 +213,9 @@ Notebook 保持教学用途；尽量添加 tiny fixtures/smoke 配置，以及�
 当前版本为 `0.1.0`，处于活跃开发阶段。Smoke 以可复现为目标；真实模型配置是起点，
 必须在自己的数据、硬件和质量标准下验证。示例不代表多 GPU 或生产规模性能支持。
 
-项目尚未选择许可证。添加许可证文件之前，源码公开可见，但未授予通用复用或再分发许可。
+除另有说明外，本仓库的原创代码、Notebook、配置和文档均采用 [MIT 许可证](LICENSE)。
+复制或再分发软件及其重要部分时，请保留该文件中的版权声明和许可声明。
+
+第三方依赖、模型权重和数据集仍遵循各自的许可证与使用条款。
+使用本项目训练，不会自动使生成的 checkpoint 或 adapter 获得 MIT 授权；
+使用或发布前，请检查适用的授权条件与限制。

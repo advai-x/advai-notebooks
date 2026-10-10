@@ -112,6 +112,26 @@ test('generation produces paired routes, explicit fallbacks and Colab entry poin
   assert.ok(!pages.get('zh-cn/start/quickstart.md').includes('从上表'));
 });
 
+test('homepages omit edit links while reading pages retain their source edit links', async () => {
+  const pages = await syncContent({ write: false });
+  const metadata = (path) => JSON.parse(pages.get(path).split('---\n')[1]);
+  for (const locale of LOCALES) {
+    assert.equal(metadata(`${locale}/index.md`).editUrl, false);
+    for (const slug of ['training', ...SOURCE_PAGES.map((page) => page.slug), ...README_PAGES.map((page) => page.slug)]) {
+      assert.match(metadata(`${locale}/${slug}.md`).editUrl, /^https:\/\/github\.com\/advai-x\/advai-notebooks\/edit\/main\//);
+    }
+  }
+});
+
+test('localized contribution pages publish MIT licensing with the repository license link', async () => {
+  const pages = await syncContent({ write: false });
+  for (const locale of LOCALES) {
+    const page = pages.get(`${locale}/development/contributing.md`);
+    assert.match(page, /\[MIT (?:License|许可证)\]\(https:\/\/github\.com\/advai-x\/advai-notebooks\/blob\/main\/LICENSE\)/);
+    assert.doesNotMatch(page, /A project license has not been selected yet|项目尚未选择许可证/);
+  }
+});
+
 test('frontmatter safely quotes multilingual metadata', () => {
   const title = 'A "quoted" title: 中文';
   const serialized = frontmatter({ title });

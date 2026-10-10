@@ -14,6 +14,7 @@
 </p>
 
 <p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="License: MIT"></a>
   <a href="pyproject.toml"><img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&amp;logoColor=white" alt="Python 3.10+"></a>
   <a href="https://pytorch.org/"><img src="https://img.shields.io/badge/PyTorch-training-EE4C2C?logo=pytorch&amp;logoColor=white" alt="PyTorch training"></a>
   <a href="notebooks/"><img src="https://img.shields.io/badge/Google%20Colab-ready-F9AB00?logo=googlecolab&amp;logoColor=white" alt="Google Colab ready"></a>
@@ -301,5 +302,12 @@ and production-scale performance vary by task and are not implied by the example
 
 ## License
 
-A project license has not been selected yet. Until a license file is added, the source
-is publicly visible but no general reuse or redistribution permission is granted.
+Except where otherwise noted, the original code, notebooks, configurations and
+documentation in this repository are licensed under the [MIT License](LICENSE).
+When copying or redistributing the software or substantial portions of it, retain
+the copyright and permission notices in that file.
+
+Third-party dependencies, model weights and datasets remain subject to their own
+licenses and terms. Training with this project does not automatically license the
+resulting checkpoints or adapters under MIT; review the applicable permissions and
+restrictions before using or publishing them.

@@ -42,7 +42,7 @@ function homepage(locale) {
     title: chinese ? '实用模型训练指南' : 'Practical model-training guides',
     description: chinese ? 'advai-notebooks 的中英文训练指南、配置与 Colab 入口。' : 'Training guides, configurations and Colab entry points for advai-notebooks.',
     template: 'splash',
-    editUrl: editUrl('site/src/components/HomeContent.astro'),
+    editUrl: false,
     hero: {
       title: chinese ? '从 Notebook 开始，走完训练流程。' : 'From notebook to trained model.',
     },
