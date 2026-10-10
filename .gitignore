@@ -29,6 +29,13 @@ dist/
 coverage.xml
 htmlcov/
 
+# Documentation site dependencies and generated content
+node_modules/
+/site/.astro/
+/site/src/content/docs/
+/site/public/generated/
+/site/.content-manifest.json
+
 # Local caches, logs and machine-specific configuration
 .cache/
 hf_cache/

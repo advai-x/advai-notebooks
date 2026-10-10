@@ -5,7 +5,7 @@
 <h1 align="center">advai-notebooks</h1>
 
 <p align="center">
-  English | <a href="README.zh-CN.md">简体中文</a>
+  English | <a href="README.zh-CN.md">简体中文</a> | <a href="https://advai-x.github.io/advai-notebooks/en/">Documentation</a>
 </p>
 
 <p align="center">
@@ -69,7 +69,8 @@ independently trainable.
 
 ### Option A — Google Colab
 
-Open a notebook from the table above, then prepare the repository in the Colab runtime:
+Open a notebook from the [training directory](notebooks/README.md), then prepare
+the repository in the Colab runtime:
 
 ```python
 %cd /content
@@ -224,11 +225,18 @@ advai-notebooks/
 │   └── common/
 ├── data/sample/                # Small versioned fixtures and schema examples
 ├── docs/                       # Architecture and task-specific references
+├── site/                       # Bilingual documentation site and content adapter
 ├── tests/                      # Unit, contract and lifecycle regression tests
 └── outputs/                    # Local generated artifacts; ignored by Git
 ```
 
 ## Documentation
+
+The [documentation website](https://advai-x.github.io/advai-notebooks/en/) provides
+search, grouped navigation and matching Chinese pages. It becomes available after
+GitHub Pages is enabled and the documentation workflow is deployed. For local
+preview and setup, see the [site guide](site/README.md). The files below remain
+the source of truth for guide content.
 
 - [Architecture and extension map](docs/architecture.md)
 - [Dataset contracts and Hub datasets](docs/datasets.md)

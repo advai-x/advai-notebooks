@@ -5,7 +5,7 @@
 <h1 align="center">advai-notebooks</h1>
 
 <p align="center">
-  <a href="README.md">English</a> | 简体中文
+  <a href="README.md">English</a> | 简体中文 | <a href="https://advai-x.github.io/advai-notebooks/zh-cn/">文档站</a>
 </p>
 
 <p align="center">
@@ -62,7 +62,7 @@ VLA/VM 是可训练基线，并非已验证的机器人控制或规划能力。
 
 ### 方式 A：Google Colab
 
-从上表打开 Notebook，在 Colab runtime 中准备仓库：
+从[训练目录](notebooks/README.zh-CN.md)打开 Notebook，在 Colab runtime 中准备仓库：
 
 ```python
 %cd /content
@@ -162,11 +162,16 @@ advai-notebooks/
 ├── src/advai_notebooks/         # 可复用实现：任务目录 + common
 ├── data/sample/                # 可版本化的小型样例与 schema
 ├── docs/                       # 架构、任务、数据和发布参考指南
+├── site/                       # 双语文档站与内容转换脚本
 ├── tests/                      # 单元、契约和生命周期回归测试
 └── outputs/                    # 本地生成产物，Git 忽略
 ```
 
 ## 中文参考文档
+
+[文档站](https://advai-x.github.io/advai-notebooks/zh-cn/)提供搜索、分类导航与对应语言切换。
+启用 GitHub Pages 并部署文档工作流后，站点才会可用。本地预览与设置步骤见[文档站指南](site/README.zh-CN.md)。
+以下原始文件仍是指南正文的唯一来源。
 
 - [架构与扩展边界](docs/architecture.zh-CN.md)
 - [Demo 数据与 Hugging Face Dataset](docs/datasets.zh-CN.md)

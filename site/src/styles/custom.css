@@ -1,0 +1,90 @@
+:root {
+  --sl-color-accent-low: #102840;
+  --sl-color-accent: #3487c5;
+  --sl-color-accent-high: #a8d8f7;
+  --sl-content-width: 52rem;
+}
+
+:root[data-theme='light'] {
+  --sl-color-accent-low: #e0f0fa;
+  --sl-color-accent: #176b9d;
+  --sl-color-accent-high: #153f5a;
+}
+
+.hero {
+  padding-block: 2rem;
+}
+
+.hero > .hero-html {
+  width: 100%;
+}
+
+.hero-html img {
+  width: 100%;
+  height: auto;
+  border-radius: 0.6rem;
+}
+
+@media (min-width: 50rem) {
+  .hero {
+    grid-template-columns: 6fr 5fr;
+    padding-block: 3rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 4.2vw, 3.5rem);
+  }
+}
+
+.track-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-block: 1.5rem;
+}
+
+@media (max-width: 40rem) {
+  .track-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.track-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 1.25rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.6rem;
+  text-decoration: none;
+  color: var(--sl-color-text);
+  background: var(--sl-color-bg);
+}
+
+.track-card:hover,
+.track-card:focus-visible {
+  border-color: var(--sl-color-accent);
+  outline-color: var(--sl-color-accent);
+}
+
+.track-card strong {
+  font-size: 1.1rem;
+  color: var(--sl-color-text-accent);
+}
+
+.track-card span {
+  font-size: 0.95rem;
+  color: var(--sl-color-gray-2);
+}
+
+.guide-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-block: 1rem 1.5rem;
+}
+
+.guide-actions a {
+  border-bottom: 1px solid var(--sl-color-accent);
+  text-decoration: none;
+}
