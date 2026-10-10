@@ -1,17 +1,25 @@
-![advai-notebooks — practical, reproducible model training with notebooks](docs/assets/readme-hero.png)
+<p align="center">
+  <img src="docs/assets/readme-hero.png" alt="advai-notebooks — practical, reproducible model training with notebooks" width="100%">
+</p>
 
-# advai-notebooks
+<h1 align="center">advai-notebooks</h1>
 
-English | [简体中文](README.zh-CN.md)
+<p align="center">
+  English | <a href="README.zh-CN.md">简体中文</a>
+</p>
 
-> Practical, reproducible training guides for modern AI models — from a tiny offline
-> smoke run to a configurable experiment on your own data.
+<p align="center">
+  Practical, reproducible training guides for modern AI models.<br>
+  From a tiny offline smoke run to a configurable experiment on your own data.
+</p>
 
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](pyproject.toml)
-[![PyTorch](https://img.shields.io/badge/PyTorch-training-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
-[![Google Colab](https://img.shields.io/badge/Google%20Colab-ready-F9AB00?logo=googlecolab&logoColor=white)](notebooks/)
-[![Hugging Face](https://img.shields.io/badge/Hugging%20Face-export%20ready-FFD21E)](docs/publishing.md)
-[![Status](https://img.shields.io/badge/status-active%20development-blue)](#project-status)
+<p align="center">
+  <a href="pyproject.toml"><img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&amp;logoColor=white" alt="Python 3.10+"></a>
+  <a href="https://pytorch.org/"><img src="https://img.shields.io/badge/PyTorch-training-EE4C2C?logo=pytorch&amp;logoColor=white" alt="PyTorch training"></a>
+  <a href="notebooks/"><img src="https://img.shields.io/badge/Google%20Colab-ready-F9AB00?logo=googlecolab&amp;logoColor=white" alt="Google Colab ready"></a>
+  <a href="docs/publishing.md"><img src="https://img.shields.io/badge/Hugging%20Face-export%20ready-FFD21E" alt="Hugging Face export ready"></a>
+  <a href="#project-status"><img src="https://img.shields.io/badge/status-active%20development-blue" alt="Status: active development"></a>
+</p>
 
 advai-notebooks is a collection of executable notebooks, YAML configurations and
 reusable Python modules for learning and applying mainstream model-training workflows.

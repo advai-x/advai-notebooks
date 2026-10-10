@@ -1,15 +1,24 @@
-![advai-notebooks — 基于 Notebook 的实用、可复现模型训练](docs/assets/readme-hero.png)
+<p align="center">
+  <img src="docs/assets/readme-hero.png" alt="advai-notebooks — 基于 Notebook 的实用、可复现模型训练" width="100%">
+</p>
 
-# advai-notebooks
+<h1 align="center">advai-notebooks</h1>
 
-[English](README.md) | 简体中文
+<p align="center">
+  <a href="README.md">English</a> | 简体中文
+</p>
 
-> 面向现代 AI 模型的实用、可复现训练指南：从离线 tiny smoke 实验，到使用自己数据的可配置训练。
+<p align="center">
+  面向现代 AI 模型的实用、可复现训练指南。<br>
+  从离线 tiny smoke 实验，到使用自己数据的可配置训练。
+</p>
 
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](pyproject.toml)
-[![PyTorch](https://img.shields.io/badge/PyTorch-training-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
-[![Google Colab](https://img.shields.io/badge/Google%20Colab-ready-F9AB00?logo=googlecolab&logoColor=white)](notebooks/)
-[![Hugging Face](https://img.shields.io/badge/Hugging%20Face-export%20ready-FFD21E)](docs/publishing.zh-CN.md)
+<p align="center">
+  <a href="pyproject.toml"><img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&amp;logoColor=white" alt="Python 3.10+"></a>
+  <a href="https://pytorch.org/"><img src="https://img.shields.io/badge/PyTorch-training-EE4C2C?logo=pytorch&amp;logoColor=white" alt="PyTorch 训练"></a>
+  <a href="notebooks/"><img src="https://img.shields.io/badge/Google%20Colab-ready-F9AB00?logo=googlecolab&amp;logoColor=white" alt="支持 Google Colab"></a>
+  <a href="docs/publishing.zh-CN.md"><img src="https://img.shields.io/badge/Hugging%20Face-export%20ready-FFD21E" alt="支持 Hugging Face 导出"></a>
+</p>
 
 advai-notebooks 提供可执行 Notebook、YAML 配置和可复用 Python 模块，帮助学习和实践主流模型的训练流程。
 每条已实现路径都覆盖完整生命周期：
