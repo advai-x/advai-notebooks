@@ -2,7 +2,7 @@
 
 [English](architecture.md) | 简体中文
 
-本项目提供十一条独立的模型训练与推理路径：Embedding、Ranker、Decision、LLM Base、LLM Instruct、LLM PPO、LLM GRPO、Diffusion、VLM、VLA 和 VM。
+本项目提供十三条独立的模型训练与推理路径：Embedding、Ranker、Decision、LLM Base、LLM Instruct、LLM PPO、LLM GRPO、Diffusion、VLM、VLA、VM、STT 和 TTS。
 每条路径拥有自己的配置、数据校验、采样、损失、优化器、评估、训练组装、导出和 CLI。
 各类任务可以分别训练、部署和调整，应用层按需要组合它们。
 
@@ -19,7 +19,11 @@ Decision 的定位是本项目自行实现的决策模型。Laya 仅作为思想
 
 ## 1. 模型任务并行，应用组合单独表达
 
-Embedding、Ranker、Decision、LLM Base、LLM Instruct、LLM PPO、LLM GRPO、Diffusion、VLM、VLA、VM 是同一级的任务模块，各自从数据到训练、评估、导出、推理形成闭环。
+Embedding、Ranker、Decision、LLM Base、LLM Instruct、LLM PPO、LLM GRPO、Diffusion、VLM、VLA、VM、STT、TTS 是同一级的任务模块，各自从数据到训练、评估、导出、推理形成闭环。
+
+STT/TTS 复用中立 epoch 执行器，但独立维护音频准备、模型适配、损失和评估。
+`common/audio.py` 仅提供 PCM 校验、重采样及指纹。语音使用独立依赖环境，
+范围详见 [STT](stt.zh-CN.md) 与 [TTS](tts.zh-CN.md)。
 图中的并行表示独立且同级，不表示必须同时训练。它们可以分别选择基座、参数、设备和部署方式。
 
 ```mermaid

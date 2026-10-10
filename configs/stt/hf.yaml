@@ -1,0 +1,24 @@
+# Copy this file, replace data/output paths, and keep an immutable base revision.
+output_dir: outputs/stt/whisper-tiny
+model:
+  id: openai/whisper-tiny
+  revision: 169d4a4341b33bc18d8881c4b69c2e104e1cc0af
+  language: Chinese
+  max_new_tokens: 128
+  max_label_tokens: 256
+data:
+  samples: data/local/stt/samples.jsonl
+  max_duration: 30.0
+training:
+  method: full
+  epochs: 3
+  batch_size: 1
+  gradient_accumulation: 4
+  learning_rate: 0.00001
+runtime:
+  device: cuda
+  precision: fp32
+  num_threads: 2
+evaluation:
+  selection_metric: cer
+  normalization: nfkc_lower_whitespace

@@ -30,12 +30,19 @@ def publish(
     model_card=None,
     commit_message=None,
     dry_run=False,
+    asset_names=(),
+    component_dirs=(),
+    pipeline_tag=None,
 ):
     export_dir = Path(export_dir).resolve()
     if not export_dir.is_dir():
         raise FileNotFoundError("Publication requires an existing local inference export")
     model_class.load(export_dir, "cpu")  # Validate kind before staging.
-    files = collect_files(export_dir, names=ASSETS, directories=("", "encoder", "base_model"))
+    files = collect_files(
+        export_dir,
+        names=(*ASSETS, *asset_names),
+        directories=("", "encoder", "base_model", *component_dirs),
+    )
     for directory in ("chat_templates", "encoder/chat_templates"):
         names = [file.name for file in (export_dir / directory).glob("*.jinja")]
         files.extend(collect_files(export_dir, names=names, directories=(directory,)))
@@ -50,6 +57,7 @@ def publish(
             library="advai-notebooks",
             license=license,
             tags=(kind, "training-guide"),
+            pipeline_tag=pipeline_tag,
         )
     )
     return publish_files(

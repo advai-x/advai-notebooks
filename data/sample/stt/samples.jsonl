@@ -1,0 +1,8 @@
+{"id":"one","group_id":"recording-1","split":"train","audio":"audio/one.wav","text":"red"}
+{"id":"two","group_id":"recording-2","split":"train","audio":"audio/two.wav","text":"green"}
+{"id":"three","group_id":"recording-3","split":"train","audio":"audio/three.wav","text":"blue"}
+{"id":"four","group_id":"recording-4","split":"train","audio":"audio/four.wav","text":"yellow"}
+{"id":"five","group_id":"recording-5","split":"validation","audio":"audio/five.wav","text":"orange"}
+{"id":"six","group_id":"recording-6","split":"validation","audio":"audio/six.wav","text":"purple"}
+{"id":"seven","group_id":"recording-7","split":"test","audio":"audio/seven.wav","text":"cyan"}
+{"id":"eight","group_id":"recording-8","split":"test","audio":"audio/eight.wav","text":"pink"}

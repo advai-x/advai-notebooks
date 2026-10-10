@@ -2,9 +2,9 @@
 
 English | [简体中文](architecture.zh-CN.md)
 
-This project provides eleven independent training/inference tracks: Embedding,
+This project provides thirteen independent training/inference tracks: Embedding,
 Ranker, Decision, LLM Base, LLM Instruct, LLM PPO, LLM GRPO, Diffusion, VLM, VLA
-and VM. Each owns its task-specific configuration, data validation, sampling,
+VM, STT and TTS. Each owns its task-specific configuration, data validation, sampling,
 objective, evaluation, model composition, export and CLI. Applications can deploy
 them separately or explicitly combine their outputs.
 
@@ -38,6 +38,8 @@ flowchart TB
         VLM[VLM: image QA]
         VLA[VLA: continuous action chunks]
         VM[VM: numerical state rollouts]
+        STT[STT: speech to text]
+        TTS[TTS: text to speech]
     end
     TASKS --> LIFE[Each: validate, baseline, train, select, test, export]
     LIFE --> INFER[Task-specific native reload and inference]
@@ -54,6 +56,8 @@ Objectives, metrics, selection and training assembly remain task-owned.
 - Base/Instruct separately assemble Transformers Trainer.
 - PPO/GRPO own online RL loops; Diffusion owns its denoising loop.
 - VLM/VLA/VM inject models, data, loss, evaluation and persistence into a neutral epoch executor.
+- STT/TTS use the same neutral executor, with independent audio preparation and objectives.
+  They use a separate speech environment; see [STT](stt.md) and [TTS](tts.md).
 
 Different trainers do not imply upstream/downstream model dependencies. A Base
 full/merged export can initialize Instruct, and an SFT full/merged export can
@@ -110,14 +114,15 @@ or shared encoder weights between tasks.
 
 ```text
 configs/
-  embedding/ ranker/ decision/ diffusion/
+  embedding/ ranker/ decision/ diffusion/ stt/ tts/
   llm/{base,instruct,ppo,grpo}/ vlm/ vla/ vm/
   data_preparation/ workflows/       # Optional preparation/composition
 src/advai_notebooks/
   common/                           # Runtime, atomic artifacts, provenance, checkpoints
     hub.py                          # Neutral packaging/upload/snapshot transport
     retrieval_training.py           # Injected retrieval optimization loop
-    native_training.py              # Injected VLM/VLA/VM epoch lifecycle
+    native_training.py              # Injected multimodal/speech epoch lifecycle
+    audio.py                        # Neutral local PCM/resampling/fingerprint tools
     native_publication.py           # Injected inference-file whitelist packaging
   embedding/ ranker/                # Task-specific model/data/loss/metrics/CLI
   decision/
@@ -136,6 +141,7 @@ src/advai_notebooks/
     base/ instruct/ ppo/ grpo/       # Independent task modules
   diffusion/                        # Native pipeline plus task-owned denoising lifecycle
   vlm/ vla/ vm/                     # Independent multimodal/dynamics baselines
+  stt/ tts/                         # Independent Whisper / Qwen3-TTS adaptation
   data_preparation/ workflows/       # Optional composition layer
 notebooks/                          # Tutorials calling the same Python implementation
 tests/                              # Components, lifecycle and import isolation

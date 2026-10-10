@@ -1,0 +1,23 @@
+# Single-speaker, fixed training reference, full talker/code-predictor updates.
+output_dir: outputs/tts/qwen3-0.6b
+model:
+  id: Qwen/Qwen3-TTS-12Hz-0.6B-Base
+  revision: 5d83992436eae1d760afd27aff78a71d676296fc
+  max_text_tokens: 512
+  max_new_tokens: 256
+data:
+  samples: data/local/tts/samples.jsonl
+  reference_audio: audio/training-reference.wav
+  max_duration: 10.0
+training:
+  method: full
+  epochs: 3
+  batch_size: 1
+  gradient_accumulation: 4
+  learning_rate: 0.000002
+runtime:
+  device: cuda
+  precision: fp32
+  num_threads: 2
+evaluation:
+  selection_metric: loss

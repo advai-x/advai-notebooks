@@ -54,12 +54,19 @@ Google Colab, then move the same configuration to a local machine or GPU environ
 | VLM | Native LLaVA single-image question answering | Answer-only full / language LoRA fine-tuning | [Notebook](notebooks/vlm/01_finetune.ipynb) · [Guide](docs/vlm.md) · [Open in Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/vlm/01_finetune.ipynb) |
 | VLA | CLIP + language + state → continuous action chunks | Behavior-cloning baseline; frozen or full encoder updates | [Notebook](notebooks/vla/01_finetune.ipynb) · [Guide](docs/vla.md) · [Open in Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/vla/01_finetune.ipynb) |
 | VM | Action-conditioned numerical World Model | Residual dynamics, native checkpoint fine-tuning, recursive rollouts | [Notebook](notebooks/vm/01_finetune.ipynb) · [Guide](docs/vm.md) · [Open in Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/vm/01_finetune.ipynb) |
+| STT | Speech-to-text / ASR with native Whisper | Full supervised fine-tuning, WER/CER | [Notebook](notebooks/stt/01_finetune.ipynb) · [Guide](docs/stt.md) · [Open in Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/stt/01_finetune.ipynb) |
+| TTS | Qwen3-TTS Base text-to-speech | Full single-speaker fine-tuning, non-streaming synthesis | [Notebook](notebooks/tts/01_finetune.ipynb) · [Guide](docs/tts.md) · [Open in Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/tts/01_finetune.ipynb) |
 
 VLM, VLA and VM are independent model families alongside `llm/`. In this repository,
 `vm/` means **World Model**, rather than a vision-only or video-only model.
 These first backends have narrow, explicit scope: VLM does not implement video/Qwen-VL,
 VLA does not load OpenVLA checkpoints, and VM does not generate video. VLA/VM are
 trainable baselines, not demonstrated robotics or planning capabilities.
+
+`stt/` and `tts/` are independent speech tracks at the same level. Speech extras
+require a **separate environment** (Transformers 4.57.3, versus 5.18.0 in several
+other tracks). TTS smoke uses a synthetic GRU, not Qwen; native Qwen fine-tuning
+requires consented speech data and target-hardware validation. See the speech guides.
 
 There is also an optional
 [retrieval comparison notebook](notebooks/workflows/01_retrieval_comparison.ipynb)
@@ -82,7 +89,8 @@ the repository in the Colab runtime:
 
 Replace `embedding` with the extra for your chosen track:
 `ranker`, `decision`, `llm-base`, `llm-instruct`, `llm-ppo`,
-`llm-grpo`, `diffusion`, `vlm`, `vla` or `vm`.
+`llm-grpo`, `diffusion`, `vlm`, `vla`, `vm`, `stt` or `tts`.
+For STT/TTS, use a fresh speech runtime; do not mix incompatible task extras.
 
 For real training, keep datasets and checkpoints in persistent storage such as
 Google Drive. A disconnected Colab runtime deletes files stored only under
@@ -151,7 +159,7 @@ package versions must still match the original run.
 - **Config-driven experiments.** Model IDs, data paths, runtime choices and
   hyperparameters live in versionable YAML files.
 - **Task isolation.** Embedding, ranker, decision, LLM, diffusion, VLM, VLA and VM own
-  their model-specific data, losses and metrics.
+  their model-specific data, losses and metrics, as do STT and TTS.
 - **Leakage-aware validation.** The data loaders validate split boundaries, groups and
   task-specific label contracts.
 - **Reproducible artifacts.** Runs record configuration, environment, metrics,
@@ -182,6 +190,8 @@ python -m advai_notebooks.diffusion run   --config configs/diffusion/smoke.yaml
 python -m advai_notebooks.vlm run         --config configs/vlm/smoke.yaml
 python -m advai_notebooks.vla run         --config configs/vla/smoke.yaml
 python -m advai_notebooks.vm run          --config configs/vm/smoke.yaml
+python -m advai_notebooks.stt run         --config configs/stt/smoke.yaml
+python -m advai_notebooks.tts run         --config configs/tts/smoke.yaml
 ```
 
 Data preparation and combined retrieval evaluation are separate, optional stages:
@@ -210,6 +220,7 @@ advai-notebooks/
 │   ├── vla/                    # Continuous-action behavior cloning
 │   ├── vm/                     # Numerical world dynamics
 │   ├── diffusion/
+│   ├── stt/ tts/                # Speech recognition and synthesis
 │   └── workflows/
 ├── configs/                    # Smoke, real-model and LoRA experiment presets
 ├── src/advai_notebooks/        # Reusable training and inference implementations
@@ -221,6 +232,7 @@ advai-notebooks/
 │   ├── vla/
 │   ├── vm/
 │   ├── diffusion/
+│   ├── stt/ tts/
 │   ├── data_preparation/
 │   ├── workflows/
 │   └── common/
@@ -250,6 +262,8 @@ the source of truth for guide content.
 - [VLA action-training guide](docs/vla.md)
 - [VM / World Model guide](docs/vm.md)
 - [Diffusion guide](docs/diffusion.md)
+- [STT / Whisper guide](docs/stt.md)
+- [TTS / Qwen3-TTS guide](docs/tts.md)
 - [Hugging Face publication guide](docs/publishing.md)
 - [Retrieval data contract](data/sample/retrieval/README.md)
 

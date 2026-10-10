@@ -5,8 +5,6 @@ import json
 import math
 from pathlib import Path
 
-from PIL import Image
-
 from .artifacts import digest
 
 
@@ -37,6 +35,8 @@ def records(path):
 
 
 def local_image(root, value):
+    from PIL import Image
+
     if not isinstance(value, str) or not value:
         raise ValueError("Image reference must be nonempty text")
     root = Path(root).resolve()

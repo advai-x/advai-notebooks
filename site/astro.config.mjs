@@ -39,6 +39,7 @@ export default defineConfig({
         group('Start here', '从这里开始', ['start/quickstart', 'training', 'start/workflow']),
         group('Retrieval & decisions', '检索与决策', ['guides/embedding', 'guides/ranker', 'guides/decision']),
         group('Language models', '语言模型', ['guides/llm', 'guides/rl']),
+        group('Speech models', '语音模型', ['guides/stt', 'guides/tts']),
         group('Multimodal & generation', '多模态与生成', ['guides/diffusion', 'guides/vlm', 'guides/vla', 'guides/vm']),
         group('Data & publication', '数据与发布', ['reference/retrieval-data', 'reference/datasets', 'reference/publishing', 'reference/cli']),
         group('Development', '开发与贡献', ['reference/architecture', 'development/contributing', 'development/docs-site']),

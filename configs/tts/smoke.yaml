@@ -1,0 +1,19 @@
+output_dir: outputs/tts/smoke
+model:
+  id: tiny
+  max_text_tokens: 128
+  max_new_tokens: 12
+data:
+  samples: data/sample/tts/samples.jsonl
+  reference_audio: audio/one.wav
+  max_duration: 1.0
+training:
+  epochs: 2
+  batch_size: 2
+  learning_rate: 0.002
+runtime:
+  device: cpu
+  precision: fp32
+  num_threads: 1
+evaluation:
+  selection_metric: loss

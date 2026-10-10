@@ -12,6 +12,8 @@ requires-python = ">=3.10"
 dependencies = ["PyYAML>=6,<7"]
 
 [project.optional-dependencies]
+stt = ["transformers==4.57.3", "torch>=2.4,<3", "safetensors>=0.8,<1", "numpy>=1.26,<3", "soundfile>=0.12,<1", "scipy>=1.11,<2"]
+tts = ["qwen-tts==0.1.1", "torch>=2.4,<3", "safetensors>=0.8,<1", "numpy>=1.26,<3", "soundfile>=0.12,<1", "scipy>=1.11,<2"]
 vlm = ["transformers==5.18.0", "torch>=2.4,<3", "peft==0.18.1", "safetensors>=0.8,<1", "numpy>=1.26,<3", "Pillow>=10,<13"]
 vla = ["transformers==5.18.0", "torch>=2.4,<3", "safetensors>=0.8,<1", "numpy>=1.26,<3", "Pillow>=10,<13"]
 vm = ["torch>=2.4,<3", "safetensors>=0.4,<1", "numpy>=1.26,<3", "huggingface-hub>=0.34,<2"]
@@ -28,6 +30,8 @@ notebooks = ["nbformat>=5.10,<6", "nbclient>=0.10,<1", "nbconvert>=7.16,<8", "ip
 dev = ["pytest>=8,<10", "ruff>=0.9,<1"]
 
 [project.scripts]
+advai-stt = "advai_notebooks.stt.cli:main"
+advai-tts = "advai_notebooks.tts.cli:main"
 advai-vlm = "advai_notebooks.vlm.cli:main"
 advai-vla = "advai_notebooks.vla.cli:main"
 advai-vm = "advai_notebooks.vm.cli:main"

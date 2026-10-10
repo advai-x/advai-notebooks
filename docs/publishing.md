@@ -180,3 +180,21 @@ LoRA adds a frozen initial pipeline and native adapter metadata. Filtered packag
 are reloaded before upload, excluding original images and generated PNGs.
 The implementation did not upload a Diffusion model or Dataset.
 See the [Diffusion guide](diffusion.md).
+
+## Speech packages
+
+STT/TTS use the same explicit publish flags in their separate speech environment:
+
+```bash
+python -m advai_notebooks.stt publish --export-dir outputs/stt/smoke/export \
+  --repo-id your-org/your-stt-model --dry-run
+python -m advai_notebooks.tts publish --export-dir outputs/tts/smoke/export \
+  --repo-id your-org/your-tts-model --dry-run
+```
+
+Whisper exports include native weights, tokenizer and feature extraction settings.
+Qwen TTS exports additionally include the speech codec and fixed speaker embedding;
+they retain the Base format. Whitelists exclude raw recordings and training state,
+but voice embeddings are derived biometric data and require explicit speaker
+permission to publish. No STT/TTS model or Dataset was uploaded by this implementation.
+See [STT](stt.md) and [TTS](tts.md) for scopes and third-party licensing requirements.

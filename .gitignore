@@ -16,6 +16,7 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .venv/
+.venv-*/
 venv/
 env/
 *.egg-info/
@@ -92,6 +93,26 @@ data/**
 !data/sample/vlm/README.md
 !data/sample/vla/README.md
 !data/sample/vm/README.md
+!data/sample/stt/README.md
+!data/sample/tts/README.md
+!data/sample/stt/samples.jsonl
+!data/sample/tts/samples.jsonl
+!data/sample/stt/audio/one.wav
+!data/sample/stt/audio/two.wav
+!data/sample/stt/audio/three.wav
+!data/sample/stt/audio/four.wav
+!data/sample/stt/audio/five.wav
+!data/sample/stt/audio/six.wav
+!data/sample/stt/audio/seven.wav
+!data/sample/stt/audio/eight.wav
+!data/sample/tts/audio/one.wav
+!data/sample/tts/audio/two.wav
+!data/sample/tts/audio/three.wav
+!data/sample/tts/audio/four.wav
+!data/sample/tts/audio/five.wav
+!data/sample/tts/audio/six.wav
+!data/sample/tts/audio/seven.wav
+!data/sample/tts/audio/eight.wav
 # Deliberately small synthetic fixtures only.
 !data/sample/vlm/samples.jsonl
 !data/sample/vlm/images/red.ppm
@@ -146,5 +167,7 @@ outputs/**
 !outputs/vlm/README.md
 !outputs/vla/README.md
 !outputs/vm/README.md
+!outputs/stt/README.md
+!outputs/tts/README.md
 
 !outputs/diffusion/README.md

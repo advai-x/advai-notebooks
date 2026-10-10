@@ -26,3 +26,9 @@ training require later implementations, not additional flags alone.
 `llm-ppo.txt` and `llm-grpo.txt` install the independent online RL task extras.
 These first RL implementations use single-device fp32, full/LoRA and PyTorch training loops;
 see [the RL guide](../docs/rl.md) for algorithm and checkpoint contracts.
+
+`stt.txt` and `tts.txt` use a **separate speech environment**. Both pin Transformers
+4.57.3; TTS pins qwen-tts 0.1.1 (which requires Accelerate 1.12.0). Do not combine
+them with task extras pinning Transformers 5.18.0 / Accelerate 1.15.0. STT/TTS may
+be installed together with `python -m pip install -e '.[stt,tts,notebooks,dev]'`.
+Use matching PyTorch/torchaudio builds and record resolved versions with each run.

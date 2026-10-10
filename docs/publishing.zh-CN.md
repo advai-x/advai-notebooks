@@ -162,3 +162,19 @@ PPO 发布 `value_head.safetensors` 以支持完整模型门面，原生 causal-
 LoRA 额外包含冻结初始 pipeline 和原生 adapter 元数据。筛选后实际加载验证再发布。
 不包含原始图片或生成 PNG。未来 demo 可以使用 `widebluesky/wbs-diffusion-demo`；
 本次实现没有上传 Diffusion 模型或 Dataset。详见 [Diffusion guide](diffusion.zh-CN.md)。
+
+## 语音发布包
+
+STT/TTS 在独立语音环境使用同样的显式发布参数：
+
+```bash
+python -m advai_notebooks.stt publish --export-dir outputs/stt/smoke/export \
+  --repo-id your-org/your-stt-model --dry-run
+python -m advai_notebooks.tts publish --export-dir outputs/tts/smoke/export \
+  --repo-id your-org/your-tts-model --dry-run
+```
+
+Whisper 包含原生权重、tokenizer 与特征提取配置；Qwen TTS 另外包含 codec 和固定
+speaker embedding，保留 Base 格式。白名单排除原录音与训练状态，但 embedding
+属于衍生生物特征，发布需要明确说话人授权。本次未上传 STT/TTS 模型或 Dataset。
+范围及第三方许可见 [STT](stt.zh-CN.md) 与 [TTS](tts.zh-CN.md)。

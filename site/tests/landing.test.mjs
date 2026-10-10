@@ -22,6 +22,9 @@ test('homepage overrides never replace reading pages or error pages', () => {
 });
 
 test('homepage notebook counts describe primary guides, excluding the optional workflow', () => {
-  assert.equal(notebookCount, 9);
+  assert.equal(notebookCount, 11);
+  assert.equal(TRACKS.length, 13);
+  assert.equal(familyFor(TRACKS.find((track) => track.extra === 'stt')), 'speech');
+  assert.equal(familyFor(TRACKS.find((track) => track.extra === 'tts')), 'speech');
   assert.equal(TRACKS.length - notebookCount, 2);
 });

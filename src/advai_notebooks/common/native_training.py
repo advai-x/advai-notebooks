@@ -27,6 +27,10 @@ def environment():
         "Pillow",
         "safetensors",
         "PyYAML",
+        "qwen-tts",
+        "soundfile",
+        "scipy",
+        "librosa",
     ):
         try:
             packages[name] = importlib.metadata.version(name)

@@ -51,10 +51,16 @@ Notebook 以教学和编排为主，调用与 CLI 相同、经过测试的实现
 | VLM | 原生 LLaVA 单图问答 | 回答区监督 full / 语言 LoRA | [Notebook](notebooks/vlm/01_finetune.zh-CN.ipynb) · [指南](docs/vlm.zh-CN.md) · [Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/vlm/01_finetune.zh-CN.ipynb) |
 | VLA | CLIP + 语言 + 状态 → 连续动作 chunk | 行为克隆基线，冻结或更新编码器 | [Notebook](notebooks/vla/01_finetune.zh-CN.ipynb) · [指南](docs/vla.zh-CN.md) · [Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/vla/01_finetune.zh-CN.ipynb) |
 | VM | 动作条件数值 World Model | Residual dynamics、原生权重微调、递归 rollout | [Notebook](notebooks/vm/01_finetune.zh-CN.ipynb) · [指南](docs/vm.zh-CN.md) · [Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/vm/01_finetune.zh-CN.ipynb) |
+| STT | 原生 Whisper 语音转文字 / ASR | 全参数监督微调、WER/CER | [Notebook](notebooks/stt/01_finetune.zh-CN.ipynb) · [指南](docs/stt.zh-CN.md) · [Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/stt/01_finetune.zh-CN.ipynb) |
+| TTS | Qwen3-TTS Base 文字转语音 | 单说话人全参数微调、非流式生成 | [Notebook](notebooks/tts/01_finetune.zh-CN.ipynb) · [指南](docs/tts.zh-CN.md) · [Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/tts/01_finetune.zh-CN.ipynb) |
 
 VLM、VLA、VM 与 `llm/` 平级；`vm/` 明确表示 World Model，而非 Vision/Video Model。
 当前后端范围有限：VLM 不实现视频/Qwen-VL，VLA 不加载 OpenVLA checkpoint，VM 不生成视频。
 VLA/VM 是可训练基线，并非已验证的机器人控制或规划能力。
+
+`stt/`、`tts/` 同样平级，需独立语音环境（Transformers 4.57.3，不能与其他任务的
+5.18.0 混装）。TTS smoke 为合成 GRU 而非 Qwen；真实 Qwen 训练需要授权语音数据
+及目标硬件验证，详见语音指南。
 
 另有可选的 [检索组合对照 Notebook](notebooks/workflows/01_retrieval_comparison.zh-CN.ipynb)，
 同时评估 embedding 召回和 ranker 重排；两类模型仍可独立训练。
@@ -73,7 +79,8 @@ VLA/VM 是可训练基线，并非已验证的机器人控制或规划能力。
 ```
 
 将 `embedding` 替换为所选任务的 extra：`ranker`、`decision`、`llm-base`、`llm-instruct`、
-`llm-ppo`、`llm-grpo`、`diffusion`、`vlm`、`vla` 或 `vm`。
+`llm-ppo`、`llm-grpo`、`diffusion`、`vlm`、`vla`、`vm`、`stt` 或 `tts`。
+STT/TTS 使用全新语音 runtime，不混装不兼容的任务 extras。
 正式训练的数据与 checkpoint 应放入 Google Drive 等持久化存储；runtime 断开后，
 仅保存在 `/content` 的文件可能丢失。
 
@@ -138,7 +145,7 @@ python -m advai_notebooks.<task> run --config <config.yaml>
 ```
 
 `<task>` 可为 `embedding`、`ranker`、`decision`、`llm.base`、`llm.instruct`、`llm.ppo`、
-`llm.grpo`、`diffusion`、`vlm`、`vla` 或 `vm`，对应配置在 `configs/` 同名目录。
+`llm.grpo`、`diffusion`、`vlm`、`vla`、`vm`、`stt` 或 `tts`，对应配置在 `configs/` 同名目录。
 数据准备与检索组合评估是独立、可选阶段：
 
 ```bash
@@ -158,6 +165,7 @@ advai-notebooks/
 │   ├── embedding/ ranker/ decision/
 │   ├── llm/{base,instruct}/
 │   ├── vlm/ vla/ vm/ diffusion/
+│   ├── stt/ tts/                # 语音识别与合成
 │   └── workflows/
 ├── configs/                    # Smoke、真实基座和 LoRA 配置
 ├── src/advai_notebooks/         # 可复用实现：任务目录 + common
@@ -180,6 +188,7 @@ advai-notebooks/
 - [PPO / GRPO](docs/rl.zh-CN.md)
 - [VLM](docs/vlm.zh-CN.md)、[VLA](docs/vla.zh-CN.md)、[VM / World Model](docs/vm.zh-CN.md)
 - [Diffusion](docs/diffusion.zh-CN.md)
+- [STT / Whisper](docs/stt.zh-CN.md)、[TTS / Qwen3-TTS](docs/tts.zh-CN.md)
 - [Hugging Face 发布](docs/publishing.zh-CN.md)
 - [Notebook 目录](notebooks/README.zh-CN.md)
 - [检索数据契约（英文）](data/sample/retrieval/README.md)

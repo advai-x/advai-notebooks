@@ -1,0 +1,19 @@
+output_dir: outputs/stt/smoke
+model:
+  id: tiny
+  max_new_tokens: 4
+  max_label_tokens: 32
+data:
+  samples: data/sample/stt/samples.jsonl
+  max_duration: 1.0
+training:
+  epochs: 2
+  batch_size: 2
+  learning_rate: 0.002
+runtime:
+  device: cpu
+  precision: fp32
+  num_threads: 1
+evaluation:
+  selection_metric: cer
+  normalization: nfkc_lower_whitespace
