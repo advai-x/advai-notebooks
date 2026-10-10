@@ -1,0 +1,7 @@
+---
+import DefaultMarkdownContent from '@astrojs/starlight/components/MarkdownContent.astro';
+import HomeContent from './HomeContent.astro';
+import { isHomepage } from '../../scripts/landing.mjs';
+---
+
+{isHomepage(Astro.locals.starlightRoute) ? <HomeContent /> : <DefaultMarkdownContent><slot /></DefaultMarkdownContent>}

@@ -1,0 +1,34 @@
+---
+import DefaultHeader from '@astrojs/starlight/components/Header.astro';
+import SiteTitle from '@astrojs/starlight/components/SiteTitle.astro';
+import Search from '@astrojs/starlight/components/Search.astro';
+import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
+import LanguageSelect from '@astrojs/starlight/components/LanguageSelect.astro';
+import { REPOSITORY, route } from '../../scripts/catalog.mjs';
+import { isHomepage } from '../../scripts/landing.mjs';
+const home = isHomepage(Astro.locals.starlightRoute);
+const locale = Astro.locals.starlightRoute.locale ?? 'en';
+const chinese = locale === 'zh-cn';
+---
+
+{home ? (
+  <div class="landing-header">
+    <SiteTitle />
+    <nav class="landing-nav" aria-label={chinese ? '主导航' : 'Main navigation'}>
+      <a href={route(locale, 'start/quickstart')}>{chinese ? '快速开始' : 'Quick start'}</a>
+      <a href={route(locale, 'training')}>{chinese ? '训练指南' : 'Training guides'}</a>
+      <a href={REPOSITORY}>GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+    <div class="landing-search"><Search /></div>
+    <div class="landing-preferences"><ThemeSelect /><LanguageSelect /></div>
+    <details class="landing-mobile-menu">
+      <summary>{chinese ? '菜单' : 'Menu'}</summary>
+      <div class="landing-mobile-panel">
+        <a href={route(locale, 'start/quickstart')}>{chinese ? '快速开始' : 'Quick start'}</a>
+        <a href={route(locale, 'training')}>{chinese ? '训练指南' : 'Training guides'}</a>
+        <a href={REPOSITORY}>GitHub</a>
+        <ThemeSelect /><LanguageSelect />
+      </div>
+    </details>
+  </div>
+) : <DefaultHeader />}

@@ -54,8 +54,11 @@ with `npm exec -- astro preview stop` from `site/` before reinstalling dependenc
 - [scripts/catalog.mjs](scripts/catalog.mjs) selects published sources, navigation
   metadata and verified Notebook/configuration entry points.
 - [scripts/sync-content.mjs](scripts/sync-content.mjs) generates home and training
-  directory pages and extracts quick-start, workflow, CLI and contributor sections
+  directory metadata and extracts quick-start, workflow, CLI and contributor sections
   from the root README translations. It does not duplicate those sections manually.
+- Homepage components in `src/components/` render the training catalog, filters
+  and original README smoke example. Shared group metadata is in
+  [scripts/landing.mjs](scripts/landing.mjs). The documentation URLs stay unchanged.
 - Markdown is parsed before transforming links. Fenced code and inline code
   examples are not interpreted as links or modified as source code.
 - Published documents link to matching-language site routes. Unpublished files
@@ -69,8 +72,9 @@ with `npm exec -- astro preview stop` from `site/` before reinstalling dependenc
 
 Generated files under `site/src/content/docs/`, `site/public/generated/` and
 `site/.content-manifest.json` are ignored. Do not hand-edit or commit them.
-Only the allowlisted banner asset is copied; local datasets, credentials,
-checkpoints and training outputs are not part of the deployment.
+The homepage illustration in `src/assets/` is optimized to responsive WebP assets
+by Astro. Geist fonts are served locally. The original README banner is unchanged;
+local datasets, credentials, checkpoints and training outputs are not deployed.
 
 ## Enable GitHub Pages
 

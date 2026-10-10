@@ -1,0 +1,31 @@
+---
+import { Image } from 'astro:assets';
+import DefaultHero from '@astrojs/starlight/components/Hero.astro';
+import illustration from '../assets/training-architecture.png';
+import { route } from '../../scripts/catalog.mjs';
+import { isHomepage } from '../../scripts/landing.mjs';
+const home = isHomepage(Astro.locals.starlightRoute);
+const locale = Astro.locals.starlightRoute.locale ?? 'en';
+const chinese = locale === 'zh-cn';
+---
+
+{home ? (
+  <section class="landing-hero" aria-labelledby="_top">
+    <div class="landing-hero-copy">
+      <p class="landing-eyebrow">{chinese ? '可复现的模型训练指南' : 'Reproducible model-training guides'}</p>
+      <h1 id="_top" data-page-title>
+        {chinese ? '从 Notebook 开始，' : 'From notebook to '}
+        <span>{chinese ? '走完训练流程。' : 'trained model.'}</span>
+      </h1>
+      <p class="landing-intro">{chinese ? '先跑通 tiny smoke 实验，再用自己的数据训练、评估与导出。' : 'Practical training guides. Start with a tiny smoke run, then train, evaluate and export on your own data.'}</p>
+      <div class="landing-hero-actions">
+        <a class="landing-button primary" href={route(locale, 'start/quickstart')}>{chinese ? '快速开始' : 'Quick start'} <span aria-hidden="true">→</span></a>
+        <a class="landing-button secondary" href={route(locale, 'training')}>{chinese ? '选择训练指南' : 'Choose a guide'} <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+    <figure class="landing-visual">
+      <Image src={illustration} alt={chinese ? '数据矩阵通过网络层连接到模型的概念插图' : 'Concept illustration of data matrices passing through network layers into a model'} widths={[480, 800, 1200]} sizes="(max-width: 767px) 90vw, 48vw" width={1200} format="webp" quality={85} loading="eager" fetchpriority="high" />
+      <figcaption>{chinese ? '数据 → 训练 → 可复用模型' : 'Data → training → a reusable model'}</figcaption>
+    </figure>
+  </section>
+) : <DefaultHero />}

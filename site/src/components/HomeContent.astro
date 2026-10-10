@@ -1,0 +1,113 @@
+---
+import readme from '../../../README.md?raw';
+import { Code } from '@astrojs/starlight/components';
+import { extractSections, markdown } from '../../scripts/content.mjs';
+import { LOCALES, TRACKS, colabUrl, notebookPath, route } from '../../scripts/catalog.mjs';
+import { TRAINING_GROUPS, familyFor, notebookCount } from '../../scripts/landing.mjs';
+const locale = Astro.locals.starlightRoute.locale ?? 'en';
+const chinese = locale === 'zh-cn';
+// The runnable example comes from the README, not a separate copy to maintain.
+const quickstart = markdown.parse(extractSections(readme, ['Quick start']));
+const smokeCode = quickstart.children.find((node) => node.type === 'code' && node.lang === 'bash');
+if (!smokeCode || smokeCode.type !== 'code') throw new Error('README local smoke example is missing.');
+const steps = chinese ? [
+  ['校验数据', '确认数据契约和 smoke 配置。'],
+  ['训练与恢复', '保留配置，支持 checkpoint 恢复。'],
+  ['评估结果', '使用 held-out 数据检查报告。'],
+  ['导出与重载', '检查导出的模型，再按需发布。'],
+] : [
+  ['Validate data', 'Check the data contract and smoke configuration.'],
+  ['Train & resume', 'Keep the configuration and resume from checkpoints.'],
+  ['Evaluate', 'Inspect reports on held-out data.'],
+  ['Export & reload', 'Verify the exported model before publishing.'],
+];
+const resources = chinese ? [
+  ['数据契约', '准备可训练、可评估的数据。', 'reference/datasets'],
+  ['实现与架构', '了解共享模块与扩展边界。', 'reference/architecture'],
+  ['参与项目', '测试、文档翻译与贡献约定。', 'development/contributing'],
+] : [
+  ['Data contracts', 'Prepare data you can train and evaluate.', 'reference/datasets'],
+  ['Implementation & architecture', 'Understand shared modules and extension boundaries.', 'reference/architecture'],
+  ['Contribute', 'Tests, guide translations and contribution conventions.', 'development/contributing'],
+];
+---
+
+<div class="landing-body">
+  <div class="landing-facts">
+    <dl aria-label={chinese ? '项目概览' : 'Project overview'}>
+    <div><dt>{TRACKS.length.toString().padStart(2, '0')}</dt><dd>{chinese ? '训练路线' : 'Training tracks'}</dd></div>
+    <div><dt>{notebookCount.toString().padStart(2, '0')}</dt><dd>{chinese ? '主线 Colab 教程' : 'Primary Colab guides'}</dd></div>
+    <div><dt>{LOCALES.length.toString().padStart(2, '0')}</dt><dd>{chinese ? '阅读语言' : 'Reading languages'}</dd></div>
+    </dl>
+    <p>{chinese ? '文档阅读、Notebook 交互与 CLI 实验，使用同一套训练实现。' : 'Read the docs, learn in notebooks, run the CLI. All share the same training implementation.'}</p>
+  </div>
+
+  <section class="landing-directory" aria-labelledby={chinese ? '选择你的起点' : 'choose-your-starting-point'}>
+    <div class="landing-section-heading">
+      <h2 id={chinese ? '选择你的起点' : 'choose-your-starting-point'}>{chinese ? '选择你的训练路线。' : 'Find your training path.'}</h2>
+      <p>{chinese ? '按目标选择模型，从对应的 smoke 配置开始。' : 'Choose a model by objective. Start with its smoke configuration.'}</p>
+    </div>
+    <div class="training-filters" role="group" aria-label={chinese ? '筛选模型类别' : 'Filter model families'}>
+      <button type="button" data-family="all" aria-pressed="true">{chinese ? '全部模型' : 'All models'} <span>{TRACKS.length}</span></button>
+      {TRAINING_GROUPS.map((group) => <button type="button" data-family={group.id} aria-pressed="false">{group.label[locale]} <span>{group.extras.length}</span></button>)}
+    </div>
+    <p class="training-results sr-only" role="status" aria-live="polite" data-result-en="training tracks shown" data-result-zh="条训练路线">{TRACKS.length} {chinese ? '条训练路线' : 'training tracks shown'}</p>
+    <div class="training-catalog" id="training-catalog">
+      {TRACKS.map((track) => {
+        const notebook = notebookPath(track, locale);
+        return <article class="training-tile" data-track-family={familyFor(track)}>
+          <div class="training-tile-meta"><code>{track.extra}</code><span>{notebook ? 'Notebook + CLI' : chinese ? 'CLI 指南' : 'CLI guide'}</span></div>
+          <h3><a href={route(locale, track.guide)}>{track.name}</a></h3>
+          <p>{track.description[locale]}</p>
+          <div class="training-tile-links">
+            <a href={route(locale, track.guide)}>{chinese ? '阅读指南' : 'Read guide'} <span aria-hidden="true">→</span></a>
+            {notebook && <a href={colabUrl(notebook)}>{chinese ? '在 Colab 中打开' : 'Open in Colab'} <span aria-hidden="true">↗</span></a>}
+          </div>
+        </article>;
+      })}
+    </div>
+    <p class="training-directory-link"><a href={route(locale, 'training')}>{chinese ? '查看配置与完整训练目录' : 'View configurations and the full training directory'} <span aria-hidden="true">→</span></a></p>
+  </section>
+
+  <section class="landing-workflow" aria-labelledby={chinese ? '同一份实现多种运行方式' : 'one-implementation-multiple-ways-to-learn'}>
+    <div class="landing-workflow-copy">
+      <h2 id={chinese ? '同一份实现多种运行方式' : 'one-implementation-multiple-ways-to-learn'}>{chinese ? '不止训练，走完完整流程。' : 'More than a training loop.'}</h2>
+      <p>{chinese ? '先验证工程链路，再将同一份实现应用到真实数据。' : 'Validate the pipeline first, then take the same implementation to real data.'}</p>
+      <ol class="workflow-steps">{steps.map(([title, detail]) => <li><strong>{title}</strong><span>{detail}</span></li>)}</ol>
+      <a class="landing-text-link" href={route(locale, 'start/workflow')}>{chinese ? '查看完整实验流程' : 'Read the complete workflow'} <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="landing-code-example">
+      <p class="code-example-heading">{chinese ? '可运行示例：Embedding smoke' : 'Runnable example: Embedding smoke'}</p>
+      <Code code={smokeCode.value} lang="bash" title="README.md / local smoke run" />
+      <p class="code-example-note">{chinese ? '依赖安装后可离线运行，不下载真实模型权重。' : 'Runs offline after dependencies are installed. No real model weights are downloaded.'}</p>
+    </div>
+  </section>
+
+  <aside class="landing-scope" aria-labelledby="scope-heading">
+    <h2 id="scope-heading">{chinese ? '先验证链路，再判断质量。' : 'Validate the pipeline. Then judge quality.'}</h2>
+    <p>{chinese ? 'Tiny 模型与合成数据只验证工程流程。VLA / VM 是训练基线，不代表已验证的机器人控制或规划能力。大型真实基座不保证适用于免费 Colab。' : 'Tiny models and synthetic data validate the engineering workflow only. VLA / VM are trainable baselines, not demonstrated robotics or planning capabilities. Large real checkpoints are not guaranteed to fit free Colab runtimes.'}</p>
+  </aside>
+
+  <nav class="landing-resources" aria-label={chinese ? '进一步阅读' : 'Further reading'}>
+    {resources.map(([title, detail, slug]) => <a href={route(locale, slug)}><strong>{title} <span aria-hidden="true">↗</span></strong><span>{detail}</span></a>)}
+  </nav>
+</div>
+
+<script>
+  const directory = document.querySelector('.landing-directory');
+  if (directory) {
+    const controls = directory.querySelectorAll<HTMLButtonElement>('[data-family]');
+    const tracks = directory.querySelectorAll<HTMLElement>('[data-track-family]');
+    const status = directory.querySelector<HTMLElement>('.training-results');
+    controls.forEach((button) => button.addEventListener('click', () => {
+      const family = button.dataset.family;
+      let count = 0;
+      controls.forEach((control) => control.setAttribute('aria-pressed', String(control === button)));
+      tracks.forEach((track) => {
+        track.hidden = family !== 'all' && track.dataset.trackFamily !== family;
+        if (!track.hidden) count++;
+      });
+      if (status) status.textContent = `${count} ${document.documentElement.lang === 'zh-CN' ? status.dataset.resultZh : status.dataset.resultEn}`;
+    }));
+  }
+</script>

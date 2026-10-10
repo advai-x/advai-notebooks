@@ -24,6 +24,11 @@ export default defineConfig({
       },
       social: [{ icon: 'github', label: 'GitHub', href: REPOSITORY }],
       customCss: ['./src/styles/custom.css'],
+      components: {
+        Header: './src/components/Header.astro',
+        Hero: './src/components/Hero.astro',
+        MarkdownContent: './src/components/MarkdownContent.astro',
+      },
       sidebar: [
         group('Start here', '从这里开始', ['start/quickstart', 'training', 'start/workflow']),
         group('Retrieval & decisions', '检索与决策', ['guides/embedding', 'guides/ranker', 'guides/decision']),

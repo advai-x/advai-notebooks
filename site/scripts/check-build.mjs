@@ -68,9 +68,14 @@ export async function checkBuild() {
       if (!values.includes(route(other, slug))) errors.push(`Language switch does not retain page: ${route(locale, slug)}`);
     }
     const overview = parsed.get(resolve(dist, locale, 'training/index.html'));
+    const home = parsed.get(resolve(dist, locale, 'index.html'));
+    if (home?.('.training-tile').length !== TRACKS.length) errors.push(`Homepage training directory is incomplete: ${locale}`);
+    if (home?.('.training-filters button[aria-pressed="true"]').length !== 1) errors.push(`Homepage filters have no unique initial selection: ${locale}`);
+    if (!home?.('.landing-visual img[src$=".webp"]').length) errors.push(`Optimized homepage illustration is missing: ${locale}`);
     for (const track of TRACKS) {
       const notebook = notebookPath(track, locale);
       if (notebook && !overview?.(`a[href="${colabUrl(notebook)}"]`).length) errors.push(`Missing localized Colab entry: ${locale}/${track.name}`);
+      if (notebook && !home?.(`a[href="${colabUrl(notebook)}"]`).length) errors.push(`Missing homepage Colab entry: ${locale}/${track.name}`);
     }
   }
   const searchFiles = allFiles.filter((file) => relative(dist, file).startsWith(`pagefind${sep}`));
