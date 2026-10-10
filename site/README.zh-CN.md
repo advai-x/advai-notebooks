@@ -58,6 +58,8 @@ Astro 可能在后台启动预览服务。预览结束后，在 `site/` 执行
 `site/src/content/docs/`、`site/public/generated/` 与 `site/.content-manifest.json` 均为被忽略的生成产物，
 不要手工修改或提交。Astro 将 `src/assets/` 中的首页插图优化为响应式 WebP，Geist 字体也在本地托管。
 README 原头图保持不变，不发布本地数据、凭据、权重或训练输出。
+`BrandTitle.astro` 在首页与文档页统一展示选中的 Notebook 图形和可选择的文字字标。
+深浅主题素材及生成记录见 [src/assets/brand.zh-CN.md](src/assets/brand.zh-CN.md)。
 
 ## 启用 GitHub Pages
 

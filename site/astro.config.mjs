@@ -16,6 +16,11 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'advai-notebooks',
+      favicon: '/brand-mark.png',
+      head: [{
+        tag: 'link',
+        attrs: { rel: 'icon', type: 'image/png', href: `${BASE_PATH}/brand-mark-dark.png`, media: '(prefers-color-scheme: dark)' },
+      }],
       description: 'Practical, reproducible training guides for modern AI models.',
       defaultLocale: 'en',
       locales: {
@@ -26,6 +31,7 @@ export default defineConfig({
       customCss: ['./src/styles/custom.css'],
       components: {
         Header: './src/components/Header.astro',
+        SiteTitle: './src/components/BrandTitle.astro',
         Hero: './src/components/Hero.astro',
         MarkdownContent: './src/components/MarkdownContent.astro',
       },

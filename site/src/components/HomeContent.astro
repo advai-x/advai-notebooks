@@ -2,7 +2,7 @@
 import readme from '../../../README.md?raw';
 import { Code } from '@astrojs/starlight/components';
 import { extractSections, markdown } from '../../scripts/content.mjs';
-import { LOCALES, TRACKS, colabUrl, notebookPath, route } from '../../scripts/catalog.mjs';
+import { TRACKS, colabUrl, notebookPath, route } from '../../scripts/catalog.mjs';
 import { TRAINING_GROUPS, familyFor, notebookCount } from '../../scripts/landing.mjs';
 const locale = Astro.locals.starlightRoute.locale ?? 'en';
 const chinese = locale === 'zh-cn';
@@ -37,7 +37,7 @@ const resources = chinese ? [
     <dl aria-label={chinese ? '项目概览' : 'Project overview'}>
     <div><dt>{TRACKS.length.toString().padStart(2, '0')}</dt><dd>{chinese ? '训练路线' : 'Training tracks'}</dd></div>
     <div><dt>{notebookCount.toString().padStart(2, '0')}</dt><dd>{chinese ? '主线 Colab 教程' : 'Primary Colab guides'}</dd></div>
-    <div><dt>{LOCALES.length.toString().padStart(2, '0')}</dt><dd>{chinese ? '阅读语言' : 'Reading languages'}</dd></div>
+    <div><dt class="landing-fact-workflow"><span>Notebook</span>{' '}<span>+ CLI</span></dt><dd>{chinese ? '同一套训练实现' : 'Shared training code'}</dd></div>
     </dl>
     <p>{chinese ? '文档阅读、Notebook 交互与 CLI 实验，使用同一套训练实现。' : 'Read the docs, learn in notebooks, run the CLI. All share the same training implementation.'}</p>
   </div>

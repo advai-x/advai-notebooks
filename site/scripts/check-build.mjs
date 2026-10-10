@@ -3,6 +3,7 @@ import { relative, resolve, sep } from 'node:path';
 import { load } from 'cheerio';
 import { BASE_PATH, LOCALES, README_PAGES, SITE_ORIGIN, SOURCE_PAGES, TRACKS, colabUrl, notebookPath, route } from './catalog.mjs';
 import { SITE_ROOT } from './content.mjs';
+import { notebookCount } from './landing.mjs';
 
 const dist = resolve(SITE_ROOT, 'dist');
 
@@ -59,6 +60,16 @@ export async function checkBuild() {
       if (!$) { errors.push(`Missing language route: ${route(locale, slug)}`); continue; }
       const expectedLanguage = locale === 'en' ? 'en' : 'zh-CN';
       if ($('html').attr('lang') !== expectedLanguage) errors.push(`Wrong document language: ${route(locale, slug)}`);
+      const brand = $('a.brand-title');
+      if (brand.length !== 1 || brand.attr('aria-label') !== 'advai-notebooks' || brand.attr('href') !== route(locale, '')) {
+        errors.push(`Brand link is missing, inaccessible or uses the wrong locale: ${route(locale, slug)}`);
+      }
+      if (brand.find('.brand-name').text() !== 'advai-notebooks' || brand.find('img.brand-mark[alt=""][aria-hidden="true"]').length !== 2) {
+        errors.push(`Selected brand artwork or complete wordmark is missing: ${route(locale, slug)}`);
+      }
+      if (!$(`link[rel~="icon"][href="${BASE_PATH}/brand-mark.png"]`).length || !$(`link[rel~="icon"][href="${BASE_PATH}/brand-mark-dark.png"][media="(prefers-color-scheme: dark)"]`).length) {
+        errors.push(`Theme-aware brand favicons are missing: ${route(locale, slug)}`);
+      }
       const searchTranslations = JSON.parse($('site-search').attr('data-translations') ?? '{}');
       if (locale === 'zh-cn' && !searchTranslations.many_results?.includes('找到')) {
         errors.push(`Chinese search messages are missing: ${route(locale, slug)}`);
@@ -69,6 +80,11 @@ export async function checkBuild() {
     }
     const overview = parsed.get(resolve(dist, locale, 'training/index.html'));
     const home = parsed.get(resolve(dist, locale, 'index.html'));
+    const facts = home?.('.landing-facts dt').toArray().map((node) => home(node).text().replace(/\s+/g, ' ').trim());
+    const expectedFacts = [TRACKS.length.toString().padStart(2, '0'), notebookCount.toString().padStart(2, '0'), 'Notebook + CLI'];
+    if (JSON.stringify(facts) !== JSON.stringify(expectedFacts)) errors.push(`Homepage overview must show track/notebook counts and the shared workflow: ${locale}`);
+    const workflowLabel = locale === 'en' ? 'Shared training code' : '同一套训练实现';
+    if (home?.('.landing-facts dd').eq(2).text() !== workflowLabel) errors.push(`Homepage workflow label is not localized: ${locale}`);
     if (home?.('.training-tile').length !== TRACKS.length) errors.push(`Homepage training directory is incomplete: ${locale}`);
     if (home?.('.training-filters button[aria-pressed="true"]').length !== 1) errors.push(`Homepage filters have no unique initial selection: ${locale}`);
     if (!home?.('.landing-visual img[src$=".webp"]').length) errors.push(`Optimized homepage illustration is missing: ${locale}`);

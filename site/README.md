@@ -75,6 +75,9 @@ Generated files under `site/src/content/docs/`, `site/public/generated/` and
 The homepage illustration in `src/assets/` is optimized to responsive WebP assets
 by Astro. Geist fonts are served locally. The original README banner is unchanged;
 local datasets, credentials, checkpoints and training outputs are not deployed.
+The shared `BrandTitle.astro` component renders the selected notebook mark and a
+live-text wordmark on both home and reading pages. Light/dark assets and their
+generation provenance are documented in [src/assets/brand.md](src/assets/brand.md).
 
 ## Enable GitHub Pages
 

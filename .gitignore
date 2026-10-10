@@ -35,6 +35,9 @@ node_modules/
 /site/src/content/docs/
 /site/public/generated/
 /site/.content-manifest.json
+# Local visual QA reports reference ignored screenshots and machine-specific paths.
+/site/design-qa.md
+/site/design-qa.zh-CN.md
 
 # Local caches, logs and machine-specific configuration
 .cache/
