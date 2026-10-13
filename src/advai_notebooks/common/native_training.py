@@ -28,6 +28,7 @@ def environment():
         "safetensors",
         "PyYAML",
         "qwen-tts",
+        "silero-vad",
         "soundfile",
         "scipy",
         "librosa",

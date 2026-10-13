@@ -64,6 +64,7 @@ events.out.tfevents.*
 # Model artifacts
 *.ckpt
 *.onnx
+*.jit
 *.pt
 *.pth
 *.safetensors
@@ -95,6 +96,16 @@ data/**
 !data/sample/vm/README.md
 !data/sample/stt/README.md
 !data/sample/tts/README.md
+!data/sample/vad/README.md
+!data/sample/vad/samples.jsonl
+!data/sample/vad/audio/one.wav
+!data/sample/vad/audio/two.wav
+!data/sample/vad/audio/three.wav
+!data/sample/vad/audio/four.wav
+!data/sample/vad/audio/five.wav
+!data/sample/vad/audio/six.wav
+!data/sample/vad/audio/seven.wav
+!data/sample/vad/audio/eight.wav
 !data/sample/stt/samples.jsonl
 !data/sample/tts/samples.jsonl
 !data/sample/stt/audio/one.wav
@@ -169,5 +180,6 @@ outputs/**
 !outputs/vm/README.md
 !outputs/stt/README.md
 !outputs/tts/README.md
+!outputs/vad/README.md
 
 !outputs/diffusion/README.md

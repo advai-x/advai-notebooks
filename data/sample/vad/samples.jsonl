@@ -1,0 +1,8 @@
+{"id":"one","group_id":"source-one","split":"train","audio":"audio/one.wav","speech_segments":[{"start":0.32,"end":0.8},{"start":1.12,"end":1.6}]}
+{"id":"two","group_id":"source-two","split":"train","audio":"audio/two.wav","speech_segments":[{"start":0.32,"end":0.8},{"start":1.12,"end":1.6}]}
+{"id":"three","group_id":"source-three","split":"train","audio":"audio/three.wav","speech_segments":[]}
+{"id":"four","group_id":"source-four","split":"train","audio":"audio/four.wav","speech_segments":[{"start":0.32,"end":0.8},{"start":1.12,"end":1.6}]}
+{"id":"five","group_id":"source-five","split":"validation","audio":"audio/five.wav","speech_segments":[{"start":0.32,"end":0.8},{"start":1.12,"end":1.6}]}
+{"id":"six","group_id":"source-six","split":"validation","audio":"audio/six.wav","speech_segments":[]}
+{"id":"seven","group_id":"source-seven","split":"test","audio":"audio/seven.wav","speech_segments":[{"start":0.32,"end":0.8},{"start":1.12,"end":1.6}]}
+{"id":"eight","group_id":"source-eight","split":"test","audio":"audio/eight.wav","speech_segments":[{"start":0.32,"end":0.8},{"start":1.12,"end":1.6}]}

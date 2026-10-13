@@ -19,3 +19,7 @@ WAV fixtures; it refuses to overwrite different audio. These tones are not real 
 `build_speech_notebooks.py` scaffolds paired English/Chinese speech tutorials with
 nbformat. Existing notebooks require explicit `--replace`, which clears saved outputs;
 rerun `validate_notebooks.py --execute` after regenerating.
+
+`prepare_vad_fixtures.py` recreates eight named synthetic tone/noise clips without
+overwriting different audio. `build_vad_notebooks.py` creates the paired fine-tuning
+and offline detection/segmentation tutorials; `--replace` clears saved outputs.

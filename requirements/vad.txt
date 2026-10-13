@@ -1,0 +1,2 @@
+# Install from the repository root; VAD requires no Transformers dependency.
+-e .[vad,notebooks,dev,publish]

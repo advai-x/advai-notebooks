@@ -178,3 +178,6 @@ Whisper 包含原生权重、tokenizer 与特征提取配置；Qwen TTS 另外�
 speaker embedding，保留 Base 格式。白名单排除原录音与训练状态，但 embedding
 属于衍生生物特征，发布需要明确说话人授权。本次未上传 STT/TTS 模型或 Dataset。
 范围及第三方许可见 [STT](stt.zh-CN.md) 与 [TTS](tts.zh-CN.md)。
+
+[VAD](vad.zh-CN.md) 同样支持显式推理包发布。原生包包含 `silero_vad.jit`、
+校准后的后处理元数据及上游 MIT 声明，不包含录音、切片 manifest 或训练状态。

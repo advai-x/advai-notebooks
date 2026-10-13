@@ -6,6 +6,7 @@ Each task has an offline `smoke.yaml`. Larger model presets are templates: repla
 
 - [Diffusion](diffusion/README.md): full/LoRA and Stable Diffusion.
 - [STT](stt/README.md): native Whisper transcription and WER/CER.
+- [VAD](vad/README.md): Silero decoder fine-tuning and validation-only interval calibration.
 - [TTS](tts/README.md): Qwen3-TTS Base single-speaker training; separate speech environment.
 - [VLM](vlm/README.md): native LLaVA full/LoRA; fixed 7B Hub revision template.
 - [VLA](vla/README.md): CLIP continuous-action head; frozen/full encoder updates.

@@ -23,6 +23,7 @@ export const SOURCE_PAGES = [
   page('guides/rl', 'LLM PPO & GRPO', 'LLM PPO 与 GRPO', 'docs/rl.md', 'docs/rl.zh-CN.md'),
   page('guides/diffusion', 'Diffusion', 'Diffusion', 'docs/diffusion.md', 'docs/diffusion.zh-CN.md'),
   page('guides/stt', 'STT: speech-to-text', 'STT：语音转文字', 'docs/stt.md', 'docs/stt.zh-CN.md'),
+  page('guides/vad', 'VAD: voice-activity detection', 'VAD：语音活动检测', 'docs/vad.md', 'docs/vad.zh-CN.md'),
   page('guides/tts', 'TTS: text-to-speech', 'TTS：文字转语音', 'docs/tts.md', 'docs/tts.zh-CN.md'),
   page('guides/vlm', 'VLM: image question answering', 'VLM：图像问答', 'docs/vlm.md', 'docs/vlm.zh-CN.md'),
   page('guides/vla', 'VLA: action-training baseline', 'VLA：动作训练基线', 'docs/vla.md', 'docs/vla.zh-CN.md'),
@@ -81,6 +82,7 @@ export const TRACKS = [
   { name: 'VLA', guide: 'guides/vla', extra: 'vla', config: 'configs/vla/smoke.yaml', notebook: 'notebooks/vla/01_finetune.ipynb', description: { en: 'CLIP, language and state to continuous action chunks: a behavior-cloning baseline.', 'zh-cn': 'CLIP、语言与状态到连续动作 chunk 的行为克隆基线。' } },
   { name: 'VM / World Model', guide: 'guides/vm', extra: 'vm', config: 'configs/vm/smoke.yaml', notebook: 'notebooks/vm/01_finetune.ipynb', description: { en: 'Action-conditioned numerical dynamics and recursive rollouts, not video generation.', 'zh-cn': '动作条件数值动力学与递归 rollout，不是视频生成模型。' } },
   { name: 'STT', guide: 'guides/stt', extra: 'stt', config: 'configs/stt/smoke.yaml', notebook: 'notebooks/stt/01_finetune.ipynb', description: { en: 'Native Whisper supervised transcription, WER/CER and epoch recovery.', 'zh-cn': '原生 Whisper 监督转写、WER/CER 与 epoch 恢复。' } },
+  { name: 'VAD', guide: 'guides/vad', extra: 'vad', config: 'configs/vad/smoke.yaml', notebook: 'notebooks/vad/01_finetune.ipynb', description: { en: 'Silero decoder tuning, validation-only calibration and offline speech segmentation.', 'zh-cn': 'Silero decoder 微调、仅验证集校准与离线语音区间切分。' } },
   { name: 'TTS', guide: 'guides/tts', extra: 'tts', config: 'configs/tts/smoke.yaml', notebook: 'notebooks/tts/01_finetune.ipynb', description: { en: 'Qwen3-TTS Base single-speaker fine-tuning and non-streaming synthesis; synthetic offline smoke.', 'zh-cn': 'Qwen3-TTS Base 单说话人微调与非流式生成；提供合成离线 smoke。' } },
 ];
 

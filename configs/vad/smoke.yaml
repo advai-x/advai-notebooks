@@ -1,0 +1,21 @@
+output_dir: outputs/vad/smoke
+model:
+  id: tiny
+  sample_rate: 16000
+data:
+  samples: data/sample/vad/samples.jsonl
+  max_duration: 2.0
+training:
+  method: decoder
+  epochs: 2
+  batch_size: 2
+  learning_rate: 0.001
+  seed: 42
+runtime:
+  device: cpu
+  precision: fp32
+  num_threads: 1
+evaluation:
+  selection_metric: bce
+  calibrate: true
+  thresholds: [0.3, 0.4, 0.5, 0.6, 0.7]

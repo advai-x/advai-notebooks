@@ -55,6 +55,7 @@ Google Colab, then move the same configuration to a local machine or GPU environ
 | VLA | CLIP + language + state → continuous action chunks | Behavior-cloning baseline; frozen or full encoder updates | [Notebook](notebooks/vla/01_finetune.ipynb) · [Guide](docs/vla.md) · [Open in Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/vla/01_finetune.ipynb) |
 | VM | Action-conditioned numerical World Model | Residual dynamics, native checkpoint fine-tuning, recursive rollouts | [Notebook](notebooks/vm/01_finetune.ipynb) · [Guide](docs/vm.md) · [Open in Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/vm/01_finetune.ipynb) |
 | STT | Speech-to-text / ASR with native Whisper | Full supervised fine-tuning, WER/CER | [Notebook](notebooks/stt/01_finetune.ipynb) · [Guide](docs/stt.md) · [Open in Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/stt/01_finetune.ipynb) |
+| VAD | Speech intervals with Silero VAD | Frozen encoder, decoder fine-tuning, validation-only calibration | [Notebook](notebooks/vad/01_finetune.ipynb) · [Guide](docs/vad.md) · [Open in Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/vad/01_finetune.ipynb) |
 | TTS | Qwen3-TTS Base text-to-speech | Full single-speaker fine-tuning, non-streaming synthesis | [Notebook](notebooks/tts/01_finetune.ipynb) · [Guide](docs/tts.md) · [Open in Colab](https://colab.research.google.com/github/advai-x/advai-notebooks/blob/main/notebooks/tts/01_finetune.ipynb) |
 
 VLM, VLA and VM are independent model families alongside `llm/`. In this repository,
@@ -67,6 +68,11 @@ trainable baselines, not demonstrated robotics or planning capabilities.
 require a **separate environment** (Transformers 4.57.3, versus 5.18.0 in several
 other tracks). TTS smoke uses a synthetic GRU, not Qwen; native Qwen fine-tuning
 requires consented speech data and target-hardware validation. See the speech guides.
+
+`vad/` is a peer speech track for offline speech-interval detection and segmentation.
+It has no Transformers dependency. Its smoke backend is random, not pretrained
+Silero; the real backend tunes only the selected decoder. See the
+[detection and segmentation tutorial](notebooks/vad/02_detect_and_segment.ipynb).
 
 There is also an optional
 [retrieval comparison notebook](notebooks/workflows/01_retrieval_comparison.ipynb)
@@ -89,7 +95,7 @@ the repository in the Colab runtime:
 
 Replace `embedding` with the extra for your chosen track:
 `ranker`, `decision`, `llm-base`, `llm-instruct`, `llm-ppo`,
-`llm-grpo`, `diffusion`, `vlm`, `vla`, `vm`, `stt` or `tts`.
+`llm-grpo`, `diffusion`, `vlm`, `vla`, `vm`, `vad`, `stt` or `tts`.
 For STT/TTS, use a fresh speech runtime; do not mix incompatible task extras.
 
 For real training, keep datasets and checkpoints in persistent storage such as
@@ -119,7 +125,8 @@ under `outputs/`, which is ignored by Git.
 ## From smoke test to a real experiment
 
 1. Pick the closest guide and run its smoke configuration unchanged.
-2. Copy the corresponding `hf.yaml`, `bge.yaml` or `lora.yaml` configuration.
+2. Copy the track's real-model preset, such as `hf.yaml`, `bge.yaml`, `lora.yaml`,
+   `qwen3.yaml` or `silero.yaml`.
 3. Pin a model ID and revision, then point the config at your own grouped data splits.
 4. Validate the smoke config first. Model-aware validation of a real config loads its
    weights and may require the target hardware and memory budget.
@@ -159,7 +166,7 @@ package versions must still match the original run.
 - **Config-driven experiments.** Model IDs, data paths, runtime choices and
   hyperparameters live in versionable YAML files.
 - **Task isolation.** Embedding, ranker, decision, LLM, diffusion, VLM, VLA and VM own
-  their model-specific data, losses and metrics, as do STT and TTS.
+  their model-specific data, losses and metrics, as do VAD, STT and TTS.
 - **Leakage-aware validation.** The data loaders validate split boundaries, groups and
   task-specific label contracts.
 - **Reproducible artifacts.** Runs record configuration, environment, metrics,
@@ -191,6 +198,7 @@ python -m advai_notebooks.vlm run         --config configs/vlm/smoke.yaml
 python -m advai_notebooks.vla run         --config configs/vla/smoke.yaml
 python -m advai_notebooks.vm run          --config configs/vm/smoke.yaml
 python -m advai_notebooks.stt run         --config configs/stt/smoke.yaml
+python -m advai_notebooks.vad run         --config configs/vad/smoke.yaml
 python -m advai_notebooks.tts run         --config configs/tts/smoke.yaml
 ```
 
@@ -220,7 +228,7 @@ advai-notebooks/
 │   ├── vla/                    # Continuous-action behavior cloning
 │   ├── vm/                     # Numerical world dynamics
 │   ├── diffusion/
-│   ├── stt/ tts/                # Speech recognition and synthesis
+│   ├── vad/ stt/ tts/           # Speech detection, recognition and synthesis
 │   └── workflows/
 ├── configs/                    # Smoke, real-model and LoRA experiment presets
 ├── src/advai_notebooks/        # Reusable training and inference implementations
@@ -232,7 +240,7 @@ advai-notebooks/
 │   ├── vla/
 │   ├── vm/
 │   ├── diffusion/
-│   ├── stt/ tts/
+│   ├── vad/ stt/ tts/
 │   ├── data_preparation/
 │   ├── workflows/
 │   └── common/
@@ -263,6 +271,7 @@ the source of truth for guide content.
 - [VM / World Model guide](docs/vm.md)
 - [Diffusion guide](docs/diffusion.md)
 - [STT / Whisper guide](docs/stt.md)
+- [VAD / Silero guide](docs/vad.md)
 - [TTS / Qwen3-TTS guide](docs/tts.md)
 - [Hugging Face publication guide](docs/publishing.md)
 - [Retrieval data contract](data/sample/retrieval/README.md)

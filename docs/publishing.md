@@ -198,3 +198,7 @@ they retain the Base format. Whitelists exclude raw recordings and training stat
 but voice embeddings are derived biometric data and require explicit speaker
 permission to publish. No STT/TTS model or Dataset was uploaded by this implementation.
 See [STT](stt.md) and [TTS](tts.md) for scopes and third-party licensing requirements.
+
+[VAD](vad.md) also supports explicit inference-only publication. Native exports
+contain `silero_vad.jit`, calibrated postprocessing metadata and the upstream MIT
+license; raw recordings, chunk manifests and training state remain excluded.

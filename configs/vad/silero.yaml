@@ -1,0 +1,33 @@
+output_dir: outputs/vad/silero-16k
+model:
+  id: silero
+  revision: "6.2.3"
+  sha256: e1122837f4154c511485fe0b9c64455f7b929c96fbb8d79fbdb336383ebd3720
+  sample_rate: 16000
+  threshold: 0.5
+  exit_threshold: 0.35
+  min_speech_duration: 0.096
+  min_silence_duration: 0.16
+  speech_pad: 0.032
+  max_inference_duration: 300.0
+data:
+  samples: data/local/vad/samples.jsonl
+  min_duration: 0.032
+  max_duration: 30.0
+training:
+  method: decoder
+  epochs: 5
+  batch_size: 4
+  gradient_accumulation: 1
+  learning_rate: 0.0001
+  optimizer: adam
+  seed: 42
+runtime:
+  device: cpu
+  precision: fp32
+  num_threads: 1
+evaluation:
+  selection_metric: bce
+  calibrate: true
+  thresholds: [0.3, 0.4, 0.5, 0.6, 0.7]
+  hysteresis: 0.15

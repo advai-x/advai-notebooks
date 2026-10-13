@@ -93,5 +93,11 @@ tokenizer、特征提取器、生成配置与项目元数据，不依赖原始�
 `publish --export-dir ... --repo-id owner/model --dry-run` 预览白名单推理包，不包含
 训练状态或原始录音。发布前核对模型和数据权限；项目 MIT 不覆盖第三方模型与数据许可。
 
+## 可选 VAD 准备
+
+[VAD](vad.zh-CN.md) 可在 STT 推理前检测并切分长录音，保留源时间偏移，遵守 Whisper
+30 秒预算。检测不提供文字对齐；监督训练时不能给每个切片赋整段转录。
+VAD 仍是独立安装、独立训练的任务。
+
 参考：[Whisper 官方微调教程](https://huggingface.co/blog/fine-tune-whisper)、
 [模型文档](https://huggingface.co/docs/transformers/model_doc/whisper)。

@@ -12,6 +12,8 @@
 - [LLM Base](llm/base/01_finetune.zh-CN.ipynb) / [Instruct](llm/instruct/01_finetune.zh-CN.ipynb)：继续预训练与 assistant SFT。
 - [Diffusion](diffusion/01_finetune.zh-CN.ipynb)：Latent 文生图 full/LoRA。
 - [STT](stt/01_finetune.zh-CN.ipynb)：原生 Whisper、WER/CER、转写与恢复。
+- [VAD](vad/01_finetune.zh-CN.ipynb)：Silero decoder 微调、恢复与仅验证集校准；
+  另有[离线检测与切分](vad/02_detect_and_segment.zh-CN.ipynb)教程。
 - [TTS](tts/01_finetune.zh-CN.ipynb)：合成 smoke、Qwen3-TTS Base 指南、单说话人语音生成。
 - [VLM](vlm/01_finetune.zh-CN.ipynb)：原生 LLaVA 图片问答、full/LoRA、processor 重载。
 - [VLA](vla/01_finetune.zh-CN.ipynb)：CLIP + state 连续动作 chunk、episode mask 与物理单位。

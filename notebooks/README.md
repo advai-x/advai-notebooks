@@ -10,6 +10,8 @@ Core tutorials explain the same implementation used by the CLI. Each `01_finetun
 - [LLM Base](llm/base/01_finetune.ipynb) / [Instruct](llm/instruct/01_finetune.ipynb): continued pre-training and assistant SFT.
 - [Diffusion](diffusion/01_finetune.ipynb): latent text-to-image full/LoRA.
 - [STT](stt/01_finetune.ipynb): native Whisper, WER/CER, transcription and recovery.
+- [VAD](vad/01_finetune.ipynb): Silero decoder adaptation, recovery and validation-only calibration;
+  [offline detection and segmentation](vad/02_detect_and_segment.ipynb) is a companion tutorial.
 - [TTS](tts/01_finetune.ipynb): synthetic smoke; Qwen3-TTS Base guide, single-speaker synthesis.
 - [VLM](vlm/01_finetune.ipynb): native LLaVA image QA, full/LoRA and multimodal processor reload.
 - [VLA](vla/01_finetune.ipynb): CLIP + state continuous action chunks, episode masks and physical units.

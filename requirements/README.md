@@ -32,3 +32,7 @@ see [the RL guide](../docs/rl.md) for algorithm and checkpoint contracts.
 them with task extras pinning Transformers 5.18.0 / Accelerate 1.15.0. STT/TTS may
 be installed together with `python -m pip install -e '.[stt,tts,notebooks,dev]'`.
 Use matching PyTorch/torchaudio builds and record resolved versions with each run.
+
+`vad.txt` pins Silero VAD 6.2.3 and uses SoundFile/SciPy for audio I/O. VAD does not
+require Transformers or TorchAudio; install with `.[vad,notebooks,dev,publish]`,
+or add `vad` to an existing compatible speech environment.

@@ -2,9 +2,9 @@
 
 English | [简体中文](architecture.zh-CN.md)
 
-This project provides thirteen independent training/inference tracks: Embedding,
+This project provides fourteen independent training/inference tracks: Embedding,
 Ranker, Decision, LLM Base, LLM Instruct, LLM PPO, LLM GRPO, Diffusion, VLM, VLA
-VM, STT and TTS. Each owns its task-specific configuration, data validation, sampling,
+VM, VAD, STT and TTS. Each owns its task-specific configuration, data validation, sampling,
 objective, evaluation, model composition, export and CLI. Applications can deploy
 them separately or explicitly combine their outputs.
 
@@ -38,6 +38,7 @@ flowchart TB
         VLM[VLM: image QA]
         VLA[VLA: continuous action chunks]
         VM[VM: numerical state rollouts]
+        VAD[VAD: speech intervals]
         STT[STT: speech to text]
         TTS[TTS: text to speech]
     end
@@ -58,6 +59,8 @@ Objectives, metrics, selection and training assembly remain task-owned.
 - VLM/VLA/VM inject models, data, loss, evaluation and persistence into a neutral epoch executor.
 - STT/TTS use the same neutral executor, with independent audio preparation and objectives.
   They use a separate speech environment; see [STT](stt.md) and [TTS](tts.md).
+- VAD uses that executor for decoder-only adaptation, then fits its offline threshold policy
+  on validation intervals. It does not depend on Transformers; see [VAD](vad.md).
 
 Different trainers do not imply upstream/downstream model dependencies. A Base
 full/merged export can initialize Instruct, and an SFT full/merged export can
@@ -86,7 +89,7 @@ task Model.load → task inference method → task result
 or: export → explicit publish → pinned Hub snapshot → task Model.load
 ```
 
-Decision can fit temperatures; Embedding/Ranker currently have no fitted
+Decision can fit temperatures; VAD can calibrate offline thresholds; Embedding/Ranker have no fitted
 postprocessing. Merged adapter export is serialization, not fitted postprocessing.
 The proposed generic contracts are:
 
@@ -114,7 +117,7 @@ or shared encoder weights between tasks.
 
 ```text
 configs/
-  embedding/ ranker/ decision/ diffusion/ stt/ tts/
+  embedding/ ranker/ decision/ diffusion/ vad/ stt/ tts/
   llm/{base,instruct,ppo,grpo}/ vlm/ vla/ vm/
   data_preparation/ workflows/       # Optional preparation/composition
 src/advai_notebooks/
@@ -141,7 +144,7 @@ src/advai_notebooks/
     base/ instruct/ ppo/ grpo/       # Independent task modules
   diffusion/                        # Native pipeline plus task-owned denoising lifecycle
   vlm/ vla/ vm/                     # Independent multimodal/dynamics baselines
-  stt/ tts/                         # Independent Whisper / Qwen3-TTS adaptation
+  vad/ stt/ tts/                    # Independent Silero / Whisper / Qwen3-TTS adaptation
   data_preparation/ workflows/       # Optional composition layer
 notebooks/                          # Tutorials calling the same Python implementation
 tests/                              # Components, lifecycle and import isolation

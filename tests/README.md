@@ -24,3 +24,9 @@ boundaries. Native codec and pretrained GPU quality are not established by these
 CPU tests; boundary spies are explicitly labeled. Without the TTS extra, native
 Qwen tests skip rather than download weights. Execute both tutorial languages with
 `scripts/validate_notebooks.py` in a kernel with speech/notebooks extras installed.
+
+VAD has no Transformers dependency. Run `python -m pytest tests/test_vad.py -q`
+after installing `.[vad,dev,publish]`. Tests cover interval/audio contracts,
+duration-weighted metrics, offline calibration, exact resume, safe chunk offsets,
+actual bundled Silero decoder gradients and native JIT parity at 8/16 kHz.
+Native tests use synthetic input and do not establish real speech quality.

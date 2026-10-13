@@ -117,6 +117,13 @@ inference package. Training state and raw recordings are not included. Only publ
 after checking dataset/model permissions; the project's MIT license does not
 relicense pretrained weights or datasets.
 
+## Optional VAD preparation
+
+[VAD](vad.md) can detect and split long recordings before STT inference. Keep source
+offsets and respect Whisper's 30-second budget. Detection does not align transcripts:
+do not assign the full recording transcript to each chunk for supervised training.
+VAD remains a separately installed, independently trainable task.
+
 ## Backend references
 
 - [Hugging Face Whisper fine-tuning guide](https://huggingface.co/blog/fine-tune-whisper)
