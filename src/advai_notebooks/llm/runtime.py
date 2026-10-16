@@ -21,7 +21,7 @@ def environment(cfg, model):
         "seed": cfg.training.seed,
         "source_sha256": source_fingerprint(cfg.kind),
         "model_source": model.source,
-        "tiny_model": cfg.model.id == "tiny",
+        "tiny_model": cfg.model.id in {"tiny", "tiny-olmoe", "tiny-qwen3-moe"},
     }
 
 

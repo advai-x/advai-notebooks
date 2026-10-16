@@ -265,6 +265,7 @@ the source of truth for guide content.
 - [Ranker guide](notebooks/ranker/README.md)
 - [Decision-model guide](notebooks/decision/README.md)
 - [LLM base and instruct guide](docs/llm.md)
+- [Native MoE CPT/SFT: OLMoE & Qwen3-MoE](docs/llm-moe.md)
 - [PPO and GRPO guide](docs/rl.md)
 - [VLM fine-tuning guide](docs/vlm.md)
 - [VLA action-training guide](docs/vla.md)

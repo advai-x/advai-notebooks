@@ -12,12 +12,13 @@ from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 from advai_notebooks.common.artifacts import write_json
 from advai_notebooks.common.hub import resolve_export
 
+from . import moe
 from .configuration import GenerationSettings
 
 TINY_TEMPLATE = """{% for message in messages %}{{ '<|' + message['role'] + '|>\\n' }}{% if message['role'] == 'assistant' %}{% generation %}{{ message['content'] + '<|end|>\\n' }}{% endgeneration %}{% else %}{{ message['content'] + '<|end|>\\n' }}{% endif %}{% endfor %}{% if add_generation_prompt %}{{ '<|assistant|>\\n' }}{% endif %}"""
 
 
-def tiny_model():
+def tiny_model(family="llama"):
     """An offline random decoder and fixed tokenizer, never a domain-quality model."""
     from tokenizers import Tokenizer, models, pre_tokenizers
     from transformers import LlamaConfig, LlamaForCausalLM, PreTrainedTokenizerFast
@@ -56,10 +57,9 @@ def tiny_model():
         model_max_length=128,
         chat_template=TINY_TEMPLATE,
     )
-    config = LlamaConfig(
+    common = dict(
         vocab_size=len(tokenizer),
         hidden_size=32,
-        intermediate_size=64,
         num_hidden_layers=1,
         num_attention_heads=4,
         num_key_value_heads=2,
@@ -69,18 +69,53 @@ def tiny_model():
         eos_token_id=3,
         tie_word_embeddings=True,
     )
-    model = LlamaForCausalLM(config)
+    if family == "llama":
+        model = LlamaForCausalLM(LlamaConfig(intermediate_size=64, **common))
+    elif family == "olmoe":
+        from transformers import OlmoeConfig, OlmoeForCausalLM
+
+        model = OlmoeForCausalLM(
+            OlmoeConfig(
+                intermediate_size=48,
+                num_experts=4,
+                num_experts_per_tok=2,
+                output_router_logits=True,
+                **common,
+            )
+        )
+    elif family == "qwen3_moe":
+        from transformers import Qwen3MoeConfig, Qwen3MoeForCausalLM
+
+        model = Qwen3MoeForCausalLM(
+            Qwen3MoeConfig(
+                intermediate_size=64,
+                moe_intermediate_size=48,
+                head_dim=8,
+                num_experts=4,
+                num_experts_per_tok=2,
+                output_router_logits=True,
+                **common,
+            )
+        )
+    else:
+        raise ValueError("Unknown tiny architecture")
     model.generation_config.eos_token_id = [3, 7]
     return model, tokenizer
 
 
-def initialize(settings, training, root, device):
+def initialize(settings, training, root, device, *, supports_moe=False):
     local = Path(settings.id).expanduser()
     if not local.is_absolute():
         local = Path(root or ".") / local
-    if settings.id == "tiny":
-        model, tokenizer = tiny_model()
-        source = {"id": "tiny", "revision": None}
+    if settings.id in moe.TINY_IDS:
+        family = {"tiny": "llama", "tiny-olmoe": "olmoe", "tiny-qwen3-moe": "qwen3_moe"}[
+            settings.id
+        ]
+        model, tokenizer = tiny_model(family)
+        moe.check_architecture(model.config, settings, supports_moe=supports_moe)
+        moe.weight_budget(model.config, settings, device)
+        model.to(dtype=getattr(torch, settings.dtype))
+        source = {"id": settings.id, "revision": None}
     else:
         identifier = str(local.resolve()) if local.is_dir() else settings.id
         if local.is_dir() and (local / "adapter_config.json").is_file():
@@ -96,11 +131,21 @@ def initialize(settings, training, root, device):
         )
         if getattr(config, "quantization_config", None):
             raise ValueError("Quantized initial models are not supported in v1")
+        family = moe.check_architecture(config, settings, supports_moe=supports_moe)
+        if family:
+            if not local.is_dir() and (
+                not settings.revision
+                or len(settings.revision) != 40
+                or any(c not in "0123456789abcdef" for c in settings.revision)
+            ):
+                raise ValueError("MoE training requires an immutable model revision SHA")
+            moe.weight_budget(config, settings, device)
         model = AutoModelForCausalLM.from_pretrained(
             identifier,
             config=config,
             revision=settings.revision,
             trust_remote_code=False,
+            dtype=getattr(torch, settings.dtype),
         )
         if getattr(model, "_hf_peft_config_loaded", False) or hasattr(model, "peft_config"):
             raise ValueError("Training initialization requires a full or merged model")
@@ -114,6 +159,7 @@ def initialize(settings, training, root, device):
             "id": identifier,
             "revision": getattr(model.config, "_commit_hash", None) or settings.revision,
         }
+    moe.configure(model, training)
     if tokenizer.pad_token_id is None:
         if tokenizer.eos_token_id is None:
             raise ValueError("Tokenizer needs an EOS or padding token")
@@ -128,7 +174,9 @@ def initialize(settings, training, root, device):
     if training and training.method == "lora":
         from peft import LoraConfig, get_peft_model
 
-        if settings.id == "tiny" or local.is_dir():
+        moe.validate_adapter_targets(model, training)
+
+        if settings.id in moe.TINY_IDS or local.is_dir():
             temporary = TemporaryDirectory(prefix="advai-lora-base-")
             model.save_pretrained(temporary.name, safe_serialization=True)
             base = {"kind": "bundled", "path": temporary.name}
@@ -144,6 +192,7 @@ def initialize(settings, training, root, device):
                 lora_alpha=training.lora_alpha,
                 lora_dropout=training.lora_dropout,
                 target_modules=training.lora_target_modules,
+                target_parameters=training.lora_target_parameters,
                 bias="none",
             ),
         )
@@ -160,6 +209,7 @@ def load_native(path, kind, device, *, trainable=False, **hub_options):
     meta = json.loads((root / "advai_metadata.json").read_text())
     if meta.get("schema_version") != 1 or meta.get("kind") != kind:
         raise ValueError(f"Expected a {kind} inference export")
+    dtype = getattr(torch, meta["model"].get("dtype", "float32"))
     tokenizer = AutoTokenizer.from_pretrained(root, trust_remote_code=False, use_fast=True)
     base = meta.get("base_model")
     if meta["format"] == "adapter":
@@ -169,13 +219,16 @@ def load_native(path, kind, device, *, trainable=False, **hub_options):
             base_path = root / base["path"]
             if not base_path.resolve().is_relative_to(root.resolve()):
                 raise ValueError("Bundled base escapes export directory")
-            model = AutoModelForCausalLM.from_pretrained(base_path, trust_remote_code=False)
+            model = AutoModelForCausalLM.from_pretrained(
+                base_path, trust_remote_code=False, dtype=dtype
+            )
             base = {"kind": "bundled", "path": str(base_path)}
         elif base["kind"] == "hub":
             model = AutoModelForCausalLM.from_pretrained(
                 base["id"],
                 revision=base["revision"],
                 trust_remote_code=False,
+                dtype=dtype,
                 **{k: v for k, v in hub_options.items() if k != "revision"},
             )
         else:
@@ -188,9 +241,19 @@ def load_native(path, kind, device, *, trainable=False, **hub_options):
         if base["kind"] == "bundled":
             model.peft_config["default"].base_model_name_or_path = base["path"]
     elif meta["format"] == "full":
-        model = AutoModelForCausalLM.from_pretrained(root, trust_remote_code=False)
+        model = AutoModelForCausalLM.from_pretrained(root, trust_remote_code=False, dtype=dtype)
     else:
         raise ValueError("Unknown model export format")
+    if moe.model_type(model.config) and kind not in {"llm/base", "llm/instruct"}:
+        raise ValueError("MoE is not supported by RL tasks in v1")
+    if "moe" in meta:
+        # Hub adapter bases keep their upstream config; restore this experiment's
+        # coefficient/router policy from the adapter's own inference metadata.
+        model.config.router_aux_loss_coef = meta["moe"]["aux_loss_coef"]
+        model.config.advai_moe_train_router = meta["moe"]["router_trainable"]
+    moe.configure(model)
+    if meta["format"] == "full":
+        model._advai_loaded_checkpoint = str(root.resolve())
     model.to(device)
     return model, tokenizer, meta, base
 
@@ -248,6 +311,11 @@ def save_native(facade, path, kind, *, merged=False):
             "source": facade.source,
             "base_model": base,
             "generation": asdict(facade.generation),
+            **(
+                {"moe": moe.describe(model if merged else facade.model)}
+                if moe.model_type(facade.model.config)
+                else {}
+            ),
         },
     )
     return root
@@ -300,6 +368,8 @@ def generate(facade, prompts, *, max_new_tokens=None, **overrides):
         "eos_token_id": facade.model.generation_config.eos_token_id
         or facade.tokenizer.eos_token_id,
     }
+    if moe.model_type(facade.model.config):
+        kwargs["output_router_logits"] = False
     if settings.do_sample:
         kwargs.update(temperature=settings.temperature, top_p=settings.top_p)
     training = facade.model.training

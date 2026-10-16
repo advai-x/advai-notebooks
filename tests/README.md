@@ -30,3 +30,15 @@ after installing `.[vad,dev,publish]`. Tests cover interval/audio contracts,
 duration-weighted metrics, offline calibration, exact resume, safe chunk offsets,
 actual bundled Silero decoder gradients and native JIT parity at 8/16 kHz.
 Native tests use synthetic input and do not establish real speech quality.
+
+LLM Base/Instruct use the Transformers 5.18.0 environment, not the TTS environment:
+
+```bash
+python -m pip install -e '.[llm-base,llm-instruct,dev,publish]'
+python -m pytest tests/llm/test_finetuning.py tests/llm/test_moe.py -q
+```
+
+Native tiny OLMoE and Qwen3-MoE tests cover full/attention/expert LoRA, actual gradient
+groups, target-weighted routing loss, padding-aware expert counts, exact epoch recovery,
+frozen weights, dtype/policy preservation, native merge/reload and offline publication.
+No real pretrained weights or CUDA quality/fit claims are part of these CPU tests.

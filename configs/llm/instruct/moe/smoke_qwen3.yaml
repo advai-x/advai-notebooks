@@ -1,0 +1,30 @@
+model:
+  id: tiny-qwen3-moe
+  architecture: moe
+  dtype: float32
+  max_len: 128
+  max_weight_memory_gb: 0.01
+data:
+  samples: data/sample/llm/instruct.jsonl
+  reject_truncation: true
+training:
+  method: full
+  moe_train_router: true
+  moe_aux_loss_coef: 0.01
+  epochs: 2
+  batch_size: 2
+  gradient_accumulation: 2
+  learning_rate: 0.003
+  gradient_checkpointing: false
+  seed: 42
+runtime:
+  device: cpu
+  precision: fp32
+  num_threads: 1
+evaluation:
+  selection_metric: nll
+  generation_metrics: []
+generation:
+  max_new_tokens: 8
+  do_sample: false
+output_dir: outputs/llm/instruct/moe-smoke-qwen3

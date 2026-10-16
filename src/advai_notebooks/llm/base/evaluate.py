@@ -3,6 +3,7 @@
 import torch
 
 from advai_notebooks.common.runtime import amp_context
+from advai_notebooks.llm.moe import RoutingAccumulator
 
 from .data import collator
 from .losses import statistics
@@ -14,6 +15,7 @@ def evaluate(model, prepared, cfg, split="test", raw_rows=None, generate_metrics
     if not rows:
         raise ValueError("Evaluation split is empty")
     total, tokens = 0.0, 0
+    routing = RoutingAccumulator(model.model.config)
     training = model.model.training
     model.model.eval()
     pad = collator(model.tokenizer)
@@ -30,9 +32,12 @@ def evaluate(model, prepared, cfg, split="test", raw_rows=None, generate_metrics
                     loss, count = statistics(output.logits, labels)
                 total += float(loss)
                 tokens += int(count)
+                routing.update(output, batch["attention_mask"], count)
     finally:
         model.model.train(training)
     result = report(total, tokens, len(rows))
     result["split"] = split
+    if routing.enabled:
+        result["moe"] = routing.report()
 
     return result

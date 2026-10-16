@@ -8,3 +8,7 @@ Instruct requires a fast tokenizer and an aligned chat template. Complex templat
 whose earlier turns change when more messages are appended need explicit generation blocks.
 Models/hardware are configurable; real-model and CUDA/MPS training require validation
 in the target environment. QLoRA, packing, multi-device and preference training are not implemented.
+
+`moe/` adds native OLMoE / Qwen3-MoE smoke and pinned real-model presets.
+See [MoE configuration and memory limits](../../../docs/llm-moe.md).
+The existing task's data/objective stay unchanged; MoE is not a separate task.

@@ -18,7 +18,7 @@ class BaseModel:
         self.device = torch.device(device)
         self.generation = generation or GenerationSettings()
         self.model, self.tokenizer, self.source, self.base_source, self._temporary = (
-            native.initialize(self.settings, training, root, self.device)
+            native.initialize(self.settings, training, root, self.device, supports_moe=True)
         )
         self._components()
 

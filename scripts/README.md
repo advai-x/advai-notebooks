@@ -23,3 +23,8 @@ rerun `validate_notebooks.py --execute` after regenerating.
 `prepare_vad_fixtures.py` recreates eight named synthetic tone/noise clips without
 overwriting different audio. `build_vad_notebooks.py` creates the paired fine-tuning
 and offline detection/segmentation tutorials; `--replace` clears saved outputs.
+
+`build_moe_notebooks.py` creates paired Base CPT / Instruct SFT native MoE tutorials,
+including router diagnostics, expert LoRA, epoch recovery and native merge checks.
+It refuses existing notebooks unless `--replace` is explicit; re-execute both languages
+with `validate_notebooks.py` after regeneration.

@@ -120,6 +120,8 @@ flowchart TB
 四个 LLM 任务另复用 `llm/` 下的 SDK、运行参数、配置校验与文件读取工具，损失、指标、选模和训练组装归各任务。
 当前 Decision 使用自己的训练循环，Embedding/Ranker 使用共享检索训练循环；
 Base/Instruct 各自组装 Transformers Trainer，PPO/GRPO 各自实现在线 RL 训练循环，Diffusion 自己实现去噪训练循环。训练器差异不意味着模型任务存在上下游关系。
+Base/Instruct 的 [MoE 架构扩展](llm-moe.zh-CN.md) 只共享原生加载、adapter 目标和诊断，
+CPT/SFT 监督与 Trainer 组装仍归各自任务所有，不增加独立 MoE 任务。
 VLM/VLA/VM 各自注入模型、数据、loss、评估和持久化，复用中立的 epoch 执行机制。
 Base full/merged 导出可作为 Instruct 的初始模型，SFT full/merged 导出可作为 PPO/GRPO 的初始模型；这些都是可选的产物衔接，不是模块依赖。
 

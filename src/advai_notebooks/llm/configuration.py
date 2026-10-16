@@ -21,6 +21,9 @@ class ModelSettings:
     revision: str | None = None
     max_len: int = 128
     chat_template: str | None = None
+    architecture: str = "auto"
+    dtype: str = "float32"
+    max_weight_memory_gb: float | None = None
 
 
 @dataclass
@@ -32,6 +35,9 @@ class TrainingSettings(RuntimeTrainingConfig):
     lora_alpha: int = 16
     lora_dropout: float = 0.0
     lora_target_modules: list[str] | None = None
+    lora_target_parameters: list[str] | None = None
+    moe_aux_loss_coef: float | None = None
+    moe_train_router: bool | None = None
 
 
 @dataclass
@@ -86,6 +92,21 @@ def load_settings(path, kind, sections, cls, root=None, *, validator=None):
 
 
 def validate(cfg, *, selection_metric="nll"):
+    if cfg.model.architecture not in {"auto", "dense", "moe"}:
+        raise ValueError("architecture must be auto, dense or moe")
+    if cfg.model.dtype not in {"float32", "bfloat16", "float16"}:
+        raise ValueError("dtype must be float32, bfloat16 or float16")
+    if cfg.model.max_weight_memory_gb is not None:
+        positive_number("max_weight_memory_gb", cfg.model.max_weight_memory_gb)
+    if cfg.training.moe_aux_loss_coef is not None:
+        positive_number("moe_aux_loss_coef", cfg.training.moe_aux_loss_coef, True)
+    if (
+        cfg.training.moe_train_router is not None
+        and type(cfg.training.moe_train_router) is not bool
+    ):
+        raise ValueError("moe_train_router must be boolean or null")
+    if cfg.training.method == "lora" and cfg.training.moe_train_router is True:
+        raise ValueError("MoE LoRA freezes the router in v1; use full to train the router")
     for name, value in (
         ("model.id", cfg.model.id),
         ("output_dir", cfg.output_dir),
@@ -134,10 +155,18 @@ def validate(cfg, *, selection_metric="nll"):
     positive_number("lora_dropout", cfg.training.lora_dropout, True)
     if cfg.training.lora_dropout >= 1:
         raise ValueError("lora_dropout must be in [0, 1)")
+    parameters = cfg.training.lora_target_parameters
+    if parameters is not None and (
+        not isinstance(parameters, list)
+        or not parameters
+        or any(not isinstance(p, str) or not p.strip() for p in parameters)
+        or len(set(parameters)) != len(parameters)
+    ):
+        raise ValueError("lora_target_parameters must be distinct nonempty parameter names")
     modules = cfg.training.lora_target_modules
     if modules is not None and (
         not isinstance(modules, list)
-        or not modules
+        or (not modules and not parameters)
         or any(not isinstance(m, str) or not m.strip() for m in modules)
         or len(set(modules)) != len(modules)
     ):

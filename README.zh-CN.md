@@ -190,6 +190,7 @@ advai-notebooks/
 - [架构与扩展边界](docs/architecture.zh-CN.md)
 - [Demo 数据与 Hugging Face Dataset](docs/datasets.zh-CN.md)
 - [LLM Base / Instruct](docs/llm.zh-CN.md)
+- [原生 MoE CPT/SFT：OLMoE 与 Qwen3-MoE](docs/llm-moe.zh-CN.md)
 - [PPO / GRPO](docs/rl.zh-CN.md)
 - [VLM](docs/vlm.zh-CN.md)、[VLA](docs/vla.zh-CN.md)、[VM / World Model](docs/vm.zh-CN.md)
 - [Diffusion](docs/diffusion.zh-CN.md)

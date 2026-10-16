@@ -11,6 +11,7 @@ from advai_notebooks.common.cli import (
     read_inputs,
 )
 from advai_notebooks.common.runtime import resolve_device, setup
+from advai_notebooks.llm.moe import describe
 
 from .config import load_config
 from .data import load_data, prepare_data
@@ -60,7 +61,7 @@ def main(argv=None):
     else:
         rows, summary = load_data(cfg)
         if args.command == "validate":
-            model = InstructModel(cfg.model, setup(cfg), cfg.root, generation=cfg.generation)
+            model = InstructModel(cfg.model, setup(cfg), cfg.root, cfg.training, cfg.generation)
             prepared = prepare_data(rows, model, cfg)
             result = {
                 "kind": cfg.kind,
@@ -71,6 +72,8 @@ def main(argv=None):
                     for name, values in prepared.items()
                 },
             }
+            if describe(model.model):
+                result["moe"] = describe(model.model)
         else:
             from .evaluate import evaluate
 

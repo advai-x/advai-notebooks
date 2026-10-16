@@ -13,3 +13,9 @@ python -m advai_notebooks.llm.base run --config configs/llm/base/smoke.yaml
 
 Select `lora.yaml` for an adapter experiment. See [the LLM guide](../../../docs/llm.md)
 for data schemas, resume, full/adapter/merged formats and Hugging Face publication.
+
+[02_moe_finetune.ipynb](02_moe_finetune.ipynb) and its
+[Chinese version](02_moe_finetune.zh-CN.ipynb) add native OLMoE / Qwen3-MoE,
+full and expert-parameter LoRA, routing diagnostics and epoch recovery.
+See the [MoE guide](../../../docs/llm-moe.md); real GPU presets are templates,
+not pretrained-model training results or free-Colab fit guarantees.

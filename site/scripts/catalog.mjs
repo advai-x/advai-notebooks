@@ -20,6 +20,7 @@ export const SOURCE_PAGES = [
   page('guides/ranker', 'Ranker fine-tuning', 'Ranker 微调', 'notebooks/ranker/README.md'),
   page('guides/decision', 'Decision-model fine-tuning', 'Decision 模型微调', 'notebooks/decision/README.md'),
   page('guides/llm', 'LLM Base & Instruct', 'LLM Base 与 Instruct', 'docs/llm.md', 'docs/llm.zh-CN.md'),
+  page('guides/llm-moe', 'LLM MoE: CPT & SFT', 'LLM MoE：CPT 与 SFT', 'docs/llm-moe.md', 'docs/llm-moe.zh-CN.md'),
   page('guides/rl', 'LLM PPO & GRPO', 'LLM PPO 与 GRPO', 'docs/rl.md', 'docs/rl.zh-CN.md'),
   page('guides/diffusion', 'Diffusion', 'Diffusion', 'docs/diffusion.md', 'docs/diffusion.zh-CN.md'),
   page('guides/stt', 'STT: speech-to-text', 'STT：语音转文字', 'docs/stt.md', 'docs/stt.zh-CN.md'),

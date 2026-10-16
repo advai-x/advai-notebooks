@@ -52,7 +52,7 @@ Pin the publication commit SHA for reproducible deployment.
 Raw training data, optimizer state and training checkpoints are excluded.
 Document domain data, training configuration and evaluation in a custom English card.
 """.replace("REPO_ID", repr(repo_id)).replace("FORMAT", metadata["format"])
-    if metadata["source"]["id"] == "tiny":
+    if metadata["source"]["id"] in {"tiny", "tiny-olmoe", "tiny-qwen3-moe"}:
         body += "\nRandom tiny decoder / synthetic smoke artifact; no domain-quality claim.\n"
     report_path = root.parent / "report.json"
     if report_path.is_file():

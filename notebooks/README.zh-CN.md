@@ -10,6 +10,8 @@
 - [Ranker](ranker/01_finetune.zh-CN.ipynb)：BCE 与独立排序评估。
 - [Decision](decision/01_finetune.zh-CN.ipynb)：原生 encoder、选项评分和校准。
 - [LLM Base](llm/base/01_finetune.zh-CN.ipynb) / [Instruct](llm/instruct/01_finetune.zh-CN.ipynb)：继续预训练与 assistant SFT。
+  原生 MoE 补充教程：[Base CPT](llm/base/02_moe_finetune.zh-CN.ipynb) /
+  [Instruct SFT](llm/instruct/02_moe_finetune.zh-CN.ipynb)，含 expert LoRA 与路由诊断。
 - [Diffusion](diffusion/01_finetune.zh-CN.ipynb)：Latent 文生图 full/LoRA。
 - [STT](stt/01_finetune.zh-CN.ipynb)：原生 Whisper、WER/CER、转写与恢复。
 - [VAD](vad/01_finetune.zh-CN.ipynb)：Silero decoder 微调、恢复与仅验证集校准；

@@ -1,11 +1,13 @@
 """Base-owned Trainer assembly, validation selection and complete checkpoints."""
 
 import copy
+from functools import partial
 
 from transformers import Trainer, TrainerCallback
 from transformers.trainer_callback import PrinterCallback
 
 from advai_notebooks.common.artifacts import write_json
+from advai_notebooks.llm.moe import GradientAudit, NativeCheckpointTrainer, coefficient, describe
 from advai_notebooks.llm.runtime import trainer_arguments
 
 from .data import collator
@@ -68,18 +70,26 @@ def train_model(
             "history": [],
         }
     )
+    inventory = describe(model.model)
+    audits = []
+    loss_function = loss
+    if inventory:
+        record.setdefault("moe_model", inventory)
+        audits = [GradientAudit(record)]
+        loss_function = partial(loss, aux_loss_coef=coefficient(model.model))
     if record["last_epoch"] >= cfg.training.epochs:
         return record
     model.model.config.use_cache = False
-    trainer = Trainer(
+    trainer_class = NativeCheckpointTrainer if inventory else Trainer
+    trainer = trainer_class(
         model=model.model,
         args=trainer_arguments(cfg, model.device),
         train_dataset=training_rows(prepared),
         data_collator=collator(model.tokenizer),
         processing_class=model.tokenizer,
-        compute_loss_func=loss,
+        compute_loss_func=loss_function,
         optimizers=(optimizer(model, cfg.training), None),
-        callbacks=[SelectionCallback(model, prepared, cfg, record), *callbacks],
+        callbacks=[*audits, SelectionCallback(model, prepared, cfg, record), *callbacks],
     )
     trainer.remove_callback(PrinterCallback)
     # PEFT wrappers also need causal (shifted) target counts for accumulation.

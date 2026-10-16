@@ -23,6 +23,10 @@ data; it is not a completed domain-quality experiment. Installing either task ex
 alone is sufficient for that task. Verified SDK versions are Transformers 5.18.0,
 PEFT 0.18.1 and Accelerate 1.15.0.
 
+For native OLMoE / Qwen3-MoE CPT and SFT, see the [MoE guide](llm-moe.md)
+and companion Base/Instruct notebooks. MoE is an architecture within these tasks,
+not a separate task; dense configurations remain unchanged.
+
 ## Data contracts
 
 Base JSONL:

@@ -1,0 +1,37 @@
+model:
+  id: Qwen/Qwen3-30B-A3B
+  architecture: moe
+  dtype: bfloat16
+  max_len: 1024
+  max_weight_memory_gb: 80
+  revision: ad44e777bcd18fa416d9da3bd8f70d33ebb85d39
+  # Text-only non-thinking format; preserves Qwen's role and end-of-turn tokens.
+  chat_template: |-
+    {%- for message in messages %}{{ '<|im_start|>' + message['role'] + '\n' }}{% if message['role'] == 'assistant' %}{{ '<think>\n\n</think>\n\n' }}{% generation %}{{ message['content'] + '<|im_end|>\n' }}{% endgeneration %}{% else %}{{ message['content'] + '<|im_end|>\n' }}{% endif %}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n<think>\n\n</think>\n\n' }}{% endif %}
+data:
+  samples: data/local/llm/instruct.jsonl
+  reject_truncation: true
+training:
+  method: lora
+  moe_train_router: false
+  moe_aux_loss_coef: 0.01
+  epochs: 2
+  batch_size: 1
+  gradient_accumulation: 8
+  learning_rate: 0.0001
+  gradient_checkpointing: true
+  seed: 42
+  lora_rank: 4
+  lora_alpha: 8
+  lora_target_modules: [q_proj, v_proj]
+runtime:
+  device: cuda
+  precision: bf16
+  num_threads: 1
+evaluation:
+  selection_metric: nll
+  generation_metrics: []
+generation:
+  max_new_tokens: 128
+  do_sample: false
+output_dir: outputs/llm/instruct/moe-qwen3-lora

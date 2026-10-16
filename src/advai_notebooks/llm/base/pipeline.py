@@ -21,7 +21,7 @@ def run(cfg, resume=None, *, callbacks=()):
         raise ValueError("Output directory is not empty; choose a new output_dir or resume")
     resume_path, state = resume_checkpoint(output, resume) if resume else (None, None)
     model = (
-        BaseModel.load(output / "baseline", device, trainable=True)
+        BaseModel.load(resume_path, device, trainable=True)
         if resume
         else BaseModel(cfg.model, device, cfg.root, cfg.training, cfg.generation)
     )

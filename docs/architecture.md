@@ -55,6 +55,8 @@ Objectives, metrics, selection and training assembly remain task-owned.
 - Embedding/Ranker share a neutral retrieval optimizer loop.
 - Decision owns its training loop.
 - Base/Instruct separately assemble Transformers Trainer.
+- Their [MoE architecture extension](llm-moe.md) shares only native sparse loading,
+  adapter targeting and diagnostics; CPT/SFT supervision and Trainer assembly remain task-owned.
 - PPO/GRPO own online RL loops; Diffusion owns its denoising loop.
 - VLM/VLA/VM inject models, data, loss, evaluation and persistence into a neutral epoch executor.
 - STT/TTS use the same neutral executor, with independent audio preparation and objectives.

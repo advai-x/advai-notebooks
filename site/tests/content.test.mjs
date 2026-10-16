@@ -47,6 +47,19 @@ test('unpublished targets use GitHub and preserve translated notebooks', () => {
   assert.equal(resolveLink('https://example.com/model?a=1', 'docs/llm.md', 'en'), 'https://example.com/model?a=1');
 });
 
+test('MoE is a bilingual architecture guide with companion notebooks, not another task', async () => {
+  const guide = SOURCE_PAGES.find((page) => page.slug === 'guides/llm-moe');
+  assert.deepEqual(Object.keys(guide.sources).sort(), ['en', 'zh-cn']);
+  assert.ok(!TRACKS.some((track) => track.guide === 'guides/llm-moe'));
+  for (const locale of LOCALES) {
+    const source = guide.sources[locale];
+    const text = await readFile(resolve(REPO_ROOT, source), 'utf8');
+    const output = rewriteMarkdown(text, source, locale);
+    assert.match(output, /02_moe_finetune/);
+    assert.equal(resolveLink('llm-moe.md', 'docs/llm.md', locale), route(locale, 'guides/llm-moe'));
+  }
+});
+
 test('missing targets and paths escaping the repository fail loudly', () => {
   assert.throws(() => resolveLink('missing.md', 'docs/llm.md', 'en'), /Missing repository target/);
   assert.throws(() => resolveLink('../../../../.env', 'docs/llm.md', 'en'), /escapes the repository/);

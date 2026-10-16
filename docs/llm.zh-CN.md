@@ -21,6 +21,9 @@ python -m advai_notebooks.llm.instruct run --config configs/llm/instruct/smoke.y
 单独安装任一任务 extra 足以运行该任务。已验证的 SDK 版本是 Transformers 5.18.0、
 PEFT 0.18.1、Accelerate 1.15.0。
 
+原生 OLMoE / Qwen3-MoE 的 CPT/SFT 见 [MoE 指南](llm-moe.zh-CN.md) 与配套双语 Notebook。
+MoE 是这两个任务内的架构，不是新增任务；原有 dense 配置不变。
+
 ## 数据契约
 
 Base JSONL：
